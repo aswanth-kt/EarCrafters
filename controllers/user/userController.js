@@ -1,7 +1,4 @@
 
-
-
-
 const loadHomepage = async (req, res) => {
     try {
 
@@ -21,7 +18,7 @@ const pageNotFound = async (req, res) => {
         res.status(404).render("page-404");
         
     } catch (error) {
-
+        res.redirect("/pageNoteFound")
         res.status(404).send("400 page Not Found");
     }
 }
