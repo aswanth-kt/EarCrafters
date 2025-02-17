@@ -15,17 +15,20 @@ const userSchema = new Schema ({
     phone : {
         type : String,
         required : false,
-        unique : false,
-        sparse : true,
-        default : null
+        // unique : false,
+        // sparse : true,
+        // default : null
     },
-    googleId : {
-        type : String,
-        unique : true
-    },
+    googleId: { 
+        type: String, 
+        sparse: true, 
+        unique: false,  //true
+        // default : undefined,
+        required : false
+      },
     password : {
         type : String,
-        required : false
+        required : true
     },
     isBlock : {
         type : Boolean,
@@ -35,15 +38,19 @@ const userSchema = new Schema ({
         type : Boolean,
         default : false
     },
-    cart : [{
-        type : Schema.Types.ObjectId,
-        ref : "Cart",
-    }],
-    wallet : [{
-        type : Schema.Types.ObjectId,
-        ref : "Wishlist"
-    }],
-    oederHistory : {
+    cart : [
+        {
+            type : Schema.Types.ObjectId,
+            ref : "Cart",
+        }
+    ],
+    wallet : [
+        {
+            type : Schema.Types.ObjectId,
+            ref : "Wishlist"
+        }
+    ],
+    orderHistory : {
         type : Schema.Types.ObjectId,
         ref : "Order"
     },
@@ -51,29 +58,35 @@ const userSchema = new Schema ({
         type : Date,
         default : Date.now
     },
-    referalCode : {
-        type : String
+    referralCode : {
+        type : String,
+        // required : true
     },
     redeemed : {
-        type : Boolean
+        type : Boolean,
+        // default : false
     },
     redeemedUsers : {
         type : Schema.Types.ObjectId,
-        ref : "User"
+        ref : "User",
+        // required : true
     },
-    searchHistory : [{
-        category : {
-            type : Schema.Types.ObjectId,
-            ref : "Category"
-        },
-        brand : {
-            type : String
-        },
-        dearchOn : {
-            type : Date,
-            default : Date.now
+    searchHistory : [
+        {
+            category : {
+                type : Schema.Types.ObjectId,
+                ref : "Category"
+            },
+            brand : {
+                type : String,
+                ref : "Category"
+            },
+            searchedOn : {
+                type : Date,
+                default : Date.now
+            }
         }
-    }]
+    ]
 });
 
 
