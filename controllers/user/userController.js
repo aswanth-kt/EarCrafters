@@ -2,6 +2,7 @@
 const User = require('../../models/userSchema');
 const nodemailer = require('nodemailer');
 const dotenv = require('dotenv').config();
+const bcrypt = require('bcrypt');
 
 
 
@@ -30,6 +31,8 @@ const pageNotFound = async (req, res) => {
 }
 
 
+
+// Load signup page
 const loadSignup = async (req, res) => {
     try {
         
@@ -49,6 +52,8 @@ function generateOtp() {
 }
 
 
+
+// For send a email
 async function sendVerificationEmail(email, otp) {
     try {
         
@@ -87,7 +92,7 @@ async function sendVerificationEmail(email, otp) {
 const signup = async (req, res) => {
     try {
         
-        const {email, password, cPassword} = req.body;
+        const {name, phone, email, password, cPassword} = req.body;
 
         // Check oassword is match
         if (password !== cPassword) {
@@ -108,10 +113,13 @@ const signup = async (req, res) => {
             return res.json("email-error");
         }
 
+        // Add data to session
         req.session.userOtp = otp;   // OTP store in to session for verification
-        req.session.userData = {email, password};
+        req.session.userData = {name, phone, email, password};
 
-        // res.render("Verify-otp");
+        
+
+        res.render("verify-otp", {message : req.session.userData.email});
         console.log("OTP Send : ", otp);
 
     } catch (error) {
@@ -119,8 +127,65 @@ const signup = async (req, res) => {
         res.redirect("/pageNotFound");
         
     }
+};
+
+
+
+// Convert to Has Password
+const securePassword = async (password) => {
+    try {
+        
+        const passwordHash = await bcrypt.hash(password, 10);
+        return passwordHash;
+
+    } catch (error) {
+
+        console.log("Error at Hash Password ", error);
+        
+    }
 }
 
+
+
+const verifyOtp = async (req, res) => {
+    try {
+        
+        const {otp} = req.body;
+        console.log(otp);
+
+        // Check user input otp and session otp
+        if (otp === req.session.userOtp) {
+            const user = req.session.userData;
+            const passwordHash = await securePassword(user.password);
+
+            // Create a new user
+            const saveUserData = new User({
+                name : user.name,
+                email : user.email,
+                phone : user.phone,
+                password : passwordHash
+            })
+
+            await saveUserData.save();      // Save user data to DB
+
+            req.session.user_id = saveUserData._id;    //Store user id for authorization
+
+            // Clear OTP and user data from session
+            // delete req.session.userOtp;
+            // delete req.session.userData;
+
+            res.json({success : true, redirectUrl : "/"});
+        } else {
+            res.status(400).json({success : false, message : "Invalid OTP, Please try again"});
+        }
+
+    } catch (error) {
+        
+        console.error("Error verifying OTP ", error);
+        res.status(500).json({success : false, message : "An error occured"});
+        
+    }
+}
 
 
 
@@ -130,4 +195,5 @@ module.exports = {
     pageNotFound,
     loadSignup,
     signup,
-}
+    verifyOtp,
+};

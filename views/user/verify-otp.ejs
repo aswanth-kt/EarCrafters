@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+        }
+
+        .verify-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .icon-section {
+            margin-bottom: 24px;
+        }
+
+        .icon-section svg {
+            width: 64px;
+            height: 64px;
+            color: #4299e1;
+        }
+
+        h1 {
+            color: #2d3748;
+            font-size: 24px;
+            margin-bottom: 12px;
+        }
+
+        .email-sent {
+            color: #718096;
+            margin-bottom: 32px;
+            font-size: 15px;
+        }
+
+        .otp-inputs {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+
+        .otp-inputs input {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 24px;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .otp-inputs input:focus {
+            outline: none;
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+        }
+
+        .timer {
+            color: #718096;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+
+        .verify-button {
+            background-color: #4299e1;
+            color: white;
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-bottom: 20px;
+        }
+
+        .verify-button:hover {
+            background-color: #3182ce;
+        }
+
+        .verify-button:disabled {
+            background-color: #cbd5e0;
+            cursor: not-allowed;
+        }
+
+        .resend-link {
+            color: #4299e1;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .resend-link:hover {
+            color: #3182ce;
+        }
+
+        .resend-link.disabled {
+            color: #cbd5e0;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #718096;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .back-link:hover {
+            color: #4a5568;
+        }
+    </style>
+</head>
+<body>
+    <div class="verify-container">
+        <div class="icon-section">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+        </div>
+
+        <h1>Email Verification</h1>
+        <p class="email-sent">We've sent a verification code to<br><strong> <%= message %> </strong></p>
+        <form action="/verify-otp" method="post" onsubmit="return validateOTPForm()">
+
+            <div class="otp-inputs">
+                    <input id="otp1" type="text" maxlength="1" autofocus>
+                    <input id="otp2" type="text" maxlength="1">
+                    <input id="otp3" type="text" maxlength="1">
+                    <input id="otp4" type="text" maxlength="1">
+                    <input id="otp5" type="text" maxlength="1">
+                    <input id="otp6" type="text" maxlength="1">
+                
+            </div>
+
+            <div class="timer" id="timer">Time remaining: 60s</div>
+
+            <button type="submit" class="verify-button" id="verifyButton">Verify Email</button>
+
+        </form>
+        
+        <a href="#" class="resend-link" id="resendLink">Resend Code</a>
+        <br>
+        <a href="#" class="back-link">← Back to Login</a>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        // Timer functionality
+        let timeLeft = 60;
+        const timerDisplay = document.getElementById('timer');
+        const resendLink = document.getElementById('resendLink');
+        
+        resendLink.classList.add('disabled');
+
+        const timer = setInterval(() => {
+            timeLeft--;
+            timerDisplay.textContent = `Time remaining: ${timeLeft}s`;
+            
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                timerDisplay.textContent = 'Time expired';
+                resendLink.classList.remove('disabled');
+            }
+        }, 1000);
+
+        // OTP input functionality
+        const inputs = document.querySelectorAll('.otp-inputs input');
+        const verifyButton = document.getElementById('verifyButton');
+
+        inputs.forEach((input, index) => {
+            input.addEventListener('input', (e) => {
+                if (e.target.value !== '') {
+                    // Move to next input
+                    if (index < inputs.length - 1) {
+                        inputs[index + 1].focus();
+                    }
+                }
+            });
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && input.value === '') {
+                    // Move to previous input
+                    if (index > 0) {
+                        inputs[index - 1].focus();
+                    }
+                }
+            });
+        });
+
+        // Resend link functionality
+        resendLink.addEventListener('click', (e) => {
+            if (resendLink.classList.contains('disabled')) {
+                e.preventDefault();
+                return;
+            }
+            
+            // Reset timer
+            timeLeft = 60;
+            resendLink.classList.add('disabled');
+            timerDisplay.textContent = `Time remaining: ${timeLeft}s`;
+            
+            timer = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = `Time remaining: ${timeLeft}s`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    timerDisplay.textContent = 'Time expired';
+                    resendLink.classList.remove('disabled');
+                }
+            }, 1000);
+        });
+
+
+        function validateOTPForm () {
+            const OtpInput1 = document.getElementById("otp1").value;
+            const OtpInput2 = document.getElementById("otp2").value;
+            const OtpInput3 = document.getElementById("otp3").value;
+            const OtpInput4 = document.getElementById("otp4").value;
+            const OtpInput5 = document.getElementById("otp5").value;
+            const OtpInput6 = document.getElementById("otp6").value;
+
+            // Convert to a string
+            const otpInput = [OtpInput1, OtpInput2, OtpInput3, OtpInput4, OtpInput5, OtpInput6].join('');
+
+            $.ajax({
+                type : "POST",
+                url : "verify-otp",
+                data : {otp : otpInput},
+                success : function (response) {
+                    if (response.success) {
+                        Swal.fire({
+                            icon : "success",
+                            title : "OTP Verified Successfully",
+                            showConfirmButton : false,
+                            timer : 1500
+                        }).then(() => {
+                            window.location.href = response.redirectUrl;
+                        })
+                    } else {
+                        Swal.fire({
+                            icon : "error",
+                            title : "Error",
+                            text : response.message
+                        })
+                    }
+                },
+                error : function () {
+                    Swal.fire({
+                        icon : "error",
+                        title : "Invalid OTP",
+                        text : "Please try again"
+                    })
+                }
+            });
+            return false;
+        }
+    </script>
+</body>
+</html>
