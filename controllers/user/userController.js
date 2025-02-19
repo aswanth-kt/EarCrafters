@@ -36,7 +36,7 @@ const pageNotFound = async (req, res) => {
 const loadSignup = async (req, res) => {
     try {
         
-        return res.render("signup");
+        return res.render("signup", {message : null});
 
     } catch (error) {
         

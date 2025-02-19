@@ -219,6 +219,12 @@
 
             <button type="submit" class="submit-button">Create Account</button>
         </form>
+        <% if (message) { %>
+            <div style="color: red; text-align: center; margin-top: 10px;">
+                <%= message %>
+            </div>
+        <% } %>
+        <br>
 
         <div class="login-link">
             Already have an account? <a href="#">Log in</a>
