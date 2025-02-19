@@ -119,7 +119,7 @@ const signup = async (req, res) => {
 
         
 
-        res.render("verify-otp", {message : req.session.userData.email});
+        res.render("verify-otp", {email : req.session.userData.email});
         console.log("OTP Send : ", otp);
 
     } catch (error) {
@@ -171,8 +171,8 @@ const verifyOtp = async (req, res) => {
             req.session.user_id = saveUserData._id;    //Store user id for authorization
 
             // Clear OTP and user data from session
-            // delete req.session.userOtp;
-            // delete req.session.userData;
+            delete req.session.userOtp;
+            delete req.session.userData;
 
             res.json({success : true, redirectUrl : "/"});
         } else {
@@ -185,6 +185,43 @@ const verifyOtp = async (req, res) => {
         res.status(500).json({success : false, message : "An error occured"});
         
     }
+};
+
+
+
+const resendOtp = async (req, res) => {
+    try {
+
+        const {email} = req.session.userData;
+        
+
+        if (!email) {
+            return res.status(400).json({success : false, message: "User data or email missing"});
+        }
+
+        const otp = generateOtp();
+        req.session.userOtp = otp;
+
+        const emailSend = await sendVerificationEmail (email, otp);
+
+        if (emailSend) {
+            
+            console.log("Resend OTP :", otp);
+            
+            res.status(200).json({success : true, message : "OTP Resend Successfully"});
+        } else {
+            return res.status(500).json({
+                success: false,
+                message: "Failed to resend otp Please try again",
+              });
+        }
+        
+    } catch (error) {
+        console.error("Error resending OTP", error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal Server Error." });
+    }
 }
 
 
@@ -196,4 +233,5 @@ module.exports = {
     loadSignup,
     signup,
     verifyOtp,
+    resendOtp,
 };

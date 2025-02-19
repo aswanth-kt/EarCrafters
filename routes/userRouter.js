@@ -14,7 +14,7 @@ router.post("/signup", userController.signup);
 
 router.post("/verify-otp", userController.verifyOtp);
 
-
+router.post("/resend-otp", userController.resendOtp);
 
 
 module.exports = router;
