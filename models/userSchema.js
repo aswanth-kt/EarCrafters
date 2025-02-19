@@ -15,20 +15,20 @@ const userSchema = new Schema ({
     phone : {
         type : String,
         required : false,
-        // unique : false,
-        // sparse : true,
-        // default : null
+        unique : false,
+        sparse : true,  //for g-auth not need phone
+        default : null
     },
     googleId: { 
         type: String, 
-        sparse: true, 
-        unique: false,  //true
+        // sparse: true, 
+        unique: true,  
         // default : undefined,
         required : false
       },
     password : {
         type : String,
-        required : true
+        required : false
     },
     isBlock : {
         type : Boolean,

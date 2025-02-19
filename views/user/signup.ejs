@@ -58,6 +58,7 @@
             cursor: pointer;
             transition: all 0.2s;
             margin-bottom: 20px;
+            text-decoration: none;
         }
 
         .google-button:hover {
@@ -176,10 +177,13 @@
             <p>Create your account and discover premium audio gear</p>
         </div>
 
-        <button class="google-button">
-            <div class="google-icon"></div>
-            Continue with Google
-        </button>
+        <!-- Google auth button -->
+        <div>
+            <a href="/auth/google" class="google-button">
+                <div class="google-icon"></div>
+                Continue with Google
+            </a>
+        </div>
 
         <div class="divider">
             <span>or</span>
