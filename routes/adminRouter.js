@@ -13,6 +13,8 @@ router.post("/login", adminController.login);
 
 router.get("/", adminAuth, adminController.loadDashboard);
 
+router.get("/logout", adminController.adminLogout)
+
 
 
 
