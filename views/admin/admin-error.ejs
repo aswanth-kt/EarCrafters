@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Error</title>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.4); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f7f9fc;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .error-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            padding: 40px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+        
+        .error-icon {
+            width: 100px;
+            height: 100px;
+            background-color: #f9e6e6;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 24px;
+            animation: pulse 2s infinite;
+        }
+        
+        .error-icon svg {
+            width: 50px;
+            height: 50px;
+            color: #e74c3c;
+        }
+        
+        h1 {
+            color: #2d3748;
+            font-size: 24px;
+            margin-bottom: 16px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            width: 0;
+            height: 3px;
+            background-color: #4a6cf7;
+            transform: translateX(-50%);
+            animation: lineExpand 1s 0.5s forwards;
+        }
+        
+        @keyframes lineExpand {
+            from { width: 0; }
+            to { width: 80%; }
+        }
+        
+        p {
+            color: #718096;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            opacity: 0;
+            animation: fadeIn 0.8s 0.3s forwards;
+        }
+        
+        .dashboard-btn {
+            background-color: #4a6cf7;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 0;
+            animation: fadeIn 0.8s 0.6s forwards;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .dashboard-btn:hover {
+            background-color: #3a57e8;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(74, 108, 247, 0.4);
+        }
+        
+        .dashboard-btn:active {
+            transform: translateY(-1px);
+        }
+        
+        .dashboard-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.4s;
+        }
+        
+        .dashboard-btn:hover::after {
+            left: 100%;
+        }
+        
+        .error-code {
+            background-color: #f1f5f9;
+            border-radius: 4px;
+            padding: 6px 12px;
+            color: #64748b;
+            font-family: monospace;
+            font-size: 14px;
+            display: inline-block;
+            margin-top: 24px;
+            opacity: 0;
+            animation: fadeIn 0.8s 0.9s forwards;
+        }
+        
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.5;
+            animation: float 5s infinite ease-in-out;
+        }
+        
+        .shake-trigger:hover ~ .error-code {
+            animation: shake 0.5s;
+        }
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+    <div class="error-container">
+        <div class="error-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+        </div>
+        <h1>Admin Access Error</h1>
+        <p>Sorry, we couldn't complete your request. You may not have sufficient permissions to access this resource or the system encountered an unexpected error.</p>
+        <button class="dashboard-btn shake-trigger" onclick="window.location.href='/admin'">
+            Return to Dashboard
+        </button>
+        <div class="error-code">Error Code: ADM-403</div>
+    </div>
+    
+    <script>
+        // Create floating particles in the background
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const colors = ['#e1e9ff', '#d1dbff', '#c1ccff', '#b1bdff'];
+            
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Random properties
+                const size = Math.random() * 20 + 10;
+                const posX = Math.random() * 100;
+                const posY = Math.random() * 100;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const delay = Math.random() * 5;
+                const duration = Math.random() * 3 + 3;
+                
+                // Apply styles
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${posX}%`;
+                particle.style.top = `${posY}%`;
+                particle.style.backgroundColor = color;
+                particle.style.animationDelay = `${delay}s`;
+                particle.style.animationDuration = `${duration}s`;
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+        
+        // Run animations when page loads
+        window.onload = function() {
+            createParticles();
+            
+            // Simulate loading state for button
+            const btn = document.querySelector('.dashboard-btn');
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                this.innerHTML = "Redirecting...";
+                this.disabled = true;
+                this.style.opacity = "0.7";
+                setTimeout(() => {
+                    window.location.href = '/admin';
+                }, 800);
+            });
+        };
+    </script>
+</body>
+</html>

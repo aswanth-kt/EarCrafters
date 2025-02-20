@@ -3,6 +3,18 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
 
+
+
+
+// Admin page error
+const pageError = async (req, res) => {
+    
+    res.render("admin-error");
+
+};
+
+
+
 // Login page
 const loadLogin = async (req, res) => {
     try {
@@ -39,13 +51,13 @@ const login = async (req, res) => {
 
             } else {
 
-                return res.redirect("/login");
+                return res.redirect("/admin/login");
                 
             }
 
         } else {
             
-            return res.redirect("/login");
+            return res.redirect("/admin/login");
 
         }
         
@@ -76,7 +88,8 @@ const loadDashboard = async (req, res) => {
 
     }
     
-}
+};
+
 
 
 
@@ -87,4 +100,5 @@ module.exports = {
     loadLogin,
     login,
     loadDashboard,
+    pageError,
 }
