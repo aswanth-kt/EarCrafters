@@ -6,8 +6,11 @@ const session = require('express-session');
 const passport = require("./config/passport");
 
 const db = require('./config/db');
+db();
+
 const userRouter = require('./routes/userRouter');
-db()
+const adminRouter = require("./routes/adminRouter");
+
 
 
 app.use(express.json());    //for convert form data
@@ -47,6 +50,7 @@ app.use(express.static(path.join(__dirname, "public")));     //mension static fo
 
 
 app.use("/", userRouter);
+app.use("/admin", adminRouter);
 
 
 

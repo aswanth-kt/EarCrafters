@@ -14,37 +14,60 @@ const pageNotFound = async (req, res) => {
         
     } catch (error) {
 
-        res.redirect("pageNotFound");
+        res.redirect("/pageNotFound");
         
     }
 }
 
-// const pageNotFound = async (req, res) => {
-//     try {
-
-//         return res.status(404).render("page-404");
-        
-//     } catch (error) {
-//         res.redirect("/pageNoteFound")
-//         res.status(404).send("400 page Not Found");
-//     }
-// }
 
 
-
-
+// Home page
 const loadHomepage = async (req, res) => {
     try {
 
-        return res.render("home");
+        const user_id = req.session.user_id;
+        if (user_id) {
+            
+            const userData = await User.findOne({_id : user_id});
+            res.render("home", {user : userData});   //When reaching home, pass user data to frontend
+
+        } else {
+
+            return res.render("home", {user : null});
+
+        }
         
     } catch (error) {
 
-        console.log("Home page not found");
+        console.error("Home page not found", error);
         res.status(500).send("Server error");
     }
 };
 
+
+
+// Shop page
+const loadShop = async (req, res) => {
+    try {
+
+        const user_id = req.session.user_id
+        if (user_id) { 
+
+            const userData = await User.findOne({_id : user_id});
+            res.render("shop", {user : userData});
+
+        } else {
+
+            return res.render("shop", {user : null});
+            
+        }
+    } catch (error) {
+        
+        console.error("Shop page not found", error);
+        res.status(500).send("Server error");
+        
+    }
+}
 
 
 
@@ -289,7 +312,7 @@ const login = async (req, res) => {
             return res.render("login", {message : "Incorrecte credentials"});
         }
 
-        req.session.user = findUser._id;
+        req.session.user_id = findUser._id;
         res.redirect("/")
 
     } catch (error) {
@@ -302,12 +325,36 @@ const login = async (req, res) => {
 
 
 
+const logout = async (req, res) => {
+    try {
+
+        req.session.destroy((err) => {
+
+            if (err) {
+                console.error("Session destroy error", error);
+                return res.redirect("/pageNotFound");
+            }
+
+            return res.redirect("/login");
+
+        })
+        
+    } catch (error) {
+
+        console.error("Logout error", error);
+        res.redirect("/pageNotFound")
+        
+    }
+}
+
+
 
 
 
 
 module.exports = {
     loadHomepage,
+    loadShop,
     pageNotFound,
     loadSignup,
     signup,
@@ -315,4 +362,5 @@ module.exports = {
     resendOtp,
     loadLogin,
     login,
+    logout,
 };

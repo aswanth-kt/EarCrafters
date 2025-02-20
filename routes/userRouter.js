@@ -10,8 +10,11 @@ router.get("/pageNotFound", userController.pageNotFound);
 // Home page
 router.get("/", userController.loadHomepage);
 
+//Shpe page
+router.get("/shop", userController.loadShop);
+
 //Sign up Managements
-router.get("/pageNotFound", userController.pageNotFound)
+router.get("/pageNotFound", userController.pageNotFound);
 
 router.get("/signup", userController.loadSignup);
 
@@ -33,7 +36,7 @@ router.get("/login", userController.loadLogin);
 
 router.post("/login", userController.login);
 
-
+router.get("/logout", userController.logout);
 
 
 
