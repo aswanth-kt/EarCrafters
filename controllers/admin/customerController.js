@@ -40,7 +40,7 @@ const customerInfo = async (req, res) => {
         // Render customer file with datas
         res.render("customers", {
             data : userData, 
-            totalPages : Math.floor(count / limit),
+            totalPages : Math.ceil(count / limit),
             currentPage : page
         });
 
@@ -68,7 +68,7 @@ const blockCustomer = async (req, res) => {
     }
 };
 
-// // Using params
+// // Admin block using params
 // const blockCustomer = async (req, res) => {
 //     try {
 
