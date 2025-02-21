@@ -302,7 +302,7 @@ const login = async (req, res) => {
             return res.render("login", {message : "User not found."});
         }
 
-        if (findUser.isBlocked) {
+        if (findUser.isBlock) {
             return res.render("login", {message : "User is blocked by admin."});
         }
 
