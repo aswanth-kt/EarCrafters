@@ -20,7 +20,7 @@ router.get("/logout", adminController.adminLogout)
 //Customer Management
 router.get("/users", adminAuth, customerController.customerInfo);
 
-router.get("/blockCustomer", adminAuth, customerController. blockCustomer);
+router.get("/blockCustomer/:id", adminAuth, customerController. blockCustomer);
 
 router.get("/unblockCustomer", adminAuth, customerController. unblockCustomer);
 

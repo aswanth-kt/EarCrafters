@@ -26,10 +26,11 @@ const loadHomepage = async (req, res) => {
     try {
 
         const user_id = req.session.user_id;
+        
         if (user_id) {
             
             const userData = await User.findOne({_id : user_id});
-            res.render("home", {user : userData});   //When reaching home, pass user data to frontend
+            return res.render("home", {user : userData});   //When reaching home, pass user data to frontend
 
         } else {
 
