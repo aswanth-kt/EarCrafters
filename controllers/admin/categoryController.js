@@ -1,4 +1,5 @@
 const Category = require("../../models/categorySchema");
+const Product = require("../../models/productSchema");
 
 
 
@@ -63,9 +64,85 @@ const addCategory = async (req, res) => {
 
 
 
+// Add category offer
+const addCategoryOffer = async (req, res) => {
+    try {
+
+        // Storing data from frondend (ajax-body)
+        const percentage = parseInt(req.body.percentage);
+        const categoryId = req.body.categoryId;
+
+        const categoryData = await Category.findById(categoryId);
+        if (!categoryData) {
+            return res.status(404).json({status: false, message: "Category not found"});
+        }
+
+        const products = await Product.find({category: categoryData._id});
+        //Check the product offer > category offer
+        const hasProductOffer = products.some((product) => product.productOffer > percentage);
+        if (hasProductOffer) {
+            return res.json({status: false, message: "Products within this category already have product offer."});
+        }
+
+        // If product has no offer, Update offer in category
+        await Category.updateOne({_id: categoryId}, {$set: {categoryOffer: percentage}});
+
+        //So if any offer in products, clear product offer
+        for (const product of products) {
+            product.productOffer = 0;
+            product.salePrice = product.regularPrice;
+            await product.save();
+        }
+
+        res.json({status: true})
+        
+    } catch (error) {
+
+        res.status(500).json({status: false, message: "Internal server error"});
+        console.error("Error at add category offer", error)
+        
+    }
+};
+
+
+
+// Remove catgory offer
+const removeCategoryOffer = async (req, res) => {
+    try {
+
+        const categoryId = req.body.categoryId;      //Receive id from frondend(using ajax)
+
+        const categoryData = await Category.findById(categoryId);
+        if (!categoryData) {
+            return res.status(404).json({status: false, message: "Category not found"});
+        }
+
+        const percentage = categoryData.categoryOffer;
+        const products = await Product.find({category: categoryData._id});
+        if (products.length > 0) {
+            for (const product of products) {
+                product.salePrice += Math.floor(product.regularPrice * (percentage / 100));
+            }
+        }
+
+        categoryData.categoryOffer = 0;
+        await categoryData.save();
+        res.json({status: true});
+        
+    } catch (error) {
+
+        res.status(500).json({status: false, message: "Internal server error", error})
+        console.error("Error at remove category offer", error);
+    };
+}
+
+
+
 
 
 module.exports = {
     categoryInfo,
     addCategory,
+    addCategoryOffer,
+    removeCategoryOffer,
 }
