@@ -47,7 +47,7 @@ const login = async (req, res) => {
             if (passwordMatch) {
                 
                 req.session.admin = true;
-                return res.redirect("/admin"); //admin-dashboard, check
+                return res.redirect("/admin"); //admin-dashboard
 
             } else {
 
@@ -64,7 +64,7 @@ const login = async (req, res) => {
     } catch (error) {
 
         console.error("Admin login error", error);
-        return res.redirect("/pageerror");
+        return res.redirect("/admin/pageerror");
         
     }
 };
@@ -82,7 +82,7 @@ const loadDashboard = async (req, res) => {
         } catch (error) {
 
             console.error("Error at render dashboard");
-            res.redirect("/pageerror");
+            res.redirect("/admin/pageerror");
             
         }
 

@@ -144,19 +144,25 @@
                       <% } %> 
                     </td>
                     <td class="text-start">
+                      <% if(category.isListed) { %>
                       <span class="badge rounded-pill alert-success" style="width: 60px">Listed</span>
+                      <% } else { %>
                       <span class="badge rounded-pill alert-danger" style="width: 60px">Unlisted</span>
+                      <% } %>
                     </td>
                     <td class="text-start">
+                      <% if(category.isListed) { %>
                       <button class="btn btn-danger" style="width: 70px">
-                        <a href="#" class="text-white">Unlist</a>
+                        <a href="/admin/listCategory?id=<%= category._id %>" class="text-white">Unlist</a>
                       </button>
+                      <% } else { %>
                       <button class="btn btn-success" style="width: 70px">
-                        <a href="" class="text-white">List</a>
+                        <a href="/admin/unlistCategory?id=<%= category._id %>" class="text-white">List</a>
                       </button>
+                      <% } %>
                     </td>
                     <td class="text-start">
-                      <a href="" class="btn btn-info text-white">Edit</a>
+                      <a href="/admin/editCategory?id=<%= category._id %>" class="btn btn-info text-white">Edit</a>
                     </td>
                   </tr>
                   <% }) %>
@@ -334,7 +340,7 @@
           const data = await response.json();
           if (response.ok && data.status === true){
             Swal.fire({
-              // icon: "success",
+              icon: "success",
               title: "Offer Added",
               content: "The offer has been added",
               type: "success"
@@ -375,11 +381,12 @@
 
         const data =await response.json();  //Data that goes to the backend and return here
         if(response.ok && data.status === true) {
-          Swal.fire(
-            "Offer Removed",
-            "Offer has been removed",
-            "succes"
-          ).then(() =>{
+          Swal.fire({
+            icon: "success",
+            title: "Offer Removed",
+            content: "Offer has been removed",
+            type: "success"
+          }).then(() =>{
             location.reload();
           });
         } else {

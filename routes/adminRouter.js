@@ -38,7 +38,15 @@ router.post("/addCategoryOffer", adminAuth, categoryController.addCategoryOffer)
 
 router.post("/removeCategoryOffer", adminAuth, categoryController.removeCategoryOffer);
 
+router.get("/listCategory", adminAuth, categoryController.getListCategory);
 
+router.get("/unlistCategory", adminAuth, categoryController.getUnListCategory);
+
+router.get("/editCategory", adminAuth, categoryController.getEditCategory);
+
+router.post("/editCategory/:id", adminAuth, categoryController.editCategory);
+
+router.get("/deleteCategory/:id", adminAuth, categoryController.deleteCategory);
 
 
 

@@ -46,7 +46,7 @@ const customerInfo = async (req, res) => {
 
         
     } catch (error) {
-        res.redirect("/pageerror");
+        res.redirect("/admin/pageerror");
     }
 };
 
@@ -63,7 +63,7 @@ const blockCustomer = async (req, res) => {
     } catch (error) {
 
         console.error("Error at Block customer", error);
-        res.redirect("/pageerror");
+        res.redirect("/admin/pageerror");
         
     }
 };
@@ -99,7 +99,7 @@ const unblockCustomer = async (req,res) => {
     } catch (error) {
         
         console.error("Error at unblock customer", error);
-        res.redirect("/pageerror");
+        res.redirect("/admin/pageerror");
     }
 }
 

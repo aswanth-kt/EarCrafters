@@ -35,7 +35,7 @@ const categoryInfo = async (req, res) => {
 
 
 
-
+// Create a new category
 const addCategory = async (req, res) => {
     try {
 
@@ -61,6 +61,7 @@ const addCategory = async (req, res) => {
         
     }
 };
+
 
 
 
@@ -134,6 +135,131 @@ const removeCategoryOffer = async (req, res) => {
         res.status(500).json({status: false, message: "Internal server error", error})
         console.error("Error at remove category offer", error);
     };
+};
+
+
+
+// Update to Unlisted category
+const getListCategory = async (req, res) => {
+    try {
+
+        const categoryId = req.query.id;
+
+        await Category.updateOne({_id: categoryId}, 
+            {$set: {isListed: false}});
+
+            res.redirect("/admin/category");
+        
+    } catch (error) {
+
+        res.redirect("/admin/pageerror");
+        console.error("Error at get listed category", error);
+        
+    }
+};
+
+
+
+// Updated to Listed category
+const getUnListCategory = async (req, res) => {
+    try {
+
+        const categoryId = req.query.id;
+
+        await Category.updateOne({_id: categoryId},
+            {$set: {
+                isListed: true
+            }}
+        );
+        res.redirect("/admin/category");
+        
+    } catch (error) {
+
+        res.redirect("/admin/pageerror");
+        console.error("Error at get unlist category", error);
+        
+    }
+};
+
+
+
+// Load Edit page
+const getEditCategory = async (req, res) => {
+    try {
+
+        const categoryId = req.query.id;
+        const categoryData = await Category.findOne({_id: categoryId});
+        
+        res.render("edit-category", {categoryData: categoryData});
+        
+    } catch (error) {
+
+        res.redirect("/admin/pageerror");
+        console.error("Error at get edit category", error);
+        
+    }
+};
+
+
+
+// Edit categories
+const editCategory = async (req, res) => {
+    try {
+
+        const categoryId = req.params.id;
+        const {categoryName, description} = req.body;
+
+        const existingCategory = await Category.findOne({name: categoryName});
+
+        if (existingCategory) {
+            res.status(400).json({error: "Category name already exists, Please choose another name"});
+        };
+
+        const updatedCategory = await Category.findByIdAndUpdate(categoryId, 
+            {
+                name: categoryName,
+                description: description
+            }, {new: true}
+        );
+
+        if (updatedCategory) {
+            res.redirect("/admin/category");
+        } else { 
+            res.status(400).json({error: "Category not found"});
+        }
+
+        
+    } catch (error) {
+
+        res.status(500).json({error: "Internal server error"});
+        console.error("Error at edit category", error);
+        
+    }
+};
+
+
+
+//Delete category
+const deleteCategory = async (req, res) => {
+    try {
+
+        const categoryId = req.params.id;
+        const {categoryName, description} = req.body;
+
+        const hasCategory = await Category.findById(categoryId);
+        if (!hasCategory) {
+            res.status(400).json({error: "Category is not found"});
+        } else {
+            await Category.findByIdAndDelete(categoryId);
+            res.redirect("/admin/category");
+        }
+        
+    } catch (error) {
+
+        res.status(500).json({error: "Internal server error"});
+        console.error("Error at delete category", error);
+        
+    }
 }
 
 
@@ -145,4 +271,9 @@ module.exports = {
     addCategory,
     addCategoryOffer,
     removeCategoryOffer,
+    getListCategory,
+    getUnListCategory,
+    getEditCategory,
+    editCategory,
+    deleteCategory,
 }
