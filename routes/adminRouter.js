@@ -3,6 +3,7 @@ const router = express.Router();
 const adminController = require("../controllers/admin/adminController");
 const customerController = require("../controllers/admin/customerController");
 const categoryController = require("../controllers/admin/categoryController");
+const productController = require("../controllers/admin/productController");
 const {adminAuth, userAuth} = require("../middlewares/auth");
 
 
@@ -47,6 +48,10 @@ router.get("/editCategory", adminAuth, categoryController.getEditCategory);
 router.post("/editCategory/:id", adminAuth, categoryController.editCategory);
 
 router.get("/deleteCategory/:id", adminAuth, categoryController.deleteCategory);
+
+
+//Product Management
+router.get("/addProducts", adminAuth, productController.getAddProduct);
 
 
 
