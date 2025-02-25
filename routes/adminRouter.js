@@ -5,10 +5,14 @@ const customerController = require("../controllers/admin/customerController");
 const categoryController = require("../controllers/admin/categoryController");
 const productController = require("../controllers/admin/productController");
 const {adminAuth, userAuth} = require("../middlewares/auth");
+const multer = require('multer');
+const storage = require("../helpers/multer");
+const uploads = multer({storage: storage});
 
 
 
 
+// Error Management
 router.get("/pageerror", adminController.pageError);
 
 
@@ -52,6 +56,8 @@ router.get("/deleteCategory/:id", adminAuth, categoryController.deleteCategory);
 
 //Product Management
 router.get("/addProducts", adminAuth, productController.getAddProduct);
+
+router.post("/addProducts", adminAuth, uploads.array("images", 3), productController.addProducts)
 
 
 

@@ -12,7 +12,7 @@ const sharp = require('sharp');   //For img resize width and height
 const getAddProduct = async (req, res) => {
     try {
 
-        const categoryDat = await Category.find({isListed: true});
+        const categoryData = await Category.find({isListed: true});
 
     res.render("product-add", {
         cateData: categoryData,
@@ -28,9 +28,71 @@ const getAddProduct = async (req, res) => {
 
 
 
+// Add new product
+const addProducts = async (req, res) => {
+    try {
+
+        const product = req.body;
+        const productExixts = await Product.findOne({
+            productName : product.productName
+        });
+
+        if (!productExixts) {
+            const images = [];
+            if (req.files && req.files.length > 0) {
+                for (let i = 0; i < req.files.length; i++) {
+
+                    const originalImagePath = req.files[i].path;
+                    const resizedImagePath = path.join("public", "uploads", "product-images", req.files[i].filename);
+                    await sharp(originalImagePath).resize({width: 440, height: 440}).toFile(resizedImagePath);
+                    images.push(req.files[i].filename);
+                }
+            } else {
+                console.log("No files uploaded");
+            };
+
+            const categoryId = await Category.findOne({name: product.category});
+
+            if (!categoryId) {
+                return res.status(400).json("Invalid category name");
+            }
+
+            const newProduct = new Product({
+                productName: product.productName,
+                description: product.description,
+                // brand: product.brand,
+                category: categoryId._id,
+                regularPrice: product.regularPrice,
+                salePrice: product.salePrice,
+                createdAt: new Date(),
+                quantity: product.quantity,
+                // size: product.size, //Check it!!!!!
+                color: product.color,
+                productImage: images,
+                status: "Available"
+            });
+
+            await newProduct.save();
+            return res.redirect("/admin/addProducts");
+
+        } else {
+            return res.status(400).json("Product already exist. Please try with another name.");
+        }
+        
+    } catch (error) {
+
+        console.error("Error at add products", error);
+        return res.redirect("/admin/pageerror");
+        
+    }
+};
+
+
+
 
 
 
 module.exports = {
     getAddProduct,
+    addProducts,
 }
