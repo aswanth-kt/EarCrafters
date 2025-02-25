@@ -57,7 +57,9 @@ router.get("/deleteCategory/:id", adminAuth, categoryController.deleteCategory);
 //Product Management
 router.get("/addProducts", adminAuth, productController.getAddProduct);
 
-router.post("/addProducts", adminAuth, uploads.array("images", 3), productController.addProducts)
+router.post("/addProducts", adminAuth, uploads.array("images", 3), productController.addProducts);
+
+router.get("/products", adminAuth, productController.getAllProducts);
 
 
 

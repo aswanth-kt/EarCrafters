@@ -89,10 +89,58 @@ const addProducts = async (req, res) => {
 
 
 
+// Get all product info
+const getAllProducts = async (req, res) => {
+    try {
+
+        const search = req.query.search || "";
+        const page = req.query.page || 1;
+        const limit = 4;
+
+        // for search bar
+        const productData = await Product.find({
+            $or: [
+                {productName: {$regex: new RegExp(".*"+search+".*", "i")}}
+            ],
+        }).limit(limit * 1)
+        .skip(page - 1)
+        .populate("category")
+        .exec();
+
+        const count = await Product.find({
+            $or: [
+                {productName: {$regex: new RegExp(".*"+search+".*", "i")}}
+            ]
+        }).countDocuments();
+
+        const category = await Category.find({isListed: true});
+
+        if (category) {
+            res.render("products", {
+                data: productData,
+                currentPage: page,
+                totalPages: Math.ceil(count / limit),
+                cat: category
+            })
+        } else {
+            res.render("page-404")
+        }
+        
+    } catch (error) {
+
+        console.error("Error at get all products", error);
+        res.redirect("/admin/pageerror")
+        
+    }
+}
+
+
+
 
 
 
 module.exports = {
     getAddProduct,
     addProducts,
+    getAllProducts,
 }
