@@ -6,6 +6,7 @@ const User = require("../../models/userSchema");
 const fs = require('fs');
 const path = require('path');
 const sharp = require('sharp');   //For img resize width and height
+const { default: mongoose } = require("mongoose");
 
 
 
@@ -102,7 +103,8 @@ const getAllProducts = async (req, res) => {
             $or: [
                 {productName: {$regex: new RegExp(".*"+search+".*", "i")}}
             ],
-        }).limit(limit * 1)
+        })
+        .limit(limit * 1)
         .skip(page - 1)
         .populate("category")
         .exec();
@@ -207,7 +209,44 @@ const removeProductOffer = async (req, res) => {
         // res.status(500).json({status: false, message: "Internal server error"});
         
     }
+};
+
+
+
+// Block products
+const blockProduct = async (req, res) => {
+    try {
+
+        const productId = req.query.id;
+        await Product.updateOne({_id: productId}, {$set: {isBlock: true}});
+        return res.redirect("/admin/products");
+
+    } catch (error) {
+
+        console.error("Error at Block products", error);
+        return res.redirect("/admin/pageerror");
+        
+    }
+};
+
+
+
+// Unblock products
+const unblockProduct = async (req, res) => {
+    try {
+
+        const productId = req.query.id;
+        await Product.updateOne({_id: productId}, {$set: {isBlock: false}});
+        return res.redirect("/admin/products");
+        
+    } catch (error) {
+
+        console.error("Error at Unblock products", error);
+        return res.redirect("/admin/pageerror");
+        
+    }
 }
+
 
 
 
@@ -220,4 +259,6 @@ module.exports = {
     getAllProducts,
     addProductOffer,
     removeProductOffer,
+    blockProduct,
+    unblockProduct,
 }

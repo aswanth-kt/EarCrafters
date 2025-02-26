@@ -67,13 +67,20 @@
                 <td> <%= data[i].quantity %> </td>
                 <td>
                 
+                    <!-- Block and Unblock products -->
+                    <% if (data[i].isBlock === false) { %>
+
                     <button class="btn btn-danger" style="width: 80px;">
-                        <a href="" class="text-white" style="text-decoration: none;">Block</a>
+                        <a href="/admin/blockProduct?id=<%= data[i]._id %>" class="text-white" style="text-decoration: none;">Block</a>
                     </button>
+
+                    <% } else{ %>
                     
                     <button class="btn btn-success" style="width: 80px;">
-                        <a href="" class="text-white" style="text-decoration: none;">Unblock</a>
+                        <a href="/admin/unblockProduct?id=<%= data[i]._id %>" class="text-white" style="text-decoration: none;">Unblock</a>
                     </button>
+
+                    <% } %>
             
                 </td>
                 <td>

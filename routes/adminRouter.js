@@ -65,6 +65,12 @@ router.post("/addProductOffer", adminAuth, productController.addProductOffer);
 
 router.post("/removeProductOffer", adminAuth, productController.removeProductOffer);
 
+router.get("/blockProduct", adminAuth, productController.blockProduct);
+
+router.get("/unblockProduct", adminAuth, productController.unblockProduct);
+
+
+
 
 
 
