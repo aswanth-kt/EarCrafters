@@ -132,6 +132,81 @@ const getAllProducts = async (req, res) => {
         res.redirect("/admin/pageerror")
         
     }
+};
+
+
+
+//Add Product Offer
+const addProductOffer = async (req, res) => {
+    try {
+
+        const {productId, percentage} = req.body;        
+
+        // Check if product exists
+        const findProduct = await Product.findOne({_id: productId});
+        if (!findProduct) {
+            return res.status(404).json({status: false, message: "Product not found"});
+        }
+
+        // Check if category exists
+        const findCategory = await Category.findOne({_id: findProduct.category});
+        if(!findCategory) {
+            return res.status(404).json({status: false, message: "Category not found"});
+        }
+
+        // if the category offer is grater than product offer
+        if (findCategory.categoryOffer > percentage) {
+            return res.json({status: false, message: "This product category already has a category offer"});
+        }
+
+        // Apply product offer
+        findProduct.salePrice = findProduct.regularPrice - Math.round((findProduct.regularPrice * (percentage / 100)));
+        findProduct.productOffer = parseInt(percentage);
+            await findProduct.save();
+
+            findCategory.categoryOffer = 0;     //if you use the product offer, set category offer to zero
+            await findCategory.save();
+            
+            return res.status(200).json({status: true});
+        
+    } catch (error) {
+        
+        console.error("Error at add Product offer", error);
+        res.redirect("/admin/pageerror");
+        // res.status(500).json({status: false, message: "Internal server error"});
+
+    }
+};
+
+
+
+// Remove product offer
+const removeProductOffer = async (req, res) => {
+    try {
+
+        const {productId} = req.body;
+
+        // Check if product exists
+        const findProduct = await Product.findOne({_id: productId});
+        if (!findProduct) {
+            return res.status(404).json({status: false, message: "Product not found"});
+        };
+
+        //Offer reset
+        const percentage = findProduct.productOffer;
+        findProduct.salePrice = findProduct.salePrice + Math.round(findProduct.regularPrice * (percentage / 100));
+        findProduct.productOffer = 0;
+        await findProduct.save()
+
+        return res.status(200).json({status: true});
+        
+    } catch (error) {
+
+        console.error("Error at Remove product offer", error);
+        res.redirect("/admin/pageerror");
+        // res.status(500).json({status: false, message: "Internal server error"});
+        
+    }
 }
 
 
@@ -143,4 +218,6 @@ module.exports = {
     getAddProduct,
     addProducts,
     getAllProducts,
+    addProductOffer,
+    removeProductOffer,
 }
