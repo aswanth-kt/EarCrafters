@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/user/userController');
 const userMiddleware = require("../middlewares/userMiddleware");    //Session handler
+const profileController = require("../controllers/user/profileController");
 const passport = require('passport');
 
 
@@ -33,13 +34,18 @@ router.get("/auth/google/callback", passport.authenticate("google", {failureRedi
 });
 
 
-
+// Login Management
 router.get("/login",userMiddleware, userController.loadLogin);
 
 router.post("/login", userController.login);
 
 router.get("/logout", userController.logout);
 
+
+//Profile Management
+router.get("/forgotPassword", profileController.getForgotPasswordPage);
+
+router.post("/forgotEmailValid", profileController.forgotEmailValid);
 
 
 
