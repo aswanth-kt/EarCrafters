@@ -48,6 +48,14 @@ router.get("/forgotPassword", profileController.getForgotPasswordPage);
 
 router.post("/forgotEmailValid", profileController.forgotEmailValid);
 
+router.post("/verify-passForgot-otp", profileController.verifyForgotPassOtp);
+
+router.get("/reset-password", profileController.getResetPassPage);
+
+router.post("/resend-forgot-otp", profileController.resendOtp);
+
+router.post("/reset-password", profileController.updatePassword)
+
 
 
 

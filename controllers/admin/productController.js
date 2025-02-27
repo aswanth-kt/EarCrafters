@@ -107,7 +107,7 @@ const getAllProducts = async (req, res) => {
         .limit(limit * 1)
         .skip((page - 1) * limit)
         .populate("category")
-        .exec();
+        .exec();77
 
         const count = await Product.find({
             $or: [
