@@ -220,6 +220,25 @@ const updatePassword = async (req, res) => {
         res.redirect("/pageNotFound");
         
     }
+};
+
+
+
+// Load user profile page
+const getUserProfilePage = async (req, res) => {
+    try {
+
+        const userId = req.session.user._id;
+
+        const  userData = await User.findById(userId);
+        res.render("profile", {user: userData})
+        
+    } catch (error) {
+
+        console.error("Error in get user profile page", error);
+        res.redirect("/pageNotFound");
+        
+    }
 }
 
 
@@ -233,4 +252,5 @@ module.exports = {
     getResetPassPage,
     resendOtp,
     updatePassword,
+    getUserProfilePage,
 }

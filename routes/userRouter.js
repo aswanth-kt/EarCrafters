@@ -4,6 +4,7 @@ const userController = require('../controllers/user/userController');
 const userMiddleware = require("../middlewares/userMiddleware");    //Session handler
 const CheckBlockedUser = require("../middlewares/userMiddleware");
 const profileController = require("../controllers/user/profileController");
+const {userAuth, adminAuth} = require("../middlewares/auth");
 const passport = require('passport');
 
 
@@ -54,7 +55,9 @@ router.get("/reset-password", profileController.getResetPassPage);
 
 router.post("/resend-forgot-otp", profileController.resendOtp);
 
-router.post("/reset-password", profileController.updatePassword)
+router.post("/reset-password", profileController.updatePassword);
+
+router.get("/userProfile", userAuth, profileController.getUserProfilePage)
 
 
 
