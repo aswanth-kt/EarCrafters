@@ -1,5 +1,7 @@
-
 const User = require('../../models/userSchema');
+const Category = require("../../models/categorySchema")
+const Product = require("../../models/productSchema")
+const Banner = require("../../models/bannerSchema");
 const nodemailer = require('nodemailer');
 const dotenv = require('dotenv').config();
 const bcrypt = require('bcrypt');
@@ -25,16 +27,47 @@ const pageNotFound = async (req, res) => {
 const loadHomepage = async (req, res) => {
     try {
 
-        const user_id = req.session.user_id;
+        const today = new Date().toISOString();     // Get current date
+        const findBanner = await Banner.find({
+            startDate: {
+                $lt: new Date(today),
+            },
+            endDate: {
+                $gt: new Date(today),
+            },
+        });
+
+        const user = req.session.user;
+        console.log("session user:",  user)
+
+        const categories = await Category.find({isListed: true});
+        let ProductData = await Product.find(
+            {
+                isBlock: false,
+                category: {
+                    $in: categories.map(category => category._id)
+                },
+                quantity: {
+                    $gt: 0
+                },
+            }
+        );
+
+        // Sort for resently added product
+        ProductData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        // Show only 4 new products
+        ProductData = ProductData.slice(0, 4);
+
         
-        if (user_id) {
+        if (user) {
             
-            const userData = await User.findOne({_id : user_id});
-            return res.render("home", {user : userData});   //When reaching home, pass user data to frontend
+            const userData = await User.findOne({_id : user._id});
+            return res.render("home", {user : userData, products: ProductData, banner: findBanner || []});   //When reaching home, pass user data to frontend
 
         } else {
 
-            return res.render("home", {user : null});
+            return res.render("home", {user : null, products: ProductData, banner: findBanner || []});
 
         }
         
@@ -51,10 +84,10 @@ const loadHomepage = async (req, res) => {
 const loadShop = async (req, res) => {
     try {
 
-        const user_id = req.session.user_id
-        if (user_id) { 
+        const user = req.session.user
+        if (user) { 
 
-            const userData = await User.findOne({_id : user_id});
+            const userData = await User.findOne({_id : user._id});
             res.render("shop", {user : userData});
 
         } else {
@@ -312,8 +345,10 @@ const login = async (req, res) => {
         if (!passwordMatch) {
             return res.render("login", {message : "Incorrecte credentials"});
         }
-
-        req.session.user_id = findUser._id;
+        
+        req.session.user = findUser;
+        // console.log("session: ", req.session.user);
+        // console.log("findUser: ", findUser);
         res.redirect("/")
 
     } catch (error) {

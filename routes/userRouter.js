@@ -30,7 +30,7 @@ router.post("/resend-otp", userController.resendOtp);
 // Google authenticate
 router.get("/auth/google", passport.authenticate("google", {scope : ["profile", "email"]}));
 router.get("/auth/google/callback", passport.authenticate("google", {failureRedirect : "/signup"}), (req, res) => {
-    req.session.user_id = req.user
+    req.session.user = req.user
     res.redirect("/");
 });
 
