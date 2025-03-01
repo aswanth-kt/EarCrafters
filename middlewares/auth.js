@@ -2,37 +2,66 @@ const User = require("../models/userSchema");
 
 
 
+// // User authentication
+// const userAuth = (req, res, next) => {
+
+//     // If no user session exists, allow access (non-logged-in users can view home)
+//     if (!req.session.user) {
+//         return next();
+//     }
+
+//     if (req.session.user) {
+
+//         User.findById(req.session.user)
+//         .then(data => {
+
+//             if (data && !data.isBlock) {
+
+//                 next();     // Proceed to next
+
+//             } else {
+
+//                 res.redirect("/login");
+//             }
+
+//         })
+//         .catch(error => {
+
+//             console.error("Error in user auth middleware", error);
+//             res.status(500).send("Internal Server Error");
+            
+//         })
+
+//     } else {
+
+//         res.redirect("/login")
+
+//     }
+
+// };
+
+
+
 // User authentication
 const userAuth = (req, res, next) => {
-
-    if (req.session.user) {
-
-        User.findById(req.session.user)
+    // If no user session exists, allow access (non-logged-in users can view home)
+    if (!req.session.user) {
+        return next();
+    }
+    
+    // If code reaches here, we know req.session.user exists
+    User.findById(req.session.user)
         .then(data => {
-
             if (data && !data.isBlock) {
-
                 next();     // Proceed to next
-
             } else {
-
                 res.redirect("/login");
             }
-
         })
         .catch(error => {
-
             console.error("Error in user auth middleware", error);
             res.status(500).send("Internal Server Error");
-            
-        })
-
-    } else {
-
-        res.redirect("/login")
-
-    }
-
+        });
 };
 
 

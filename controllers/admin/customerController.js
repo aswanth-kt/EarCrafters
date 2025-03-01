@@ -23,6 +23,7 @@ const customerInfo = async (req, res) => {
                 {email : {$regex : ".*" + search + ".*"}}
             ]
         })
+        .sort({createdOn: -1})
         .limit(limit * 1)
         .skip((page-1)*limit)   //Image page=2, 2-1*(3) == 3, So skip first 3.
         .exec();   

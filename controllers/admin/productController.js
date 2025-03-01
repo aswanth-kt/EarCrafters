@@ -104,14 +104,16 @@ const getAllProducts = async (req, res) => {
                 {productName: {$regex: new RegExp(".*"+search+".*", "i")}}
             ],
         })
+        // .sort({createdAt: -1})
         .limit(limit * 1)
         .skip((page - 1) * limit)
         .populate("category")
-        .exec();77
+        .exec();
 
         const count = await Product.find({
             $or: [
-                {productName: {$regex: new RegExp(".*"+search+".*", "i")}}
+                {productName: {$regex: new RegExp(".*"+search+".*", "i")}},
+                // {category: {$regex: new RegExp(".*"+search+".*", "i")}},
             ]
         }).countDocuments();
 
@@ -122,7 +124,8 @@ const getAllProducts = async (req, res) => {
                 data: productData,
                 currentPage: page,
                 totalPages: Math.ceil(count / limit),
-                cat: category
+                cat: category,
+                search: search  // for search values
             })
         } else {
             res.render("page-404")

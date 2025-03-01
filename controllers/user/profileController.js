@@ -209,7 +209,7 @@ const updatePassword = async (req, res) => {
                     password: passwordHash
                 }}
             )
-            res.redirect("/login")
+            res.render("login", {message: "Password changed!, Please login"})
         } else {
             res.render("reset-password", {message: "Password do not match"});
         }

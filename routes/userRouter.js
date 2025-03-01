@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/user/userController');
 const userMiddleware = require("../middlewares/userMiddleware");    //Session handler
-const CheckBlockedUser = require("../middlewares/userMiddleware");
+// const CheckBlockedUser = require("../middlewares/userMiddleware");
 const profileController = require("../controllers/user/profileController");
 const {userAuth, adminAuth} = require("../middlewares/auth");
 const passport = require('passport');
@@ -12,7 +12,7 @@ const passport = require('passport');
 router.get("/pageNotFound", userController.pageNotFound);
 
 // Home page
-router.get("/",CheckBlockedUser, userController.loadHomepage);
+router.get("/", userAuth, userController.loadHomepage);
 
 //Shpe page
 router.get("/shop", userController.loadShop);
