@@ -18,6 +18,9 @@
 
         .container {
             text-align: center;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
         }
 
         h1 {
@@ -32,6 +35,22 @@
             margin: 20px 0;
         }
 
+        .image-container {
+            width: 100%;
+            margin: 20px 0;
+            /* Control the width of the container */
+            max-width: 300px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
         .home-button {
             padding: 12px 30px;
             font-size: 16px;
@@ -41,6 +60,7 @@
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s ease;
+            margin-top: 20px;
         }
 
         .home-button:hover {
@@ -51,9 +71,9 @@
 <body>
     <div class="container">
         <h1>404</h1>
-        <p>Oops! The page you’re looking for doesn’t exist.</p>
-        <div>
-        <img src="https://cdn.dribbble.com/users/285475/screenshots/2083086/dribbble_1.gif" alt="404-shock" style="height: auto; width: 100%;">
+        <p>Oops! The page you're looking for doesn't exist.</p>
+        <div class="image-container">
+            <img src="https://cdn.dribbble.com/users/285475/screenshots/2083086/dribbble_1.gif" alt="404-shock" style="height: auto; width: 100%;">  
         </div>
         <button class="home-button" onclick="window.location.href='/'">Return Home</button>
     </div>

@@ -75,6 +75,21 @@ router.put("/verify-changepassword-otp", userAuth, profileController.verifyChang
 
 
 
+// Address Management
+router.get("/addAddress", userAuth, profileController.getAddAddressPage);
+
+router.post("/addAddress", userAuth, profileController.postAddAddress);
+
+router.get("/editAddress", userAuth, profileController.getEditAddress);
+
+router.post("/editAddress", userAuth, profileController.postEditAddress);
+
+router.get("/deleteAddress", userAuth, profileController.deleteAddress);
+
+
+
+
+
 
 
 module.exports = router;

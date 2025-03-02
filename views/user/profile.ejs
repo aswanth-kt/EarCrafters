@@ -145,6 +145,7 @@
            <div class="col-md-4">
              <div class="dashboard-menu">
                <ul class="nav flex-column" role="tablist">
+
                  <li class="nav-item">
                    <a class="nav-link active" id="dashboard-tab" data-bs-toggle="tab" href="#dashboard" role="tab" aria-controls="dashboard" aria-selected="false">
                      <i class="fi-rs-settings-sliders mr-10"></i>Dashboard
@@ -180,6 +181,7 @@
                      <i class="fi-rs-sign-out mr-10"></i>Logout
                    </a>
                  </li>
+
                </ul>
              </div>
            </div>
@@ -213,31 +215,40 @@
                  role="tabpanel"
                  aria-labelledby="address-tab"
                >
-                 <div class="row">
+                <div class="row">
+
+                  <% if (userAddress) { %>
+                    <% userAddress.address.forEach((address) => { %>
                 
                    <div class="col-lg-6">
                      <div class="card mb-3 mb-lg-0">
                        <div class="card-header">
-                         <h5 class="mb-0"></h5>
+                         <h5 class="mb-0"> <%= address.addressType %> </h5>
                        </div>
 
 
                        <div class="card-body">
                          <address>
-                        
-                        
+                          <%= address.name %> <br>
+                          <%= address.city %> <br>
+                          <%= address.landMark %> <br>
+                          <%= address.state %> 
                          </address>
-                         <p></p>
+                         <p> <%= address.pincode %> </p>
+                         <p> <%= address.phone %> </p>
+                         <p> <%= address.altPhone %> </p>
                       
                          <div class="d-flex justify-content-between">
-                           <a href="#" class="btn-small">Edit</a>
-                           <a href="#" class="btn-small" onclick="">Delete</a>
+                           <a href="/editAddress?id=<%= address._id %>" class="btn-small">Edit</a>
+                           <a href="/deleteAddress?id=<%= address._id %>" class="btn-small" onclick="return confirm('Are you sure you want to delete this address')">Delete</a>
                          </div>
                         
                        </div>
                      </div>
                    </div>
-                
+                    <% }) %>
+                  <% } else{ %>
+                    
                    <div class="col-lg-6">
                      <div class="card mb-3 mb-lg-0">
                        <div class="card-header">
@@ -248,9 +259,10 @@
                        </div>
                      </div>
                    </div>
-              
+                  <% } %>
+                  <br>
                    <div>
-                     <a href="#">
+                     <a href="/addAddress">
                        <button class="btn btn-primary w-70">
                          Add address
                        </button>

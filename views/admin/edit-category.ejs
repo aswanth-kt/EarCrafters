@@ -14,7 +14,7 @@
                 </div>
                 <div class="d-grid text-end mt-30 col-md-5">
                     <button class="btn btn-primary" type="submit">Update category</button> <br>
-                    <a href="/admin/deleteCategory/<%= categoryData._id %>" class="btn btn-danger" type="submit">Delete category</a>
+                    <a href="/admin/deleteCategory/<%= categoryData._id %>" class="btn btn-danger" type="submit" onclick="confirm('Are you sure!')">Delete category</a>
                 </div>
             </form>
         </div>

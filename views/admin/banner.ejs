@@ -40,7 +40,7 @@
 
 
 
-                          <td class="action" data-title="Remove"><a href="/admin/deleteBanner?id=<%= data[i]._id %>"><i class="fa-solid fa-trash-can" style="color: #000000;"></i> </a></td>
+                          <td class="action" data-title="Remove" onclick="confirm('Are you sure you want to delete this banner')"><a href="/admin/deleteBanner?id=<%= data[i]._id %>" ><i class="fa-solid fa-trash-can" style="color: #000000;"></i> </a></td>
                       </tr>
                 <% } %>
             <% } else { %>

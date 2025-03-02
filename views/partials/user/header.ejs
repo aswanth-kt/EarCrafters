@@ -72,7 +72,7 @@
 
         /* logo */
         .header__logo svg {
-            width: 170px; /* or whatever size you need */
+            width: 170px; 
             height: auto;
         }
         .footer-logo {
@@ -95,7 +95,7 @@
 
 
                <!-- Logo start -->
-               <div class="header__logo">
+               <div class="header__logo" style="width: auto;">
                     <a href="/">
                     
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400">
@@ -138,7 +138,9 @@
                        <ul>
                            <li><a href="/">Home</a></li>
                            <li><a href="/shop">Shop</a></li>
-                           <li><a href="/userProfile" style="text-align: center;"> Profile </a></li>
+                           <%if(locals.user){%>
+                            <li><a href="/userProfile" style="text-align: center;"> Profile </a></li>
+                           <% } %>
                        </ul>
                    </nav>
                </div>

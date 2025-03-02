@@ -45,12 +45,10 @@ const User = require("../models/userSchema");
 // User authentication
 const userAuth = (req, res, next) => {
     
-    // If no user session exists, allow access (non-logged-in users can view home)
     if (!req.session.user) {
         return next();
     }
     
-    // If code reaches here, we know req.session.user exists
     User.findById(req.session.user)
         .then(data => {
             if (data && !data.isBlock) {
