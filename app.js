@@ -4,6 +4,7 @@ const path = require('path');
 const dotenv = require('dotenv').config();
 const session = require('express-session');
 const passport = require("./config/passport");
+const MongoStore = require("connect-mongo");
 
 const db = require('./config/db');
 db();
@@ -21,11 +22,12 @@ app.use(session({
     secret : process.env.SESSION_SECRET,
     resave : false,
     saveUninitialized : true,
+    store: MongoStore.create({mongoUrl: process.env.MONGODB_URI}),
     cookie : {
         secure : false, //Remind change to true at production time
         httpOnly : true,
         maxAge : 72*60*60*1000
-    }
+    },
 }));
 
 
@@ -33,7 +35,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 
-// To prevent data store to browser
+// To prevent data store in browser cache
 app.use((req, res, next) => {
     res.set('cache-control' , 'no-store')
     next();
@@ -48,13 +50,13 @@ app.use(express.static(path.join(__dirname, "public")));     //mension static fo
 
 
 
-
+// Routes
 app.use("/", userRouter);
 app.use("/admin", adminRouter);
 
 
 
-const port = process.env.PORT || 4000;
+const port = process.env.PORT || process.env.SECOND_PORT;
 app.listen(port, () => {
     console.log(`http://localhost:${port}`);
 });

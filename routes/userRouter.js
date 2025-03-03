@@ -14,8 +14,11 @@ router.get("/pageNotFound", userController.pageNotFound);
 // Home page
 router.get("/", userAuth, userController.loadHomepage);
 
-//Shpe page
-router.get("/shop", userController.loadShop);
+//Shping Management
+router.get("/shop", userAuth, userController.loadShopPage);
+
+router.get("/filter", userAuth, userController.filterProducts)
+
 
 //Sign up Managements
 router.get("/pageNotFound", userController.pageNotFound);

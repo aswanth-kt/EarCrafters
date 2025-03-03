@@ -254,7 +254,7 @@ const getUserProfilePage = async (req, res) => {
 // Load Email page
 const loadChangeEmailPage = async (req, res) => {
     try {
-
+        console.log("User session at load email: ", req.session.user)
         return res.render("change-email", {message: null, user: req.session.user});
         
     } catch (error) {

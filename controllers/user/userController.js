@@ -38,7 +38,7 @@ const loadHomepage = async (req, res) => {
         });
 
         const user = req.session.user;
-        console.log("session user:",  user)
+        // console.log("session user:",  user)
 
         const categories = await Category.find({isListed: true});
         let ProductData = await Product.find(
@@ -81,24 +81,134 @@ const loadHomepage = async (req, res) => {
 
 
 // Shop page
-const loadShop = async (req, res) => {
+const loadShopPage = async (req, res) => {
     try {
 
-        const user = req.session.user
+        const user = req.session.user;
         if (user) { 
 
             const userData = await User.findOne({_id : user._id});
-            res.render("shop", {user : userData});
+
+            // Fetch ctegories data and store the id's in an array
+            const categories = await Category.find({isListed: true});
+            const categoryIds = categories.map((category) => category._id.toString());
+
+            // Pagination setup
+            const page = parseInt(req.query.page) || 1;
+            const limit = 9;
+            const skip = (page - 1) * limit;
+
+            const products = await Product.find({
+                isBlock: false,
+                category: {$in: categoryIds},
+                quantity: {$gt: 0},
+            })
+            .sort({createdAt: -1})
+            .skip(skip)
+            .limit(limit);
+
+            const totalProducts = await Product.countDocuments({
+                isBlock: false,
+                category: {$in: categoryIds},
+                quantity: {$gt: 0},
+            });
+
+            const totalPages = Math.ceil(totalProducts / limit);
+
+            const categoriesWithIds = categories.map(category => ({_id: category._id, name: category.name}));
+
+            res.render("shop", {
+                user : userData, 
+                products: products,
+                category: categoriesWithIds,
+                totalProducts: totalProducts,
+                currentPage: page,
+                totalPages: totalPages,
+            });
 
         } else {
 
-            return res.render("shop", {user : null});
+            res.render("shop", {user : null});
             
         }
     } catch (error) {
         
-        console.error("Shop page not found", error);
-        res.status(500).send("Server error");
+        console.error("Shop page not found: ", error);
+        res.status(500).redirect("/pageNotFound");
+        
+    }
+};
+
+
+
+// Filter setups
+const filterProducts = async (req, res) => {
+    try {
+
+        const user = req.session.user
+        const categoryId = req.query.categoryId;
+
+        // find category using ternary operator
+        const findCategory = categoryId ? await Category.findById(categoryId) : null;
+
+        // Create query object
+        const query = {
+            isBlock: false,
+            quantity: {$gt: 0}
+        };
+        
+        if (findCategory && findCategory._id) {
+            query.category = findCategory._id;
+            console.log("query :",query);
+            console.log("findCategory :",findCategory);
+        } else {
+            console.log("Error in findCategory");  
+        };
+
+        let findProducts = await Product.find(query).lean();
+        findProducts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        console.log(findProducts)
+
+        // Fetch listed categories
+        const categories = await Category.find({isListed: true});
+
+        let itemsPerPage = 6;
+
+        let currentPage = parseInt(req.query.page) || 1;
+        let startIndex = (currentPage - 1) * itemsPerPage;
+        let endIndex = startIndex + itemsPerPage;
+        let totalPages = Math.ceil(findProducts.length / itemsPerPage);
+        let currentProduct = findProducts.slice(startIndex, endIndex);
+
+        // Save user search activity to DB
+        let userData = null;
+        if (user) {
+            userData = await User.findOne({_id: user});
+            if (userData) {
+                const searchEntry = {
+                    category: findCategory ? findCategory._id : null,
+                    searchedOn: new Date()
+                };
+                userData.searchHistory.push(searchEntry);
+                await userData.save();
+            }
+        };
+
+        req.session.filteredProducts = currentProduct;  // Store filtered products in session
+
+        res.render("shop", {
+            user: userData,
+            products: currentProduct,
+            category : categories,
+            totalPages: totalPages,
+            currentPage: currentPage,
+            selectedCategory: categoryId || null,
+        })
+        
+    } catch (error) {
+
+        console.error("Error in Filter Products: ", error);
+        res.redirect("/pageNotFound");
         
     }
 }
@@ -254,7 +364,7 @@ const verifyOtp = async (req, res) => {
             delete req.session.userOtp;
             delete req.session.userData;
 
-            res.json({success : true, redirectUrl : "/"});
+            res.json({success : true, redirectUrl : "/login"});
         } else {
             res.status(400).json({success : false, message : "Invalid OTP, Please try again"});
         }
@@ -390,7 +500,8 @@ const logout = async (req, res) => {
 
 module.exports = {
     loadHomepage,
-    loadShop,
+    loadShopPage,
+    filterProducts,
     pageNotFound,
     loadSignup,
     signup,

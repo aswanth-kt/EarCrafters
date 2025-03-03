@@ -105,9 +105,10 @@ const getAllProducts = async (req, res) => {
             ],
         })
         // .sort({createdAt: -1})
+        .populate("category")
+        .lean()
         .limit(limit * 1)
         .skip((page - 1) * limit)
-        .populate("category")
         .exec();
 
         const count = await Product.find({
