@@ -4,6 +4,7 @@ const userController = require('../controllers/user/userController');
 const userMiddleware = require("../middlewares/userMiddleware");    //Session handler
 // const CheckBlockedUser = require("../middlewares/userMiddleware");
 const profileController = require("../controllers/user/profileController");
+const productController = require("../controllers/user/productController");
 const {userAuth, adminAuth} = require("../middlewares/auth");
 const passport = require('passport');
 
@@ -14,14 +15,17 @@ router.get("/pageNotFound", userController.pageNotFound);
 // Home page
 router.get("/", userAuth, userController.loadHomepage);
 
-//Shping Management
+
+//Shoping Management
 router.get("/shop", userAuth, userController.loadShopPage);
 
 router.get("/filter", userAuth, userController.filterProducts);
 
 router.get("/filterPrice", userAuth, userController.filterByPrice);
 
-router.post("/search", userAuth, userController.getSearchProducts);
+router.post("/search", userAuth, userController.searchProducts);
+
+
 
 
 //Sign up Managements
@@ -92,6 +96,12 @@ router.get("/editAddress", userAuth, profileController.getEditAddress);
 router.post("/editAddress", userAuth, profileController.postEditAddress);
 
 router.get("/deleteAddress", userAuth, profileController.deleteAddress);
+
+
+
+// Product Management
+router.get("/productDetails", userAuth, productController.productDetails);
+
 
 
 

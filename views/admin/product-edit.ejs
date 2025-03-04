@@ -42,6 +42,7 @@
 
                     <div class="card-body">
                         <form method="post" action="/admin/editProduct/<%= product._id %>" enctype="multipart/form-data" onsubmit="return validateForm()">
+
                             <div class="mb-4">
                                 <label for="product_name" class="form-label">Product Name</label>
                                 <input type="text" name="productName" value="<%= product.productName %>" class="form-control border"

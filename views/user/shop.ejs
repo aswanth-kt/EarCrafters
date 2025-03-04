@@ -41,7 +41,7 @@
 
 .clear-btn {
     position: absolute;
-    right: 10px;
+    right: 100px;
     font-size: 16px;
     color: #888;
     cursor: pointer;
@@ -233,6 +233,14 @@
  }
 </style>
 
+<div class="page-header breadcrumb-wrap">
+  <div class="container">
+      <div class="breadcrumb">
+          <a href="/" rel="nofollow">Home</a>
+          <span></span> shop
+      </div>
+  </div>
+</div>
 
 <div class="main-container">
  <section class="shop-page container">
@@ -251,9 +259,8 @@
    <div>
     <% if (locals.count) { %>
       <p> <%= count %> results are found </p>
-    <% } else { %>
-      No result found
     <% } %>
+
    </div>
   
    <div class="product-list-container">
@@ -297,6 +304,12 @@
            </div>
          </form>
        </div>
+
+       <br>
+       <div>
+        <a href="/shop"><button type="button" class="btn btn-outline-secondary">Clear Filters</button></a>
+       </div>
+
      </aside>
 
 
@@ -304,7 +317,7 @@
         <% for(let i = 0; i < products.length; i++) { %>
          <div class="product-card">
            <span class="wishlist-btn" onclick="">❤️</span>
-           <a href="">
+           <a href="/productDetails?id=<%= products[i]._id %>">
              <img src="/uploads/re-images/<%= products[i].productImage[0] %>" alt="<%= products[i].productName %>" />
              <h4><%= products[i].productName %></h4>
              <!-- <p></p>     Brand -->
