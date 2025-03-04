@@ -85,9 +85,9 @@ const loadShopPage = async (req, res) => {
     try {
 
         const user = req.session.user;
-        if (user) { 
+            // console.log(user);
 
-            const userData = await User.findOne({_id : user._id});
+            const userData = await User.findOne({_id : user});
 
             // Fetch ctegories data and store the id's in an array
             const categories = await Category.find({isListed: true});
@@ -126,11 +126,7 @@ const loadShopPage = async (req, res) => {
                 totalPages: totalPages,
             });
 
-        } else {
-
-            res.render("shop", {user : null});
-            
-        }
+        
     } catch (error) {
         
         console.error("Shop page not found: ", error);
@@ -211,7 +207,7 @@ const filterProducts = async (req, res) => {
         res.redirect("/pageNotFound");
         
     }
-}
+};
 
 
 

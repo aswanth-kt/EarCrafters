@@ -426,7 +426,7 @@ const verifyChangePassOtp = async (req, res) => {
         if (enteredOtp === req.session.userOtp) {
             res.status(200).json({success: true, redirectUrl: "/reset-password"});
         } else {
-            res.status(400).json({success: false, message: "OTP is not match"})
+            res.status(400).json({success: false, message: "OTP is not match"});
         }
         
     } catch (error) {
