@@ -155,15 +155,15 @@ const filterProducts = async (req, res) => {
         
         if (findCategory && findCategory._id) {
             query.category = findCategory._id;
-            console.log("query :",query);
-            console.log("findCategory :",findCategory);
+            // console.log("query :",query);
+            // console.log("findCategory :",findCategory);
         } else {
             console.log("Error in findCategory");  
         };
 
         let findProducts = await Product.find(query).lean();
         findProducts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        console.log(findProducts)
+        // console.log(findProducts)
 
         // Fetch listed categories
         const categories = await Category.find({isListed: true});
@@ -189,8 +189,10 @@ const filterProducts = async (req, res) => {
                 await userData.save();
             }
         };
+        // console.log("currentProduct :", currentProduct)
+        // console.log("findProducts :", findProducts)
 
-        req.session.filteredProducts = currentProduct;  // Store filtered products in session
+        req.session.filteredProducts = currentProduct;  // Store filtered products in session for Search feature
 
         res.render("shop", {
             user: userData,
@@ -206,6 +208,115 @@ const filterProducts = async (req, res) => {
         console.error("Error in Filter Products: ", error);
         res.redirect("/pageNotFound");
         
+    }
+};
+
+
+const filterByPrice = async (req, res) => {
+    try {
+
+        const user = req.session.user;
+        const lowestPrice = req.query.gt;
+        const highestPrice = req.query.lt;
+
+        const userData = await User.findOne({_id: user});
+        const categories = await Category.find({isListed: true}).lean();
+
+        // Find products for that price range.
+        let findProducts = await Product.find({
+            salePrice: {$gt: lowestPrice, $lt: highestPrice},
+            isBlock: false,
+            quantity: {$gt: 0}
+        }).lean();
+
+        findProducts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        // Pagination
+        let itemsPerPage = 6;
+        let currentPage = parseInt(req.query.page) || 1;
+        let startIndex = (currentPage - 1) * itemsPerPage;
+        let endIndex = startIndex + itemsPerPage;
+        let totalPages = Math.ceil(findProducts.length / itemsPerPage);
+
+        const currentProduct = findProducts.slice(startIndex, endIndex);
+
+        req.session.filteredProducts = findProducts;        // Store filtered products in session for Search feature
+
+        res.render("shop", {
+            user: userData,
+            products: currentProduct,
+            category: categories,
+            totalPages: totalPages,
+            currentPage: currentPage
+        })
+        
+    } catch (error) {
+        
+        console.error("Error in filter by price", error);
+        res.redirect("/pageNotFound");
+
+    }
+};
+
+
+
+// Search products at shope page
+const getSearchProducts = async (req, res) => {
+    try {
+
+        const user = req.session.user;
+        const search = req.body.search.trim();
+        console.log(search)
+        if (!search) {
+            return res.redirect("/shop");
+        };
+
+        const userData = await User.findById(user);
+
+        const categories = await Category.find({isListed: true}).lean();
+        const categoryIds = categories.map(category => category._id);
+
+        // console.log("Session products :", req.session.filteredProducts);
+        let searchResults = [];
+        if (req.session.filteredProducts && req.session.filteredProducts.length > 0) {
+            searchResults = req.session.filteredProducts.filter(product => {
+                return product.productName.toLowerCase().includes(search.toLowerCase());
+            });
+        } else {
+            searchResults = await Product.find({
+                productName: {$regex: search, $options: "i"},
+                isBlock: false,
+                quantity: {$gt: 0},
+                category: {$in: categoryIds}
+            }).lean();
+        };
+        console.log("search result: ", searchResults)
+        searchResults.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        // pagination
+        let itemsPerPage = 6;
+        let currentPage = parseInt(req.query.page) || 1;
+        let totalPages = Math.ceil(searchResults.length / itemsPerPage);
+
+        let startIndex = (currentPage - 1) * itemsPerPage;
+        let endIndex = startIndex + itemsPerPage;
+        const currentProduct = searchResults.slice(startIndex, endIndex);
+        console.log("current products :", currentProduct)
+
+        res.render("shop", {
+            user: userData,
+            products: currentProduct,
+            category: categories,
+            totalPages: totalPages,
+            currentPage: currentPage,
+            count: searchResults.length,
+            searchValue: search
+        })
+        
+    } catch (error) {
+        
+        console.error("Error in get search products", error);
+        res.redirect("/pageNotFound");
     }
 };
 
@@ -498,6 +609,8 @@ module.exports = {
     loadHomepage,
     loadShopPage,
     filterProducts,
+    filterByPrice,
+    getSearchProducts,
     pageNotFound,
     loadSignup,
     signup,

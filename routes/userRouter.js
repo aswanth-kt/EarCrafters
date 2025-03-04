@@ -17,7 +17,11 @@ router.get("/", userAuth, userController.loadHomepage);
 //Shping Management
 router.get("/shop", userAuth, userController.loadShopPage);
 
-router.get("/filter", userAuth, userController.filterProducts)
+router.get("/filter", userAuth, userController.filterProducts);
+
+router.get("/filterPrice", userAuth, userController.filterByPrice);
+
+router.post("/search", userAuth, userController.getSearchProducts);
 
 
 //Sign up Managements

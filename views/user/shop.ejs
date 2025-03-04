@@ -6,51 +6,70 @@
    padding: 20px;
  }
  .shop-topbar {
-   display: flex;
-   justify-content: space-between;
-   align-items: center;
-   margin-bottom: 20px;
- }
+    width: 100%;
+    display: flex;
+    justify-content: center; /* Center the search bar */
+}
 
+.search-bar {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
- .search-form {
-   display: flex;
-   align-items: center;
-   background-color: #f1f1f1;
-   border-radius: 25px;
-   overflow: hidden;
-   max-width: 250px;
-   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
- }
+.search-form {
+    display: flex;
+    width: 350px;  /* Adjust width */
+    align-items: center;
+    background-color: #f1f1f1;
+    border-radius: 25px;
+    overflow: hidden;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    /* padding: 5px 15px; */
+    position: relative;
+}
 
+.search-input {
+    flex: 1;
+    padding: 8px 10px;
+    font-size: 14px;
+    border: none;
+    outline: none;
+    background-color: transparent;
+}
 
- .search-input {
-   flex: 1;
-   padding: 8px 10px;
-   font-size: 14px;
-   border: none;
-   outline: none;
-   background-color: transparent;
- }
+.clear-btn {
+    position: absolute;
+    right: 10px;
+    font-size: 16px;
+    color: #888;
+    cursor: pointer;
+    display: none;
+}
 
+.clear-btn:hover {
+    color: #333;
+}
 
- .search-button {
-   padding: 8px 15px;
-   background-color: #1e918b;
-   color: #fff;
-   border: none;
-   cursor: pointer;
-   font-size: 14px;
-   border-radius: 15px;
-   margin-right: 5px;
-   transition: background-color 0.3s, transform 0.2s;
- }
+.search-button {
+  display: flex;
+    padding: 8px 15px;
+    background-color: #1e918b;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    border-radius: 25px;
+    margin-left: 10px; /* Space between input and button */
+    transition: background-color 0.3s, transform 0.2s;
+}
 
+.search-button:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+}
 
- .search-button:hover {
-   background-color: #0056b3;
-   transform: scale(1.05);
- }
  .sidebar {
    padding: 20px;
    border: 1px solid #ddd;
@@ -219,11 +238,22 @@
  <section class="shop-page container">
    <div class="shop-topbar">
      <div class="search-bar">
-       <form action="" method="POST" class="search-form">
-         <input type="text" name="query" placeholder="Search items..." class="search-input" />
+      <div>
+       <form action="/search" method="POST" class="search-form">
+         <input type="text" name="search" placeholder="Search items..." class="search-input" value="<%= locals.searchValue %>">
+         <span class="clear-btn" id="clearSearch">&times;</span> 
          <button type="submit" class="search-button">Search</button>
        </form>
+       </div>
      </div>
+   </div> <br>
+
+   <div>
+    <% if (locals.count) { %>
+      <p> <%= count %> results are found </p>
+    <% } else { %>
+      No result found
+    <% } %>
    </div>
   
    <div class="product-list-container">
@@ -260,10 +290,10 @@
          <div class="filter-title">Filter by Price</div>
          <form id="price-filter-form">
            <div class="price-options">
-             <a href=""><button type="button" class="price-button">Under ₹500</button></a>
-             <a href=""><button type="button" class="price-button">₹500 - ₹1000</button></a>
-             <a href=""><button type="button" class="price-button">₹1000- ₹1500</button></a>
-             <a href=""><button type="button" class="price-button">Above ₹1500</button></a>
+             <a href="/filterPrice?gt=0&lt=500"><button type="button" class="price-button">Under ₹500</button></a>
+             <a href="/filterPrice?gt=500&lt=1000"><button type="button" class="price-button">₹500 - ₹1000</button></a>
+             <a href="/filterPrice?gt=1000&lt=1500"><button type="button" class="price-button">₹1000- ₹1500</button></a>
+             <a href="/filterPrice?gt=1500&lt=100000"><button type="button" class="price-button">Above ₹1500</button></a>
            </div>
          </form>
        </div>
