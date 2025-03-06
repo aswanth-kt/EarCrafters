@@ -25,6 +25,13 @@ router.get("/filterPrice", userAuth, userController.filterByPrice);
 
 router.post("/search", userAuth, userController.searchProducts);
 
+router.get("/filterPriceLowToHigh", userAuth, userController.filterPriceLowToHigh);
+
+router.get("/filterPriceHighToLow", userAuth, userController.filterPriceHighToLow);
+
+router.get("/filterA-Z", userAuth, userController.filterNameAscendingOrder);
+
+router.get("/filterZ-A", userAuth, userController.filterNameDescendingOrder);
 
 
 

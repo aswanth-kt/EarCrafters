@@ -258,11 +258,10 @@
 
    <div>
     <% if (locals.count) { %>
-      <p> <%= count %> results are found </p>
+      <p> <%= locals.count %> results are found </p>
     <% } %>
-
    </div>
-  
+  <!-- categories -->
    <div class="product-list-container">
      <aside class="sidebar">
        <div class="filter-section">
@@ -271,7 +270,7 @@
            <ul>
             <% for (let i = 0; i < category.length; i++) { %>
                <li class="filter-item">
-                 <a href="/filter?categoryId=<%= category[i]._id %>"> <%= category[i].name %> </a>
+                 <a href="/filter?categoryId=<%= category[i]._id %>&filter<%= filter %>"> <%= category[i].name %> </a>
                </li>
             <% } %>
            </ul>
@@ -291,22 +290,44 @@
          </div>
        </div> -->
 
+       
 
       
        <div class="price-filter">
          <div class="filter-title">Filter by Price</div>
          <form id="price-filter-form">
-           <div class="price-options">
-             <a href="/filterPrice?gt=0&lt=500"><button type="button" class="price-button">Under ₹500</button></a>
-             <a href="/filterPrice?gt=500&lt=1000"><button type="button" class="price-button">₹500 - ₹1000</button></a>
-             <a href="/filterPrice?gt=1000&lt=1500"><button type="button" class="price-button">₹1000- ₹1500</button></a>
-             <a href="/filterPrice?gt=1500&lt=100000"><button type="button" class="price-button">Above ₹1500</button></a>
+           <div class="price-options" >
+             <a  href="/filterPrice?gt=0&lt=500">Under ₹500</a>
+             <a href="/filterPrice?gt=500&lt=1000">₹500 - ₹1000</a>
+             <a href="/filterPrice?gt=1000&lt=1500">₹1000- ₹1500</a>
+             <a href="/filterPrice?gt=1500&lt=100000">Above ₹1500</a>
            </div>
          </form>
        </div>
 
        <br>
-       <div>
+       <div class="filter-section">
+        <div class="filter-title">Sorted By</div>
+        <div class="category-brand-container">
+          <ul>
+              <li class="filter-item">
+                <a href="/filterPriceLowToHigh"> Price: Low to High </a>
+              </li>
+              <li class="filter-item">
+                <a href="/filterPriceHighToLow"> Price: High to Low </a>
+              </li>
+              <li class="filter-item">
+                <a href="/filterA-Z"> Name: A-Z </a>
+              </li>
+              <li class="filter-item">
+                <a href="/filterZ-A"> Name: Z-A </a>
+              </li>
+          </ul>
+        </div>
+      </div>
+
+       <!-- Clear filter btn -->
+       <br><div>
         <a href="/shop"><button type="button" class="btn btn-outline-secondary">Clear Filters</button></a>
        </div>
 
@@ -331,7 +352,7 @@
 
 
 <!-- Pagination -->
-   <div class="pagination">
+   <!-- <div class="pagination">
 
     <% if (currentPage > 1) { %>
         <a class="btn" href="/shop?page=<%= currentPage - 1 %>">Prev</a>
@@ -347,6 +368,12 @@
         <a class="btn" href="/shop?page=<%= currentPage + 1 %>">Next</a>
       <% } %>
  
+   </div> -->
+
+   <div class="pagination">
+      <% for (let i = 1; i <= totalPages; i++) { %>
+        <a class="btn <%= currentPage === i ? 'active' : '' %>" href="/shop?page=<%= i %>&filter=<%= filter %>"><%= i %></a>
+      <% } %>
    </div>
   
  </section>

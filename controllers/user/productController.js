@@ -22,6 +22,7 @@ const productDetails = async (req, res) => {
 
         res.render("product-details", {
             userData: userData,
+            user,   //session user for profile name
             product: product,
             quantity: product.quantity,
             totalOffer: totalOffer,

@@ -208,7 +208,7 @@ ol {
 	0% {
 		-webkit-transform: rotate(0deg);
 		transform: rotate(0deg);
-		border: 4px solid #f44336;
+		border: 4px solid #8794BE;
 		border-left-color: transparent;
 	}
 	50% {
@@ -220,7 +220,7 @@ ol {
 	100% {
 		-webkit-transform: rotate(360deg);
 		transform: rotate(360deg);
-		border: 4px solid #f44336;
+		border: 4px solid #8794BE;
 		border-left-color: transparent;
 	}
 }
@@ -228,7 +228,7 @@ ol {
 @-webkit-keyframes loader {
 	0% {
 		-webkit-transform: rotate(0deg);
-		border: 4px solid #f44336;
+		border: 4px solid #8794BE;
 		border-left-color: transparent;
 	}
 	50% {
@@ -238,7 +238,7 @@ ol {
 	}
 	100% {
 		-webkit-transform: rotate(360deg);
-		border: 4px solid #f44336;
+		border: 4px solid #8794BE;
 		border-left-color: transparent;
 	}
 }
@@ -493,7 +493,7 @@ ol {
 	bottom: 0;
 	width: 100%;
 	height: 2px;
-	background: #e53637;
+	background: #8794BE;
 	content: "";
 	-webkit-transition: all, 0.5s;
 	-o-transition: all, 0.5s;
