@@ -91,7 +91,9 @@ const addCategoryOffer = async (req, res) => {
         //So if any offer in products, clear product offer
         for (const product of products) {
             product.productOffer = 0;
-            product.salePrice = product.regularPrice;
+            // Calculate the new sale price with the category offer
+            const discountAmount = (product.regularPrice * percentage) / 100;
+            product.salePrice = Math.round(product.regularPrice - discountAmount);
             await product.save();
         }
 
@@ -122,7 +124,7 @@ const removeCategoryOffer = async (req, res) => {
         const products = await Product.find({category: categoryData._id});
         if (products.length > 0) {
             for (const product of products) {
-                product.salePrice += Math.floor(product.regularPrice * (percentage / 100));
+                product.salePrice += Math.round(product.regularPrice * (percentage / 100));
             }
         }
 

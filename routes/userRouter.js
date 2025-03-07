@@ -5,6 +5,7 @@ const userMiddleware = require("../middlewares/userMiddleware");    //Session ha
 // const CheckBlockedUser = require("../middlewares/userMiddleware");
 const profileController = require("../controllers/user/profileController");
 const productController = require("../controllers/user/productController");
+const wishlistController = require("../controllers/user/wishlistController");
 const {userAuth, adminAuth} = require("../middlewares/auth");
 const passport = require('passport');
 
@@ -109,6 +110,14 @@ router.get("/deleteAddress", userAuth, profileController.deleteAddress);
 // Product Management
 router.get("/productDetails", userAuth, productController.productDetails);
 
+
+
+// Wishlist Management
+router.get("/wishlist", userAuth, wishlistController.loadWishlistPage);
+
+router.post("/addToWishlist", userAuth, wishlistController.addToWishlist);
+
+router.get("/removeFromWishlist", userAuth, wishlistController.removeProduct);
 
 
 

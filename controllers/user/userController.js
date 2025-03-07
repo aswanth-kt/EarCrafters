@@ -228,7 +228,8 @@ const verifyOtp = async (req, res) => {
             delete req.session.userOtp;
             delete req.session.userData;
 
-            res.json({success : true, redirectUrl : "/login"});
+            res.json({success : true, redirectUrl : "/login",message: "Register successful, Please login"});
+            
         } else {
             res.status(400).json({success : false, message : "Invalid OTP, Please try again"});
         }
@@ -287,7 +288,7 @@ const loadLogin = async (req, res) => {
     try {
         
         if (!req.session.user) {
-            return res.render("login", {message : null});
+            res.render("login", {message : null});
         } else {
             res.redirect("/")
         }
@@ -341,7 +342,7 @@ const logout = async (req, res) => {
         req.session.destroy((err) => {
 
             if (err) {
-                console.error("Session destroy error", error);
+                console.error("Session destroy error", err);
                 return res.redirect("/pageNotFound");
             }
 
@@ -481,7 +482,7 @@ const filterProducts = async (req, res) => {
             totalPages: totalPages,
             currentPage: currentPage,
             selectedCategory: categoryId || null,
-            count: findProducts.length,
+            count: currentProduct.length,
             filter: currentProduct,
         })
         
@@ -550,7 +551,7 @@ const searchProducts = async (req, res) => {
 
         const user = req.session.user;
         const search = req.body.search.trim();
-        console.log(search)
+        // console.log(search)
         if (!search) {
             return res.redirect("/shop");
         };
@@ -561,6 +562,7 @@ const searchProducts = async (req, res) => {
         const categoryIds = categories.map(category => category._id);
 
         // console.log("Session products :", req.session.filteredProducts);
+
         let searchResults = [];
         if (req.session.filteredProducts && req.session.filteredProducts.length > 0) {
             searchResults = req.session.filteredProducts.filter(product => {
@@ -574,7 +576,7 @@ const searchProducts = async (req, res) => {
                 category: {$in: categoryIds}
             }).lean();
         };
-        console.log("search result: ", searchResults)
+        console.log("search result: ", searchResults.length)
         searchResults.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
         // pagination
@@ -585,7 +587,7 @@ const searchProducts = async (req, res) => {
         let startIndex = (currentPage - 1) * itemsPerPage;
         let endIndex = startIndex + itemsPerPage;
         const currentProduct = searchResults.slice(startIndex, endIndex);
-        console.log("current products :", currentProduct)
+        // console.log("current products :", currentProduct)
 
         res.render("shop", {
             user: userData,

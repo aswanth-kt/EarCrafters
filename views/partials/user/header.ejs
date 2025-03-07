@@ -19,7 +19,9 @@
    <link rel="stylesheet" href="css/slicknav.min.css" type="text/css">
    <link rel="stylesheet" href="css/style.css" type="text/css">
    <link rel="stylesheet" href="./user-assets/css/maind134.css">
-   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+   <!-- <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet"> -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
    
 
    <style>
@@ -81,6 +83,98 @@
             height: auto;
         }
 
+
+/* Add this to your existing CSS file (style.css) */
+
+/* Mobile menu styling with list appearance */
+@media only screen and (max-width: 767px) {
+  .mobile-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background-color: white;
+    padding: 15px 0;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+    z-index: 999;
+  }
+  
+  .mobile-menu.show {
+    display: block;
+  }
+  
+  .mobile-menu ul {
+    padding: 0;
+    margin: 0;
+    list-style: none; /* Reset default list style */
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .mobile-menu ul li {
+    padding: 12px 25px;
+    text-align: left;
+    border-bottom: 1px solid #f1f1f1; /* Add separator between items */
+    position: relative;
+    display: block;
+    width: 100%;
+  }
+  
+  .mobile-menu ul li:last-child {
+    border-bottom: none; /* Remove border from last item */
+  }
+  
+  .mobile-menu ul li a {
+    color: #333;
+    font-size: 16px;
+    font-weight: 600;
+    display: block;
+    padding: 5px 0;
+    width: 100%;
+    position: relative;
+  }
+  
+  /* Optional: Add arrow indicators */
+  .mobile-menu ul li a:after {
+    content: "›";
+    position: absolute;
+    right: 0;
+    font-size: 20px;
+  }
+  
+  .canvas__open {
+    cursor: pointer;
+    display: block;
+    font-size: 22px;
+    position: absolute;
+    right: 15px;
+    top: 20px;
+  }
+  
+  .canvas__open.active i:before {
+    content: "\f00d";  /* This changes the hamburger to an X when active */
+  }
+  
+  /* Prevent body scrolling when menu is open */
+  body.menu-open {
+    overflow: hidden;
+  }
+}
+
+/* Ensure desktop menu is visible on larger screens */
+@media only screen and (min-width: 768px) {
+  .mobile-menu {
+    display: block !important;
+  }
+  
+  .canvas__open {
+    display: none;
+  }
+}
+
+
     </style>
 
 </head>
@@ -134,7 +228,7 @@
                 <!-- Logo end -->
 
 
-               <div class="col-lg-6 col-md-6">
+                <div class="col-lg-6 col-md-6 col-12">
                    <nav class="header__menu mobile-menu">
                        <ul>
                            <li><a href="/">Home</a></li>
@@ -171,3 +265,37 @@
        </div>
    </header>
 
+<script>
+   // Add this script at the end of your body tag before the closing </body>
+document.addEventListener('DOMContentLoaded', function() {
+  // Get the canvas open button (hamburger menu icon)
+  const canvasOpen = document.querySelector('.canvas__open');
+  // Get the mobile menu
+  const mobileMenu = document.querySelector('.mobile-menu');
+  
+  // Toggle mobile menu when hamburger icon is clicked
+  if (canvasOpen && mobileMenu) {
+    canvasOpen.addEventListener('click', function() {
+      // Toggle the 'active' class on the hamburger icon
+      this.classList.toggle('active');
+      
+      // Toggle the 'show' class on the mobile menu
+      mobileMenu.classList.toggle('show');
+      
+      // Optional: prevent scrolling when menu is open
+      document.body.classList.toggle('menu-open');
+    });
+  }
+  
+  // Close menu when clicking outside
+  document.addEventListener('click', function(event) {
+    if (mobileMenu.classList.contains('show') && 
+        !mobileMenu.contains(event.target) && 
+        !canvasOpen.contains(event.target)) {
+      mobileMenu.classList.remove('show');
+      canvasOpen.classList.remove('active');
+      document.body.classList.remove('menu-open');
+    }
+  });
+});
+</script>
