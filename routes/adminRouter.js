@@ -52,7 +52,12 @@ router.get("/editCategory", adminAuth, categoryController.getEditCategory);
 
 router.post("/editCategory/:id", adminAuth, categoryController.editCategory);
 
-router.get("/deleteCategory/:id", adminAuth, categoryController.deleteCategory);
+router.delete("/deleteCategory/:categoryId", adminAuth, categoryController.deleteCategory);
+
+router.get("/recoveryDeletedCategory", adminAuth, categoryController.getDeletedCategoryList);
+
+router.get("/categoryRecovery", adminAuth, categoryController.categoryRecovery);
+
 
 
 //Product Management

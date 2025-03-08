@@ -23,6 +23,10 @@ const categorySchema = new Schema ({
     createAt : {
         type : Date,
         default : Date.now
+    },
+    isSoftDelete : {
+        type: Boolean,
+        default: false
     }
 })
 

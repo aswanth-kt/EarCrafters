@@ -14,10 +14,53 @@
                 </div>
                 <div class="d-grid text-end mt-30 col-md-5">
                     <button class="btn btn-primary" type="submit">Update category</button> <br>
-                    <a href="/admin/deleteCategory/<%= categoryData._id %>" class="btn btn-danger" type="submit" onclick="confirm('Are you sure!')">Delete category</a>
+                    <button class="btn btn-danger" type="button" onclick="confirmCategoryDelete('<%= categoryData._id %>')">Delete category</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+
+
+<script>
+
+function confirmCategoryDelete(categoryId) {
+    Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to undo this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, remove it!"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: `/admin/deleteCategory/${categoryId}`,  // Send categoryId in URL
+                method: "DELETE",
+                success: (response) => {
+                    Swal.fire({
+                        title: response.message || "Removed",
+                        text: "Don't worry! You can restore this",
+                        icon: "success"
+                    }).then(() => {
+                        window.location.href = "/admin/category";  // Redirect to category list
+                    });
+                },
+                error: (error) => {
+                    Swal.fire({
+                        title: "Sorry, Something went wrong!",
+                        text: error.responseJSON?.message || "Internal server error",
+                        icon: "error"
+                    });
+                }
+            });
+        }
+    });
+}
+
+</script>
+
+
 <%- include("../../views/partials/admin/footer") %>

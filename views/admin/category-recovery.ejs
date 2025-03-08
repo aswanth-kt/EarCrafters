@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deleted Categories Recovery</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background-color: #4a6cf7;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .sub-header {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .info-box {
+            background-color: #f0f7ff;
+            border-left: 4px solid #4a6cf7;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+
+        .deleted-list {
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .list-header {
+            display: grid;
+            grid-template-columns: 50px 1fr 120px 120px 100px;
+            background-color: #f9f9f9;
+            padding: 12px 15px;
+            font-weight: bold;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .list-item {
+            display: grid;
+            grid-template-columns: 50px 1fr 120px 120px 100px;
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            align-items: center;
+        }
+
+        .list-item:last-child {
+            border-bottom: none;
+        }
+
+        .list-item:hover {
+            background-color: #f5f9ff;
+        }
+
+        .id {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .category-name {
+            font-weight: 500;
+        }
+
+        .deleted-date {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .item-count {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .recovery-btn {
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+
+        .recovery-btn:hover {
+            background-color: #43a047;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        .footer {
+            background-color: #f9f9f9;
+            padding: 15px 20px;
+            text-align: center;
+            border-top: 1px solid #e0e0e0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        @media (max-width: 700px) {
+            .list-header {
+                display: none;
+            }
+
+            .list-item {
+                grid-template-columns: 1fr 100px;
+                grid-template-areas:
+                    "name button"
+                    "meta meta";
+                gap: 10px;
+            }
+
+            .id {
+                grid-area: meta;
+                margin-right: 10px;
+            }
+
+            .category-name {
+                grid-area: name;
+            }
+
+            .deleted-date,
+            .item-count {
+                grid-area: meta;
+                display: inline-block;
+                margin-right: 15px;
+            }
+
+            .recovery-btn {
+                grid-area: button;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Deleted Categories</h1>
+            <div class="sub-header">View and recover your deleted categories</div>
+        </header>
+
+
+        <div class="deleted-list">
+            <div class="list-header">
+                <div class="id">No</div>
+                <div class="category-name">Category Name</div>
+                <div class="action">Action</div>
+            </div>
+
+            <% if (category.length> 0) { %>
+
+                <% category.forEach((category, index)=> { %>
+                    <!-- List items -->
+                    <div class="list-item">
+                        <div class="id">
+                            <%= index + 1 %>
+                        </div>
+                        <div class="category-name">
+                            <%= category.name %>
+                        </div>
+                        <div class="action">
+                            <button class="recovery-btn"><a
+                                    href="/admin/categoryRecovery?id=<%= category._id %>">Recover</a></button>
+                        </div>
+                    </div>
+                    <% }) %>
+                        <% } else { %>
+                            <!-- If no items, show this instead -->
+                            <div class="empty-state">
+                                <p>No deleted categories found</p>
+                                <br>
+                                <button class="recovery-btn"><a href="/admin/category">Go to category page</a></button>
+                            </div>
+                            <% }%>
+
+        </div>
+    </div>
+
+
+    </div>
+</body>
+
+</html>

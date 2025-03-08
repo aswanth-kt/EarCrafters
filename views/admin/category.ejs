@@ -77,7 +77,7 @@
     <header class="card-header text-center mb-20">
       <form action="/admin/category" method="get" class="d-inline">
         <div class="input-group input-group-sm border border-1 border-grey rounded-pill" style="width: 500px; margin-left: 230px">
-          <input type="text" class="form-control border-0 rounded-pill mt-3" placeholder="Search categories" name="search"/>
+          <input type="text" class="form-control border-0 rounded-pill mt-3" placeholder="Search categories" name="search" value="<%= locals.search %>">
           <button class="btn" type="submit">Search</button>
         </div>
       </form>
@@ -167,9 +167,10 @@
                   </tr>
                   <% }) %>
                 </tbody>
-              </table>
+              </table>              
             </div>
           </div>
+          <a href="/admin/recoveryDeletedCategory">Recovery deleted category</a>
         </div>
       </div>
     </div>
@@ -195,12 +196,6 @@
   </section>
 
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-
-  <!-- Sweet alert cdn -->
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-<%- include("../../views/partials/admin/footer") %>
 
 
 <script>
@@ -413,3 +408,10 @@
 
 </script>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+  <!-- Sweet alert cdn -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+<%- include("../../views/partials/admin/footer") %>

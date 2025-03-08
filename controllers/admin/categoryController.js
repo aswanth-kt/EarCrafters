@@ -6,23 +6,35 @@ const Product = require("../../models/productSchema");
 const categoryInfo = async (req, res) => {
     try {
 
-        const page = parseInt(req.query.page) || 1;     // Parse query parameters
-        const limit = 4;
-        const skip = (page - 1) * limit;
+        let page = parseInt(req.query.page) || 1;     // Parse query parameters
+        if (page < 1) page = 1;
 
-        const categoryData = await Category.find({})
+        const search = req.query.search || "";
+        // console.log("Search:", search)
+        const limit = 4;
+        const skip = ((page - 1) * limit);
+
+        const filter = {
+            isSoftDelete: false, 
+            name: { $regex: new RegExp(search, "i") }
+        };
+
+        const categoryData = await Category.find(filter)
         .sort({createdAt : -1})  
         .skip(skip)
-        .limit(limit);
+        .limit(limit)
+        .lean()
+        .exec();
 
-        const totalCategory = await Category.countDocuments();
+        const totalCategory = await Category.countDocuments(filter);
         const totalPage = Math.ceil(totalCategory / limit);
 
         res.render("category", {
             cateData : categoryData,
             currentPage : page,
             totalPages : totalPage,
-            totalCategories : totalCategory
+            totalCategories : totalCategory,
+            search
         });
         
     } catch (error) {
@@ -214,7 +226,7 @@ const editCategory = async (req, res) => {
         const existingCategory = await Category.findOne({name: categoryName});
 
         if (existingCategory) {
-            res.status(400).json({error: "Category name already exists, Please choose another name"});
+            return res.status(400).json({error: "Category name already exists, Please choose another name"});
         };
 
         const updatedCategory = await Category.findByIdAndUpdate(categoryId, 
@@ -225,42 +237,94 @@ const editCategory = async (req, res) => {
         );
 
         if (updatedCategory) {
-            res.redirect("/admin/category");
+            return res.redirect("/admin/category");
         } else { 
-            res.status(400).json({error: "Category not found"});
+            return res.status(400).json({error: "Category not found"});
         }
 
         
     } catch (error) {
 
-        res.status(500).json({error: "Internal server error"});
         console.error("Error at edit category", error);
+        return res.status(500).json({error: "Internal server error"});
         
     }
 };
 
 
 
-//Delete category
+
+//Soft Delete category
 const deleteCategory = async (req, res) => {
     try {
 
-        const categoryId = req.params.id;
-        const {categoryName, description} = req.body;
+        const {categoryId} = req.params;
 
         const hasCategory = await Category.findById(categoryId);
         if (!hasCategory) {
-            res.status(400).json({error: "Category is not found"});
-        } else {
-            await Category.findByIdAndDelete(categoryId);
-            res.redirect("/admin/category");
-        }
+            return res.status(404).json({success: false, message: "Category is not found"});
+        } 
+            await Category.findByIdAndUpdate(categoryId, {$set: {isSoftDelete: true}}, { new: true });
+            return res.status(200).json({success: true, message: "Category removed successfully"});
         
     } catch (error) {
 
-        res.status(500).json({error: "Internal server error"});
         console.error("Error at delete category", error);
+        return res.status(500).json({success: false, message: "Internal server error"});
         
+    }
+};
+
+
+// List all deleted categories
+const getDeletedCategoryList = async (req, res) => {
+    try {
+
+        let page = parseInt(req.query.page) || 1;
+        if (page > 0) page = 1;
+        const limit = 10;
+        let skip = ((page - 1) * limit);
+
+        const deletedCategories = await Category.find({isSoftDelete: true})
+        .sort({name: 1})
+        .skip(skip)
+        .limit(limit)
+        .lean()
+        .exec();
+        // console.log(deletedCategories)
+        // get total count for pagination
+        const count = await Category.countDocuments({isSoftDelete: true});
+        let totalPage = Math.ceil(count / limit);
+
+        res.render("category-recovery", {
+            category: deletedCategories,
+            currentPage: page,
+            totalPage
+        })
+        
+    } catch (error) {
+        
+        console.error("Error in get deleted category list", error);
+        res.redirect("/pageerror");
+        
+    }
+};
+
+
+
+const categoryRecovery = async (req, res) => {
+    try {
+
+        const categoryId = req.query.id;
+        await Category.findByIdAndUpdate(categoryId, {$set: {isSoftDelete: false}});
+
+        res.redirect("/admin/recoveryDeletedCategory")
+        
+    } catch (error) {
+        
+        console.error("Error in category recovery", error);
+        res.redirect("/pageerror");
+
     }
 }
 
@@ -278,4 +342,6 @@ module.exports = {
     getEditCategory,
     editCategory,
     deleteCategory,
+    getDeletedCategoryList,
+    categoryRecovery,
 }

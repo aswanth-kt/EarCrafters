@@ -90,55 +90,51 @@ const addProducts = async (req, res) => {
 
 
 
-// Get all product info
+
 const getAllProducts = async (req, res) => {
     try {
-
         const search = req.query.search || "";
-        const page = req.query.page || 1;
+        let page = parseInt(req.query.page) || 1;
         const limit = 4;
 
-        // for search bar
-        const productData = await Product.find({
-            $or: [
-                {productName: {$regex: new RegExp(".*"+search+".*", "i")}}
-            ],
-        })
-        .sort({createdAt: -1})
-        .populate("category")
-        .skip((page - 1) * limit)
-        .limit(limit * 1)
-        .lean()
-        .exec();
+        // Ensure page is at least 1
+        if (page < 1) page = 1;
 
-        const count = await Product.find({
-            $or: [
-                {productName: {$regex: new RegExp(".*"+search+".*", "i")}},
-                // {category: {$regex: new RegExp(".*"+search+".*", "i")}},
-            ]
-        }).countDocuments();
+        // Define search filter
+        const filter = {
+            productName: { $regex: new RegExp(search, "i") }
+        };
 
-        const category = await Category.find({isListed: true});
+        // Fetch products with pagination
+        const productData = await Product.find(filter)
+            .sort({ createdAt: -1 })
+            .populate("category")
+            .skip((page - 1) * limit)
+            .limit(limit)
+            .lean()
+            .exec();
 
-        if (category) {
-            res.render("products", {
-                data: productData,
-                currentPage: page,
-                totalPages: Math.ceil(count / limit),
-                cat: category,
-                search: search  // for search values
-            })
-        } else {
-            res.render("page-404")
-        }
-        
+        // Get total count for pagination
+        const count = await Product.countDocuments(filter);
+
+        // Fetch categories
+        const category = await Category.find({ isListed: true });
+
+        // Render page
+        res.render("products", {
+            data: productData,
+            currentPage: page,
+            totalPages: Math.ceil(count / limit),
+            cat: category,
+            search // Pass search term to retain in UI
+        });
+
     } catch (error) {
-
-        console.error("Error at get all products", error);
-        res.redirect("/admin/pageerror")
-        
+        console.error("Error at getAllProducts:", error);
+        res.redirect("/admin/pageerror");
     }
 };
+
 
 
 
