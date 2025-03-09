@@ -291,7 +291,7 @@ const getDeletedCategoryList = async (req, res) => {
         .limit(limit)
         .lean()
         .exec();
-        // console.log(deletedCategories)
+
         // get total count for pagination
         const count = await Category.countDocuments({isSoftDelete: true});
         let totalPage = Math.ceil(count / limit);

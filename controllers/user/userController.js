@@ -44,6 +44,7 @@ const loadHomepage = async (req, res) => {
         let ProductData = await Product.find(
             {
                 isBlock: false,
+                isSoftDelete: false,
                 category: {
                     $in: categories.map(category => category._id)
                 },
@@ -371,7 +372,7 @@ const loadShopPage = async (req, res) => {
         const userData = await User.findOne({_id : user});
 
         // Fetch ctegories data and store the id's in an array
-        const categories = await Category.find({isListed: true});
+        const categories = await Category.find({isListed: true, isSoftDelete: false});
         const categoryIds = categories.map((category) => category._id.toString());
 
         // Pagination setup
@@ -381,6 +382,7 @@ const loadShopPage = async (req, res) => {
 
         const products = await Product.find({
             isBlock: false,
+            isSoftDelete: false,
             category: {$in: categoryIds},
             quantity: {$gt: 0},
         })
@@ -390,6 +392,7 @@ const loadShopPage = async (req, res) => {
 
         const totalProducts = await Product.countDocuments({
             isBlock: false,
+            isSoftDelete: false,
             category: {$in: categoryIds},
             quantity: {$gt: 0},
         });
@@ -433,6 +436,7 @@ const filterProducts = async (req, res) => {
         // Create query object
         const query = {
             isBlock: false,
+            isSoftDelete: false,
             quantity: {$gt: 0}
         };
         
@@ -510,6 +514,7 @@ const filterByPrice = async (req, res) => {
         let findProducts = await Product.find({
             salePrice: {$gt: lowestPrice, $lt: highestPrice},
             isBlock: false,
+            isSoftDelete: false,
             quantity: {$gt: 0}
         }).sort({createdAt: -1}).lean();
         // findProducts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -558,7 +563,7 @@ const searchProducts = async (req, res) => {
 
         const userData = await User.findById(user);
 
-        const categories = await Category.find({isListed: true}).lean();
+        const categories = await Category.find({isListed: true, isSoftDelete: false}).lean();
         const categoryIds = categories.map(category => category._id);
 
         // console.log("Session products :", req.session.filteredProducts);
@@ -572,6 +577,7 @@ const searchProducts = async (req, res) => {
             searchResults = await Product.find({
                 productName: {$regex: search, $options: "i"},
                 isBlock: false,
+                isSoftDelete: false,
                 quantity: {$gt: 0},
                 category: {$in: categoryIds}
             }).lean();
@@ -614,15 +620,15 @@ const filterPriceLowToHigh = async (req, res) => {
         
         const user = req.session.user;
         const userData = await User.findById(user);
-        const categories = await Category.find({isListed: true}).lean();
+        const categories = await Category.find({isListed: true, isSoftDelete: false}).lean();
         
         // Pagination
         let itemsPerPage = 6;
         let currentPage = parseInt(req.query.page) || 1;
-        const totalProducts = await Product.countDocuments({isBlock: false})
+        const totalProducts = await Product.countDocuments({isBlock: false, isSoftDelete: false})
         let totalPages = Math.ceil(totalProducts / itemsPerPage);
 
-        const products = await Product.find({isBlock: false})
+        const products = await Product.find({isBlock: false, isSoftDelete: false})
         .sort({salePrice: 1})
         .skip((currentPage - 1) * itemsPerPage)
         .limit(itemsPerPage)
@@ -654,15 +660,15 @@ const filterPriceHighToLow = async (req, res) => {
         
         const user = req.session.user;
         const userData = await User.findById(user);
-        const categories = await Category.find({isListed: true}).lean();
+        const categories = await Category.find({isListed: true, isSoftDelete: false}).lean();
         
         // Pagination
         let itemsPerPage = 6;
         let currentPage = parseInt(req.query.page) || 1;
-        const totalProducts = await Product.countDocuments({isBlock: false})
+        const totalProducts = await Product.countDocuments({isBlock: false, isSoftDelete: false})
         let totalPages = Math.ceil(totalProducts / itemsPerPage);
 
-        const products = await Product.find({isBlock: false})
+        const products = await Product.find({isBlock: false, isSoftDelete: false})
         .sort({salePrice: -1})
         .skip((currentPage - 1) * itemsPerPage)
         .limit(itemsPerPage)
@@ -695,16 +701,16 @@ const filterNameAscendingOrder = async (req, res) => {
 
         const user = req.session.user;
         const userData = await User.findById(user);
-        const categories = await Category.find({isListed: true}).lean();
+        const categories = await Category.find({isListed: true, isSoftDelete: false}).lean();
         
         // Pagination
         let itemsPerPage = 6;
         let currentPage = parseInt(req.query.page) || 1;
-        const totalProducts = await Product.countDocuments({isBlock: false});
+        const totalProducts = await Product.countDocuments({isBlock: false, isSoftDelete: false});
         let totalPages = Math.ceil(totalProducts / itemsPerPage);
 
         // find products based condition
-        const findProducts = await Product.find({isBlock: false})
+        const findProducts = await Product.find({isBlock: false, isSoftDelete: false})
         .sort({productName: 1})
         .skip((currentPage - 1) * itemsPerPage)
         .limit(itemsPerPage)
@@ -737,16 +743,16 @@ const filterNameDescendingOrder = async (req, res) => {
 
         const user = req.session.user;
         const userData = await User.findById(user);
-        const categories = await Category.find({isListed: true}).lean();
+        const categories = await Category.find({isListed: true, isSoftDelete: false}).lean();
         
         // Pagination
         let itemsPerPage = 6;
         let currentPage = parseInt(req.query.page) || 1;
-        const totalProducts = await Product.countDocuments({isBlock: false});
+        const totalProducts = await Product.countDocuments({isBlock: false, isSoftDelete: false});
         let totalPages = Math.ceil(totalProducts / itemsPerPage);
 
         // find products based condition
-        const findProducts = await Product.find({isBlock: false})
+        const findProducts = await Product.find({isBlock: false, isSoftDelete: false})
         .sort({productName: -1})
         .skip((currentPage - 1) * itemsPerPage)
         .limit(itemsPerPage)

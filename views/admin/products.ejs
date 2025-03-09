@@ -29,6 +29,7 @@
                 <th scope="col"><b>Quantity</b></th>
                 <th scope="col"><b>Action</b></th>
                 <th scope="col"><b>Edit</b></th>
+                <th scope="col"><b>Delete / restore</b></th>
             </tr>
         </thead>
         <tbody>
@@ -93,13 +94,30 @@
                     <% } %>
             
                 </td>
-                <td>
+                <!-- <td>
                     <a href="/admin/deleteProduct?id=<%= data[i]._id %>"><i class="fa-solid fa-trash-can" style="color: #000000;"></i></a>
-                </td>
+                </td> -->
                 <td>
                     <button class="btn btn-info" style="width: 80px;">
                         <a href="/admin/editProduct?id=<%= data[i]._id %>" class="text-white" style="text-decoration: none;">Edit</a>
                     </button>
+                </td>
+                    
+                <td>
+                    <% if (data[i].isSoftDelete === false) { %>
+
+                        <button class="btn btn-danger" style="width: 80px;" onclick="deleteConfirmation('<%= data[i]._id %>')">
+                            Delete
+                            <!-- <a href="/admin/productDelete?id=<%= data[i]._id %>" class="text-white" style="text-decoration: none;" onclick="deleteConfirmation('<%= data[i]._id %>')">Delete</a> -->
+                        </button>
+    
+                        <% } else{ %>
+                        
+                            <button class="btn btn-success" style="width: 80px;" onclick="restoreConfirmation('<%= data[i]._id %>')">
+                                Restore
+                            </button>
+    
+                        <% } %>   
                 </td>
             </tr>
 
@@ -251,64 +269,82 @@
         
 
 
-    // async function removeOffer(productId) {
-    //     try {
+// Delete confirmation msg and data parse using ajax
+    function deleteConfirmation(productId){
+        Swal.fire({
+            title: "Are you sure!",
+            text: "You can restore it",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Yes, remove it!"
+        }).then((result) => {
+            if (result.isConfirmed) {
 
-    //         Swal.fire({
+                $.ajax({
+                    url: `/admin/deleteProduct/${productId}`,
+                    method: "DELETE",
+                    success: (response) => {
+                        Swal.fire({
+                            title: response.message || "Removed",
+                            text: "Don't worry! You can restore this",
+                            icon: "success",
+                            timer: 3000
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    },
+                    error: (error) => {
+                        Swal.fire({
+                            title: "Sorry, Something went wrong!",
+                        text: error.responseJSON?.message || "Internal server error",
+                        icon: "error"
+                        });
+                    }
+                });
+            };
+        })
+        
+    }
 
-    //             title: "Remove Offer",
-    //             text: "Are you sure you want to remove this offer?",
-    //             icon: "warning",
-    //             showCancelButton: true,
-    //             confirmButtonColor: "#3085d6",
-    //             cancelButtonColor: "#d33",
-    //             confirmButtonText: "Yes, remove it!"
 
-    //             }).then((result) => {
-                    
-    //             if (result.isConfirmed) {
-    //                 Swal.fire({
-    //                 title: "Deleted!",
-    //                 text: "Your file has been deleted.",
-    //                 icon: "success"
-    //                 });
-    //             }
+    // Restore confirmation
+    function restoreConfirmation(productId){
+        $.ajax({
+            url: `/admin/restoreDeleteproduct/${productId}`,
+            method: "PUT",
+            success: (response) => {
+                if(response.status === true) {
+                    Swal.fire({
+                        title: "Recovery successfull",
+                        text: response.message || "",
+                        icon: "success",
+                        timer: 3000
+                    }).then(() => {
+                        window.location.reload();
+                    })
+                } else {
+                    Swal.fire({
+                        title: response.message || "Error",
+                        text: response.message || "",
+                        icon: "info",
+                        timer: 3000
+                    }).then(() => {
+                        window.location.reload()
+                    })
+                }
+            },
+            error: (error) => {
+                Swal.fire({
+                    title: "Sorry, Something went wrong!",
+                    text: error.responseJSON?.message || "Internal server error",
+                    icon: "error"
+                });
+            }
+        })
+    }
 
-    //         }).then(async (result) => {
-    //             if (result.isConfirmed) {
-    //                 $.ajax({
-    //                     url: "/admin/removeProductOffer",
-    //                     method: "post",
-    //                     data: {
-    //                         productId: productId,
-    //                     },
-    //                     success: (response) => {
-    //                         if (response.status === true) {
-    //                             Swal.fire(
-    //                                 "Removed",
-    //                                 "The offer has been removed",
-    //                                 "success"
-    //                             );
-    //                             location.reload();
-    //                         } else if (response.status === false) {
-    //                             Swal.fire(
-    //                                 "Failed"
-    //                             )
-    //                         } else {
-    //                             alert("Failed");
-    //                         }
-    //                     }
-    //                 })
-    //             }
-    //         })
-            
-    //     } catch (error) {
-
-    //         console.error("Error at remove product offer", error);
-            
-            
-    //     }
-    // }
 
 </script>
 

@@ -81,7 +81,9 @@ router.post("/editProduct/:id", adminAuth, uploads.array("images" , 3), productC
 
 router.post("/deleteImage", adminAuth, productController.deleteSingleImage);
 
-router.get("/deleteProduct", adminAuth, productController.deleteProduct);
+router.delete("/deleteProduct/:productId",adminAuth, productController.deleteProduct);
+
+router.put("/restoreDeleteproduct/:productId", adminAuth, productController.restoreDeletedProduct);
 
 
 //Banner Management

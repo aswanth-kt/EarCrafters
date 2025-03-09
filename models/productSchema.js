@@ -53,6 +53,10 @@ const productSchema = new Schema ({
         enum : ["Available", "Out of Stock", "Discontinued"],
         required : true,
         default : "Available"
+    },
+    isSoftDelete : {
+        type : Boolean,
+        default : false
     }
 
 }, {timestamps : true})

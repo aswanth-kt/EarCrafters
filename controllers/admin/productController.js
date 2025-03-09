@@ -353,24 +353,74 @@ const deleteSingleImage = async (req, res) => {
 
 
 
+// const deleteProduct = async (req, res) => {
+//     try {
+
+//         const {id} = req.query;
+//         console.log("id :", id);
+//         const findProduct = await Product.findById(id);
+//         if (!findProduct) {
+//             return res.status(400).json({message: "Product not found"});
+//         }
+//         console.log("findPro:",findProduct);
+        
+//         await Product.findByIdAndDelete(id);
+//         return res.redirect("/admin/products");
+        
+//     } catch (error) {
+        
+//         console.error("Error in Delete product", error);
+//         return res.status(500).json("Internal server error");
+//     }
+// }
+
 const deleteProduct = async (req, res) => {
     try {
 
-        const {id} = req.query;
-        console.log("id :", id);
-        const findProduct = await Product.findById(id);
-        if (!findProduct) {
-            return res.status(400).json({message: "Product not found"});
+        const {productId} = req.params;
+
+        const hasProduct = await Product.findById(productId)
+        if(!hasProduct) {
+            return res.status(404).json({status: false, message: "Product not found"})
         }
-        console.log("findPro:",findProduct);
-        
-        await Product.findByIdAndDelete(id);
-        return res.redirect("/admin/products");
-        
+
+        const deleteProducts = await Product.findByIdAndUpdate(productId, {$set: {isSoftDelete: true}}, {new: true})
+
+        return res.status(200).json({status: true, message: "Product removed successfully", data: deleteProduct});
+
     } catch (error) {
         
-        console.error("Error in Delete product", error);
-        return res.status(500).json("Internal server error");
+        console.error("Error in delete product", error);
+        res.status(500).json({status:false, message: "Internal server error"})
+        
+    }
+};
+
+
+
+// Restore deleted products
+const restoreDeletedProduct = async (req, res) => {
+    try {
+
+        const {productId} = req.params;
+        const hasProduct = await Product.findById(productId);
+        if (!hasProduct) {
+            return res.status(404).json({status: false, message: "Product is not found"})
+        } 
+
+        // Check if the product is already restored
+        if (!hasProduct.isSoftDelete === true) {
+            return res.status(200).json({ status: false, message: "Product is already restored"});
+        }
+
+        await Product.findByIdAndUpdate(productId, {$set: {isSoftDelete: false}});
+        return res.status(200).json({status: true, message: "Product restored"});
+        
+    } catch (error) {
+
+        console.error("Error in restore deleted product", error);
+        return res.status(500).json({status: false, message: "Internal server error"});
+        
     }
 }
 
@@ -391,4 +441,5 @@ module.exports = {
     editProduct,
     deleteSingleImage,
     deleteProduct,
+    restoreDeletedProduct,
 }
