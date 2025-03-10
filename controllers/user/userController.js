@@ -155,7 +155,9 @@ const signup = async (req, res) => {
         // Check the email is unique
         const findUser = await User.findOne({email});
         if (findUser) {
-            return res.render("signup", {message : "User with this email already exists"});
+            return res.render("signup", {
+                name, phone, email, password, cPassword, // for store the typed data in inputs
+                message : "User with this email already exists"});
         }
 
         const otp = generateOtp();

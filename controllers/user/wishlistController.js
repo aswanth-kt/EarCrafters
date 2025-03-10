@@ -10,7 +10,10 @@ const loadWishlistPage = async (req, res) => {
 
         const user = req.session.user
         const userData = await User.findById(user);
+        // console.log("Wishlist user data :", userData)
+
         const products = await Product.find({_id: {$in: userData.wishlist}}).populate("category");
+        // console.log("Wishlist products ;", products)
 
         res.render("wishlist", {
             user: userData,
@@ -20,7 +23,7 @@ const loadWishlistPage = async (req, res) => {
     } catch (error) {
         
         console.error(" error in Load wishlist page", error);
-        res.ststus(500).redirect("/pageNotFound");
+        res.status(500).redirect("/pageNotFound");
         
     }
 };
@@ -32,6 +35,7 @@ const addToWishlist = async (req, res) => {
     try {
 
         const productId = req.body.productId;
+
         const user = req.session.user;
         const userData = await User.findById(user);
 

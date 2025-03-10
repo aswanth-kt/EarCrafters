@@ -99,11 +99,10 @@
                                       
                                          <button type="submit" class="button button-add-to-cart" onclick="">Add to cart</button>
                                        
-                                         <a aria-label="Add To Wishlist" class="action-btn hover-up" href="#"><i class="fi-rs-heart"></i></a>
+                                         <a aria-label="Add To Wishlist" class="action-btn hover-up" href="javascript:void(0)" onclick="addToWishlist('<%= product._id %>')"><i class="fi-rs-heart"></i></a>
                                      </div>
                                  </div>
                                  <ul class="product-meta font-xs color-grey mt-50">
-                                     <!-- <li class="mb-5">Stock Code: <a href="#">FWM15VKT</a></li> -->
                                      <li class="mb-5">Tags: <a href="#" rel="tag" class="text-muted"> <%= category.name %> </a> <a href="#" rel="tag">  </a> <a href="#" rel="tag"></a> </li>
                                      <% if (quantity > 0) {%>
                                      <li>Availability:<span class="in-stock text-muted ml-5"> <%= quantity %> Items in stock</span></li>
@@ -120,8 +119,103 @@
          </div>
      </div>
  </section>
+
+ <!-- Product Recommendations Section -->
+<section class="product-recommendations mb-50">
+    <div class="container">
+        <div class="section-title style-2">
+            <h3>You May Also Like</h3>
+        </div>
+        <div class="row">
+            <% if (locals.relatedProducts && locals.relatedProducts.length > 0) { %>
+                <% relatedProducts.forEach(relatedProduct => { %>
+                    <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                        <div class="product-cart-wrap mb-30">
+                            <div class="product-img-action-wrap">
+                                <div class="product-img product-img-zoom">
+                                    <a href="/productDetails?id=<%= relatedProduct._id %>">
+                                        <img class="default-img" src="/uploads/re-images/<%= relatedProduct.productImage[0] %>" alt="<%= relatedProduct.productName %>">
+                                        <% if (relatedProduct.productImage.length > 1) { %>
+                                            <img class="hover-img" src="/uploads/re-images/<%= relatedProduct.productImage[1] %>" alt="<%= relatedProduct.productName %>">
+                                        <% } %>
+                                    </a>
+                                </div>
+                                <div class="product-badges product-badges-position product-badges-mrg">
+                                    <% if (relatedProduct.regularPrice > relatedProduct.salePrice) { %>
+                                        <span class="sale">Sale</span>
+                                    <% } %>
+                                </div>
+                            </div>
+                            <div class="product-content-wrap">
+                                <h2><a href="/product/<%= relatedProduct._id %>"><%= relatedProduct.productName %></a></h2>
+                                <div class="product-price">
+                                    <span>₹<%= relatedProduct.salePrice %></span>
+                                    <% if (relatedProduct.regularPrice > relatedProduct.salePrice) { %>
+                                        <span class="old-price">₹<%= relatedProduct.regularPrice %></span>
+                                    <% } %>
+                                </div>
+                                <div class="product-action-1 show">
+                                    <a aria-label="Add To Cart" class="action-btn hover-up" href="javascript:void(0)" onclick="addToCart('<%= relatedProduct._id %>')"><i class="fi-rs-shopping-bag-add"></i></a>
+                                    <a aria-label="Add To Wishlist" class="action-btn hover-up" href="javascript:void(0)" onclick="addToWishlist('<%= relatedProduct._id %>')"><i class="fi-rs-heart"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <div class="col-12 text-center">
+                    <p>No related products found</p>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</section>
+
 </main>
+
+
+<script>
+
+function addToWishlist(productId){
+
+    $.ajax({
+
+        url: "/addToWishlist",
+        method: "POST",
+        data: {productId: productId},
+        success: (response) => {
+            if (response.status === true) {
+
+            Swal.fire({
+                title: response.message || "Added",
+                text: "Product has been added to your wishlist",
+                icon: "success",
+                timer: 3000
+            });
+
+            } else {
+            Swal.fire({
+                title: "Already in wishlist",
+                text: response.message,
+                icon: "info",
+                timer: 3000
+            });
+            };
+        },
+        error: (error) => {
+            Swal.fire({
+            title: "Error",
+            text: error.message || "There was an error in adding the product to wishlis",
+            icon: "error",
+            timer: 3000
+            })
+        }
+
+    })
+
+}
+
+</script>
+
+
 <%- include("../../views/partials/user/footer") %>
-
-
-

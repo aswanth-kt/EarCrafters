@@ -45,6 +45,7 @@ const User = require("../models/userSchema");
 // User authentication
 const userAuth = (req, res, next) => {
     
+    // Without login in gust role
     if (!req.session.user) {
         return next();
     }
