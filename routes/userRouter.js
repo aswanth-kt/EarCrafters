@@ -6,6 +6,7 @@ const userMiddleware = require("../middlewares/userMiddleware");    //Session ha
 const profileController = require("../controllers/user/profileController");
 const productController = require("../controllers/user/productController");
 const wishlistController = require("../controllers/user/wishlistController");
+const cartController = require("../controllers/user/cartController");
 const {userAuth, adminAuth} = require("../middlewares/auth");
 const passport = require('passport');
 
@@ -118,6 +119,18 @@ router.get("/wishlist", userAuth, wishlistController.loadWishlistPage);
 router.post("/addToWishlist", userAuth, wishlistController.addToWishlist);
 
 router.get("/removeFromWishlist", userAuth, wishlistController.removeProduct);
+
+
+
+// Cart Management
+router.get("/cart", userAuth, cartController.getCartPage);
+
+router.post("/addToCart", userAuth, cartController.addToCart);
+
+router.get("/removeFromCart/:productId", userAuth, cartController.removeCartProduct);
+
+router.put("/increaseProductQty", userAuth, cartController.increaseProductQuantity);
+
 
 
 

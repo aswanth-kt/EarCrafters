@@ -344,7 +344,7 @@
              <!-- <p></p>     Brand -->
              <p> <%= products[i].salePrice.toLocaleString('en-IN', { style: 'currency', currency: 'INR' }) %> <span class="text-muted"><strike> <%= products[i].regularPrice.toLocaleString('en-IN',{ style: 'currency', currency: 'INR' }) %> </strike></span></p>
            </a>
-           <button class="add-to-cart-btn" onclick="">Add to Cart</button>
+           <button class="add-to-cart-btn" onclick="addToCart('<%= products[i]._id %>')">Add to Cart</button>
          </div>
          <% } %>
      </main>
@@ -422,7 +422,42 @@
 
     })
 
-  }
+  };
+
+
+  // Add to cart function
+function addToCart(productId) {
+    $.ajax({
+        url: "/addToCart",
+        method: "POST",
+        data: {productId: productId},
+        success: (response) => {
+            if (response.status === true) {
+                Swal.fire({
+                    title: response.message || "Product Added",
+                    text: "Product has been added to your cart",
+                    icon: "success",
+                    timer: 3000
+                })
+            } else {
+                Swal.fire({
+                    title: "Product already in cart",
+                    text: response.message || "Check your cart",
+                    icon: "info",
+                    timer: 3000
+                })
+            }
+        },
+        error: (error) => {
+            Swal.fire({
+            title: "Error",
+            text: error.message || "There was an error in adding the product to wishlis",
+            icon: "error",
+            timer: 3000
+            })
+        }
+    })
+};
 
 </script>
 

@@ -45,7 +45,7 @@ const addToWishlist = async (req, res) => {
 
         userData.wishlist.push(productId);
         await userData.save();
-        return res.status(200).json({status: true, message: "Product added to wishlist"});
+        return res.status(201).json({status: true, message: "Product added to wishlist"});
         
     } catch (error) {
 
@@ -67,7 +67,7 @@ const removeProduct = async (req, res) => {
         const userData = await User.findById(user);
         // find index that product in wishlist array
         const index = userData.wishlist.indexOf(productId);
-        userData.wishlist.splice(index, 1)  // Remove the product fro wishlist array
+        userData.wishlist.splice(index, 1)  // Remove the product from wishlist array
         await userData.save();
 
         return res.status(200).redirect("/wishlist");

@@ -195,7 +195,7 @@
                       <div class="product-content-wrap">
                           <h6><%= products[i].productName %></h6>
                           <h5>₹ <%= products[i].salePrice %></h5>
-                          <a href="/addToCart?id=<%= products[i]._id %>">Add to cart</a>
+                          <a href="javascript:void(0)" onclick="addToCart('<%= products[i]._id %>')">Add to cart</a>
                       </div>
                   </div>
               </div>
@@ -227,7 +227,7 @@
   });
 
 
-
+// Add to Wishlist function
   function addToWishlist(productId){
 
     $.ajax({
@@ -242,7 +242,7 @@
                 title: response.message || "Added",
                 text: "Product has been added to your wishlist",
                 icon: "success",
-                // timer: 2000
+                timer: 3000
             });
 
             } else {
@@ -250,7 +250,7 @@
                 title: "Already in wishlist",
                 text: response.message,
                 icon: "info",
-                // timer: 2000
+                timer: 3000
             });
             };
         },
@@ -259,13 +259,48 @@
             title: "Error",
             text: error.message || "There was an error in adding the product to wishlis",
             icon: "error",
-            // timer: 2000
+            timer: 3000
             })
         }
 
     })
 
-}
+};
+
+
+// Add to cart function
+function addToCart(productId) {
+    $.ajax({
+        url: "/addToCart",
+        method: "POST",
+        data: {productId: productId},
+        success: (response) => {
+            if (response.status === true) {
+                Swal.fire({
+                    title: response.message || "Product Added",
+                    text: "Product has been added to your cart",
+                    icon: "success",
+                    timer: 3000
+                })
+            } else {
+                Swal.fire({
+                    title: "Product already in cart",
+                    text: response.message || "Check your cart",
+                    icon: "info",
+                    timer: 3000
+                })
+            }
+        },
+        error: (error) => {
+            Swal.fire({
+            title: "Error",
+            text: error.message || "There was an error in adding the product to wishlis",
+            icon: "error",
+            timer: 3000
+            })
+        }
+    })
+};
 
 </script>
 
