@@ -50,6 +50,13 @@ const userSchema = new Schema ({
             ref : "Cart",
         }
     ],
+    // cart: [{
+    //     productId: {
+    //       type: Schema.Types.ObjectId,
+    //       ref: 'Cart'
+    //     },
+    //     quantity: Number
+    // }],
     wallet : [
         {
             type : Schema.Types.ObjectId,

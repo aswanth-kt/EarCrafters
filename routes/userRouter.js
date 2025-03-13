@@ -123,13 +123,21 @@ router.get("/removeFromWishlist", userAuth, wishlistController.removeProduct);
 
 
 // Cart Management
-router.get("/cart", userAuth, cartController.getCartPage);
+// router.get("/cart", userAuth, cartController.getCartPage);
 
-router.post("/addToCart", userAuth, cartController.addToCart);
+// router.post("/addToCart", userAuth, cartController.addToCart);
 
-router.get("/removeFromCart/:productId", userAuth, cartController.removeCartProduct);
+// router.get("/removeFromCart/:productId", userAuth, cartController.removeCartProduct);
 
-router.put("/increaseProductQty", userAuth, cartController.increaseProductQuantity);
+// router.post("/increaseProductQty", userAuth, cartController.increaseProductQuantity);
+
+// router.get('/getCartTotal', userAuth, cartController.getCartTotal);
+router.get("/cart", userAuth, cartController.getCartPage)
+router.post("/addToCart",userAuth, cartController.addToCart)
+router.post("/changeQuantity", userAuth,cartController.changeQuantity)
+router.get("/deleteItem", userAuth, cartController.deleteProduct)
+
+
 
 
 
