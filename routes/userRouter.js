@@ -79,6 +79,10 @@ router.post("/reset-password", profileController.updatePassword);
 
 router.get("/userProfile", userAuth, profileController.getUserProfilePage);
 
+router.get("/edit-userProfile", userAuth, profileController.getEditUserProfilePage);
+
+router.put("/edit-profile/:fieldName", userAuth, profileController.editProfile);
+
 router.get("/change-email", userAuth, profileController.loadChangeEmailPage);
 
 router.post("/change-email", userAuth, profileController.changeEmailValid);
@@ -123,19 +127,14 @@ router.get("/removeFromWishlist", userAuth, wishlistController.removeProduct);
 
 
 // Cart Management
-// router.get("/cart", userAuth, cartController.getCartPage);
 
-// router.post("/addToCart", userAuth, cartController.addToCart);
+router.get("/cart", userAuth, cartController.getCartPage);
 
-// router.get("/removeFromCart/:productId", userAuth, cartController.removeCartProduct);
+router.post("/addToCart",userAuth, cartController.addToCart);
 
-// router.post("/increaseProductQty", userAuth, cartController.increaseProductQuantity);
+router.post("/changeQuantity", userAuth,cartController.changeQuantity);
 
-// router.get('/getCartTotal', userAuth, cartController.getCartTotal);
-router.get("/cart", userAuth, cartController.getCartPage)
-router.post("/addToCart",userAuth, cartController.addToCart)
-router.post("/changeQuantity", userAuth,cartController.changeQuantity)
-router.get("/deleteItem", userAuth, cartController.deleteProduct)
+router.get("/deleteItem", userAuth, cartController.deleteProduct);
 
 
 

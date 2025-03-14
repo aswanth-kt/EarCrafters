@@ -281,8 +281,8 @@ function addToCart(productId) {
                 })
             } else {
                 Swal.fire({
-                    title: "Product already in cart",
-                    text: response.message || "Check your cart",
+                    title: "Error",
+                    text:  response.message|| "Check your cart",
                     icon: "info",
                     timer: 3000
                 })

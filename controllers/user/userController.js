@@ -2,6 +2,7 @@ const User = require('../../models/userSchema');
 const Category = require("../../models/categorySchema")
 const Product = require("../../models/productSchema")
 const Banner = require("../../models/bannerSchema");
+const Cart = require("../../models/cartSchema");
 const nodemailer = require('nodemailer');
 const dotenv = require('dotenv').config();
 const bcrypt = require('bcrypt');
@@ -403,6 +404,9 @@ const loadShopPage = async (req, res) => {
 
         const categoriesWithIds = categories.map(category => ({_id: category._id, name: category.name}));
 
+        const cart = await Cart.findOne({ _id: { $in: userData.cart } }).populate("items.productId");
+        console.log("cart:",cart.items.map(item => item.quantity))
+
         res.render("shop", {
             user : userData, 
             products: products,
@@ -410,7 +414,8 @@ const loadShopPage = async (req, res) => {
             totalProducts: totalProducts,
             currentPage: page,
             totalPages: totalPages,
-            filter: null
+            filter: null,
+            cart: cart
         });
 
         

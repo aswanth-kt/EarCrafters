@@ -344,7 +344,11 @@
              <!-- <p></p>     Brand -->
              <p> <%= products[i].salePrice.toLocaleString('en-IN', { style: 'currency', currency: 'INR' }) %> <span class="text-muted"><strike> <%= products[i].regularPrice.toLocaleString('en-IN',{ style: 'currency', currency: 'INR' }) %> </strike></span></p>
            </a>
+
            <button class="add-to-cart-btn" onclick="addToCart('<%= products[i]._id %>')">Add to Cart</button>
+            <!-- <a href="/cart">
+            <button class="add-to-cart-btn" >Go to Cart</button>
+            </a> -->
          </div>
          <% } %>
      </main>
@@ -384,7 +388,6 @@
 
 
 <script>
-
   function addToWishlist(productId){
 
     $.ajax({

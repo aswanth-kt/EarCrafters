@@ -2,6 +2,7 @@ const User = require("../../models/userSchema");
 const Product = require("../../models/productSchema");
 // const Category = require("../../models/categorySchema");
 const Cart = require("../../models/cartSchema");
+const { render } = require("ejs");
 
 
 
@@ -55,21 +56,6 @@ const getCartPage = async (req, res) => {
           }]
         };
       });
-
-    // const data = cart.items.map(item => {
-    //     return {
-    //         quantity: item.quantity,
-    //         _id: item.productId._id,
-    //         // id: item.productId._id,
-    //         productName: item.productId.productName,
-    //         category: item.productId.category,
-    //         description: item.productId.description,
-    //         salePrice: item.productId.salePrice,
-    //         productImage: item.productId.productImage,
-    //         quantity: item.productId.quantity // product's available quantity
-
-    //     };
-    //   });
       
       // Calculate total quantity and grand total
       let quantity = 0;
@@ -100,16 +86,22 @@ const getCartPage = async (req, res) => {
 const addToCart = async (req, res) => {
     try {
       const productId = req.body.productId;
+      const count = req.body.count;
+      console.log("count:", count)
       const userId = req.session.user;
+      if(!userId) {
+        return res.json({ status: false, message: "Please login" });
+      }
+
       const user = await User.findById(userId);
       const product = await Product.findById(productId).lean();
       
       if (!product) {
-        return res.json({ status: "Product not found" });
+        return res.json({ status: false, message: "Product not found" });
       }
       
       if (product.quantity <= 0) {
-        return res.json({ status: "Out of stock" });
+        return res.json({ status: false, message: "Out of stock" });
       }
   
       // Check if user already has a cart
@@ -167,7 +159,7 @@ const addToCart = async (req, res) => {
             userCart.items[itemIndex].totalPrice = 
               userCart.items[itemIndex].price * userCart.items[itemIndex].quantity;
           } else {
-            return res.json({ status: "Out of stock" });
+            return res.json({ status: false, message: "Out of stock" });
           }
         }
         
@@ -196,12 +188,12 @@ const addToCart = async (req, res) => {
       // Find the user's cart
       const user = await User.findById(userId);
       if (!user.cart || user.cart.length === 0) {
-        return res.json({ status: false, error: "No cart found" });
+        return res.json({ status: false, message: "No cart found" });
       }
       
       const cart = await Cart.findOne({ _id: { $in: user.cart } });
       if (!cart) {
-        return res.json({ status: false, error: "No cart found" });
+        return res.json({ status: false, message: "No cart found" });
       }
       
       // Find the product in the cart items
@@ -210,13 +202,13 @@ const addToCart = async (req, res) => {
       );
       
       if (itemIndex === -1) {
-        return res.json({ status: false, error: "Product not found in cart" });
+        return res.json({ status: false, message: "Product not found in cart" });
       }
       
       // Get product for stock check
       const product = await Product.findById(productId);
       if (!product) {
-        return res.json({ status: false, error: "Product not found" });
+        return res.json({ status: false, message: "Product not found" });
       }
       
       // Calculate new quantity
@@ -224,11 +216,11 @@ const addToCart = async (req, res) => {
       
       // Validate new quantity
       if (newQuantity <= 0) {
-        return res.json({ status: false, error: "Quantity cannot be less than 1" });
+        return res.json({ status: false, message: "Quantity cannot be less than 1" });
       }
       
       if (count > 0 && newQuantity > product.quantity) {
-        return res.json({ status: false, error: "Out of stock" });
+        return res.json({ status: false, message: "Out of stock" });
       }
       
       // Update quantity and total price

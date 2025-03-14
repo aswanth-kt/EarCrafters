@@ -251,6 +251,84 @@ const getUserProfilePage = async (req, res) => {
 
 
 
+// Load Edit user profile
+const getEditUserProfilePage = async (req, res) => {
+    try {
+
+        const userId = req.session.user;
+        if (!userId) {
+            console.log("User not found");
+            return res.redirect("/login");
+        }
+
+        const userData = await User.findById(userId);
+
+        res.render("edit-profile", {
+            user: userData
+        });
+        
+    } catch (error) {
+        
+        console.error("Error in get edit user profile page", error);
+        res.redirect("/pageNotFound");
+        
+    }
+}
+
+
+
+const editProfile = async (req, res) => {
+    try {
+
+        const {fieldName} = req.params;             //name field, email field, phone field
+        const fieldValue = req.body[fieldName];     //name value, email value, phone value
+        console.log(fieldName, ":", fieldValue);
+
+        const allowFields = ['name', 'email', 'phone'];
+        if (!allowFields.includes(fieldName)) {
+            return res.status(400).json({
+                status: false,
+                message: "Invalid field name"
+            })
+        };
+
+        const userId = req.session.user;
+
+        // Update the specific field
+        const updateData = {};
+        updateData[fieldName] = fieldValue;
+
+        const updateUser = await User.findByIdAndUpdate(
+            userId,
+            {$set: updateData},
+            {new: true}
+        );
+        
+        if (!updateUser) {
+            return res.status(404).json({
+                status: false,
+                message: "User not found"
+            });
+        }
+
+        return res.status(200).json({
+            status: true,
+            message: "Profile update successfully"
+        })
+
+    } catch (error) {
+        
+        console.error('Error updating profile:', error);
+        return res.status(500).json({
+            status: false,
+            message: 'Server error occurred while updating profile'
+        });
+    }
+}
+
+
+
+
 // Load Email page
 const loadChangeEmailPage = async (req, res) => {
     try {
@@ -624,6 +702,8 @@ module.exports = {
     resendOtp,
     updatePassword,
     getUserProfilePage,
+    getEditUserProfilePage,
+    editProfile,
     loadChangeEmailPage,
     changeEmailValid,
     verifyChangeEmailOtp,
