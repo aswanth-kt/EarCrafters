@@ -1,5 +1,35 @@
 <%- include("../../views/partials/user/header") %>
 
+<style>
+    .quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Space between buttons and input */
+}
+
+.increment-button, .decrement-button {
+    padding: 5px 10px;
+    border: none;
+    background-color: #6888B4;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 5px;
+}
+
+.quantity-input {
+    text-align: center;
+    width: 45px;
+    font-size: 15px;
+    font-weight: bold;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 5px 10px;
+    height: 40px;
+}
+
+</style>
+
 <main class="main">
     <div class="page-header breadcrumb-wrap">
         <div class="container">
@@ -65,14 +95,14 @@
 
 
                                                     <td class="text-center" data-title="Stock">
-                                                        <div class="detail-qty border radius m-auto">
-                                                            <div class="quantity-control">
+                                                        <!-- <div class="detail-qty border radius m-auto"> -->
+                                                            <!-- <div class="quantity-control d-flex">
 
 
                                                                 <div class="quantity-controls">
                                                                     <button class="btn btn-sm increment-button plus"
                                                                         onclick="changeQuantity('<%= data[i].productDetails[0]._id %>', '<%= data[i].quantity %>', 1, '<%= data[i].productDetails[0].salePrice %>',  '<%= data[i].productDetails[0].id %>', '<%= data[i].productDetails[0].quantity%>')">+</button>
-                                                                    <span>
+                                                                    <span class="input-group-btn">
                                                                 <input class="quantity-input"
                                                                     id="cartProductQuantity<%= data[i].productDetails[0].id %>"
                                                                     value="<%= data[i].quantity %>" style="width: 45px;"
@@ -82,7 +112,24 @@
                                                                     onclick="changeQuantity('<%= data[i].productDetails[0]._id %>', '<%= data[i].quantity %>', -1, '<%= data[i].productDetails[0].salePrice %>',  '<%= data[i].productDetails[0].id %>', '<%= data[i].productDetails[0].quantity%>')">-</button>
                                                                 </div>
 
+                                                            </div> -->
+
+                                                            <div class="quantity-control d-flex">
+                                                                <div class="quantity-controls">
+                                                                    <button class="btn btn-sm increment-button plus"
+                                                                        onclick="changeQuantity('<%= data[i].productDetails[0]._id %>', '<%= data[i].quantity %>', 1, '<%= data[i].productDetails[0].salePrice %>',  '<%= data[i].productDetails[0].id %>', '<%= data[i].productDetails[0].quantity%>')">+</button>
+                                                            
+                                                                    <input class="quantity-input"
+                                                                        id="cartProductQuantity<%= data[i].productDetails[0].id %>"
+                                                                        value="<%= data[i].quantity %>"
+                                                                        type="text" readonly>
+                                                            
+                                                                    <button class="btn btn-sm decrement-button minus"
+                                                                        onclick="changeQuantity('<%= data[i].productDetails[0]._id %>', '<%= data[i].quantity %>', -1, '<%= data[i].productDetails[0].salePrice %>',  '<%= data[i].productDetails[0].id %>', '<%= data[i].productDetails[0].quantity%>')">-</button>
+                                                                </div>
                                                             </div>
+                                                            
+
                                                         </div>
                                                     </td>
 
@@ -151,7 +198,8 @@
 
 <script>
     function changeQuantity(productId, cartQuantity, count, productPrice, i, productQuantity) {
-        console.log("productId:",productId, "cart qty :",cartQuantity, "count :", count, "product price :", productPrice, "i :", i, "product qty :", productQuantity)
+        console.log("productId:",productId, "cart qty :",cartQuantity, "count :", count, "product price :", productPrice, "i :", i, "product qty :", productQuantity);
+
         const abc = document.getElementById("totalabc").value
         const cartProductQuantityElement = document.querySelector(`#cartProductQuantity${i}`)
         const subtotalElement = document.querySelector(`#subTotal${i}`);
@@ -160,10 +208,10 @@
         let currentQuantity = parseInt(cartProductQuantityElement.value)
         const currentSubTotal = parseInt(subtotalElement.innerHTML);           
 
-        if (currentQuantity + count > 3) {
+        if (currentQuantity + count > 5) {
             Swal.fire({
                 title: 'Limit Exceeded!',
-                text: 'You can only add up to 3 items to your cart.',
+                text: 'You can only add up to 5 items to your cart.',
                 icon: 'error',
                 timer: 5000
             });
@@ -220,7 +268,7 @@
             },
             error: (error) => {
                 // Handle error
-                wal.fire({
+                Swal.fire({
             title: "Error",
             text: error.message || "There was an error in adding the product to cart",
             icon: "error",

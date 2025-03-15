@@ -1,5 +1,5 @@
 const Product = require("../../models/productSchema");
-const Category = require("../../models/categorySchema");
+const Cart = require("../../models/cartSchema");
 const User = require("../../models/userSchema");
 
 
@@ -28,6 +28,14 @@ const productDetails = async (req, res) => {
             _id: { $ne: product._id } // Exclude current product
         }).limit(4);
 
+        const cart = await Cart.findOne({_id: {$in: userData.cart}}).populate("items.productId");
+
+        const cartItemQty = cart.items.map(item => {
+            return {
+                quantity: item.quantity
+            }
+        })
+
         res.render("product-details", {
             userData: userData,
             user,   //session user for profile name
@@ -35,7 +43,8 @@ const productDetails = async (req, res) => {
             quantity: product.quantity,
             totalOffer: totalOffer,
             category: findCategory,
-            relatedProducts //Recomented product
+            relatedProducts, //Recomented product
+            cartItemQty //cart qty
         })
         
     } catch (error) {
