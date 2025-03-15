@@ -563,7 +563,7 @@ const postAddAddress = async (req, res) => {
             await userAddress.save();
         }
 
-        res.redirect("/userProfile");
+        res.redirect("/userProfile#address");
         
     } catch (error) {
         

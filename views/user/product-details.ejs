@@ -97,7 +97,7 @@
                                      </div>
                                      <div class="product-extra-link2">
                                       
-                                         <button type="submit" class="button button-add-to-cart" onclick="">Add to cart</button>
+                                         <button type="submit" class="button button-add-to-cart" onclick="addToCart('<%= product._id %>')">Add to cart</button>
                                        
                                          <a aria-label="Add To Wishlist" class="action-btn hover-up" href="javascript:void(0)" onclick="addToWishlist('<%= product._id %>')"><i class="fi-rs-heart"></i></a>
                                      </div>
@@ -214,6 +214,41 @@ function addToWishlist(productId){
     })
 
 }
+
+
+// Add to cart function
+function addToCart(productId) {
+    $.ajax({
+        url: "/addToCart",
+        method: "POST",
+        data: { productId: productId },
+        success: (response) => {
+            if (response.status === true) {
+                Swal.fire({
+                    title: response.message || "Product Added",
+                    text: "Product has been added to your cart",
+                    icon: "success",
+                    timer: 3000
+                })
+            } else {
+                Swal.fire({
+                    title: "Product already in cart",
+                    text: response.message || "Check your cart",
+                    icon: "info",
+                    timer: 3000
+                })
+            }
+        },
+        error: (error) => {
+            Swal.fire({
+            title: "Error",
+            text: error.message || "There was an error in adding the product to cart",
+            icon: "error",
+            timer: 3000
+            })
+        }
+    })
+  };
 
 </script>
 

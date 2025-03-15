@@ -29,7 +29,7 @@ const getCartPage = async (req, res) => {
       // Find and populate the cart
       const cart = await Cart.findOne({ _id: { $in: user.cart } })
         .populate('items.productId');
-    //   console.log("cart:", cart);
+      console.log("cart:", cart);
 
       if (!cart) {
         return res.render("cart", {

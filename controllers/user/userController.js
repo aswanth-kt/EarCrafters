@@ -404,8 +404,25 @@ const loadShopPage = async (req, res) => {
 
         const categoriesWithIds = categories.map(category => ({_id: category._id, name: category.name}));
 
-        const cart = await Cart.findOne({ _id: { $in: userData.cart } }).populate("items.productId");
-        console.log("cart:",cart.items.map(item => item.quantity))
+        // const cart = await Cart.findOne({ _id: { $in: userData.cart } }).populate("items.productId");
+        const cart = await Cart.findOne({ _id: { $in: userData.cart } })
+            .populate('items.productId');
+        
+            const cartData = cart.items.map(item => {
+                return {
+                  quantity: item.quantity,
+                  productDetails: [{
+                    _id: item.productId._id,
+                    id: item.productId._id,
+                    productName: item.productId.productName,
+                    category: item.productId.category,
+                    brand: item.productId.brand,
+                    salePrice: item.productId.salePrice,
+                    productImage: item.productId.productImage,
+                    quantity: item.productId.quantity // product's available quantity
+                  }]
+                };
+              });
 
         res.render("shop", {
             user : userData, 
@@ -415,7 +432,7 @@ const loadShopPage = async (req, res) => {
             currentPage: page,
             totalPages: totalPages,
             filter: null,
-            cart: cart
+            cartData
         });
 
         

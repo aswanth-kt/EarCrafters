@@ -170,6 +170,16 @@
     </style>
 
 <body>
+    <div class="page-header breadcrumb-wrap mb-3">
+        <div class="container">
+          <div class="breadcrumb">
+            <a href="/" rel="nofollow">Home</a>
+            <span></span><a href="/userProfile" rel="nofollow">Profile</a> 
+            <span></span>Edit Profile
+          </div>
+        </div>
+      </div>
+
     <div class="EditProfilecontainer">
         <h1>Edit Profile</h1>
         
@@ -314,13 +324,13 @@
         // Set up all editable fields
         document.addEventListener('DOMContentLoaded', function() {
             setupEditField('name');
-            setupEditField('email');
+            // setupEditField('email');
             setupEditField('phone');
             
-            // Handle reset password button (example alert)
-            document.querySelector('.reset-btn').addEventListener('click', function() {
-                alert('Password reset instructions have been sent to your email.');
-            });
+            // // Handle reset password button (example alert)
+            // document.querySelector('.reset-btn').addEventListener('click', function() {
+            //     alert('Password reset instructions have been sent to your email.');
+            // });
         });
     </script>
 </body>
