@@ -136,6 +136,9 @@ router.post("/changeQuantity", userAuth,cartController.changeQuantity);
 
 router.get("/deleteItem", userAuth, cartController.deleteProduct);
 
+  // Update product quantity from product details
+  router.put("/cart/update-quantity/:productId", userAuth, cartController.updateCartQuantity);
+
 
 
 

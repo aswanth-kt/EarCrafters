@@ -91,13 +91,13 @@
                                  <div class="bt-1 border-color-1 mt-30 mb-30"></div>
                                  <div class="detail-extralink">
                                      <div class="detail-qty border radius">
-                                         <a href="#" class="qty-down" onclick="" ><i class="fi-rs-angle-small-down"></i></a>
+                                         <a href="#" class="qty-down" onclick="" id="decrease-quantity"><i class="fi-rs-angle-small-down"></i></a>
                                          <span class="qty-val" id="quantity">1</span>
-                                         <a href="#" class="qty-up" onclick=""><i class="fi-rs-angle-small-up"></i></a>
+                                         <a href="#" class="qty-up" onclick="" id="increase-quantity"><i class="fi-rs-angle-small-up"></i></a>
                                      </div>
                                      <div class="product-extra-link2">
                                       
-                                         <button type="submit" class="button button-add-to-cart" onclick="addToCart('<%= product._id %>','<%= cartItemQty %>')">Add to cart</button>
+                                         <button type="submit" class="add-cart button button-add-to-cart" data-product-id="<%= product._id %>" onclick="addToCart('<%= product._id %>','<%= cartItemQty %>')">Add to cart</button>
                                        
                                          <a aria-label="Add To Wishlist" class="action-btn hover-up" href="javascript:void(0)" onclick="addToWishlist('<%= product._id %>')"><i class="fi-rs-heart"></i></a>
                                      </div>
@@ -155,8 +155,8 @@
                                     <% } %>
                                 </div>
                                 <div class="product-action-1 show">
-                                    <a aria-label="Add To Cart" class="action-btn hover-up" href="javascript:void(0)" onclick="addToCart('<%= relatedProduct._id %>')"><i class="fi-rs-shopping-bag-add"></i></a>
-                                    <a aria-label="Add To Wishlist" class="action-btn hover-up" href="javascript:void(0)" onclick="addToWishlist('<%= relatedProduct._id %>')"><i class="fi-rs-heart"></i></a>
+                                    <a aria-label="Add To Cart" class="add-cart action-btn hover-up" href="javascript:void(0)" data-product-id="<%= product._id %>" onclick="addToCart('<%= relatedProduct._id %>','<%= cartItemQty %>')"><i class="fi-rs-shopping-bag-add"></i></a>
+                                    <a aria-label="Add To Wishlist" class="add-cart action-btn hover-up" href="javascript:void(0)" onclick="addToWishlist('<%= relatedProduct._id %>')"><i class="fi-rs-heart"></i></a>
                                 </div>
                             </div>
                         </div>
@@ -175,6 +175,149 @@
 
 
 <script>
+
+
+document.addEventListener("DOMContentLoaded", function() {
+    let availableProductQuantity = parseInt('<%= quantity %>');
+    console.log("Available quantity:", availableProductQuantity);
+
+    const decreaseBtn = document.getElementById('decrease-quantity');
+    const increaseBtn = document.getElementById('increase-quantity');
+    const quantityInput = document.getElementById('quantity');
+
+    quantityInput.textContent = 1;
+
+    // Decrease button
+    decreaseBtn.addEventListener("click", function(e) {
+        e.preventDefault();
+
+        let currentQuantity = parseInt(quantityInput.textContent);
+        // console.log("Current quantity (decrease):", currentQuantity);
+
+        if (currentQuantity > 1) {
+            quantityInput.textContent = currentQuantity - 1;
+        }
+    });
+
+    // Increase Button
+    increaseBtn.addEventListener("click", function(e) {
+        e.preventDefault()
+
+        let currentQuantity = parseInt(quantityInput.textContent);
+
+        // console.log("Current quantity (increase):", currentQuantity);
+        // console.log("Comparing:", currentQuantity, "<", availableProductQuantity);
+
+
+        if (currentQuantity < availableProductQuantity) {
+            quantityInput.textContent = currentQuantity + 1;
+        } else {
+            Swal.fire({
+                title: "Limit Reached!",
+                text: `You cannot add more than ${availableProductQuantity} of this product.`,
+                icon: "warning",
+                confirmButtonColor: "#3085d6",
+                confirmButtonText: "OK",
+                timer: 3000
+            });
+        }
+    });
+
+    const addToCartBtn = document.querySelectorAll(".add-cart");
+
+    addToCartBtn.forEach((button) => {
+        button.addEventListener("click", async (event) => {
+            event.preventDefault();
+
+            let currentQuantity = parseInt(quantityInput.textContent);
+
+            if (currentQuantity > 5) {
+                Swal.fire({
+                    title: "Limit Exceeded!",
+                    text: "You cannot add more than 5 of this product.",
+                    icon: "warning",
+                    confirmButtonColor: "#3085d6",
+                    confirmButtonText: "OK",
+                    timer: 3000
+                });
+                return;
+            };
+
+            if (availableProductQuantity <= 0) {
+                Swal.fire({
+                    title: "Out of Stock!",
+                    text: "This product is currently out of stock. Please check later.",
+                    icon: "warning",
+                    confirmButtonColor: "#3085d6",
+                    confirmButtonText: "OK",
+                });
+                return;
+            };
+
+            const productId = event.target.getAttribute("data-product-id");
+
+            if (!productId) {
+                console.error("No product ID found!", error);
+                return;
+            }
+
+            try {
+                const response = await fetch("/cart/update-quantity/" + productId, {
+                    method: "PUT",
+                    headers: {
+                    "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                    productId: productId,
+                    quantity: currentQuantity,
+                    }),
+                    
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    Swal.fire({
+                        title: "Success!",
+                        text: "Item added to cart",
+                        icon: "success",
+                        showCancelButton: true,
+                        confirmButtonColor: "#3085d6",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "Go to cart",
+                        cancelButtonText: "Cancel",
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = "/cart";
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        title: "Error",
+                        text: data.message,
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#3085d6",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "Login",
+                        cancelButtonText: "Cancel",
+                    }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "/login";
+                    }
+                    });
+                }
+                } catch (error) {
+                    console.error("Error:", error);
+                    alert("There was an error adding the item to the cart.");
+                }
+        })
+    })
+});
+
+
+
+
 
 function addToWishlist(productId){
 
@@ -216,39 +359,6 @@ function addToWishlist(productId){
 }
 
 
-// Add to cart function
-function addToCart(productId) {
-    $.ajax({
-        url: "/addToCart",
-        method: "POST",
-        data: { productId: productId },
-        success: (response) => {
-            if (response.status === true) {
-                Swal.fire({
-                    title: response.message || "Product Added",
-                    text: "Product has been added to your cart",
-                    icon: "success",
-                    timer: 3000
-                })
-            } else {
-                Swal.fire({
-                    title: "Product already in cart",
-                    text: response.message || "Check your cart",
-                    icon: "info",
-                    timer: 3000
-                })
-            }
-        },
-        error: (error) => {
-            Swal.fire({
-            title: "Error",
-            text: error.message || "There was an error in adding the product to cart",
-            icon: "error",
-            timer: 3000
-            })
-        }
-    })
-  };
 
 </script>
 
