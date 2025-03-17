@@ -367,15 +367,35 @@ const logout = async (req, res) => {
 // Shop page
 const loadShopPage = async (req, res) => {
     try {
+        let userData = null;
+        let cartData = [];
 
-        const user = req.session.user;
-        // const filter = req.query.filter;
-        // console.log("filter :",filter)
+        if (req.session.user) {
+            userData = await User.findOne({ _id: req.session.user });
 
-        const userData = await User.findOne({_id : user});
+            if (userData && userData.cart && userData.cart.length > 0) {
+                const cart = await Cart.findOne({ _id: { $in: userData.cart } }).populate('items.productId');
+                
+                if (cart && cart.items.length > 0) {
+                    cartData = cart.items.map(item => ({
+                        quantity: item.quantity,
+                        productDetails: [{
+                            _id: item.productId._id,
+                            id: item.productId._id,
+                            productName: item.productId.productName,
+                            category: item.productId.category,
+                            brand: item.productId.brand,
+                            salePrice: item.productId.salePrice,
+                            productImage: item.productId.productImage,
+                            quantity: item.productId.quantity // product's available quantity
+                        }]
+                    }));
+                }
+            }
+        }
 
-        // Fetch ctegories data and store the id's in an array
-        const categories = await Category.find({isListed: true, isSoftDelete: false});
+        // Fetch categories
+        const categories = await Category.find({ isListed: true, isSoftDelete: false });
         const categoryIds = categories.map((category) => category._id.toString());
 
         // Pagination setup
@@ -383,49 +403,30 @@ const loadShopPage = async (req, res) => {
         const limit = 9;
         const skip = (page - 1) * limit;
 
+        // Fetch products
         const products = await Product.find({
             isBlock: false,
             isSoftDelete: false,
-            category: {$in: categoryIds},
-            quantity: {$gt: 0},
+            category: { $in: categoryIds },
+            quantity: { $gt: 0 },
         })
-        .sort({createdAt: -1})
+        .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit);
 
         const totalProducts = await Product.countDocuments({
             isBlock: false,
             isSoftDelete: false,
-            category: {$in: categoryIds},
-            quantity: {$gt: 0},
+            category: { $in: categoryIds },
+            quantity: { $gt: 0 },
         });
 
         const totalPages = Math.ceil(totalProducts / limit);
 
-        const categoriesWithIds = categories.map(category => ({_id: category._id, name: category.name}));
-
-        // const cart = await Cart.findOne({ _id: { $in: userData.cart } }).populate("items.productId");
-        const cart = await Cart.findOne({ _id: { $in: userData.cart } })
-            .populate('items.productId');
-        
-            const cartData = cart.items.map(item => {
-                return {
-                  quantity: item.quantity,
-                  productDetails: [{
-                    _id: item.productId._id,
-                    id: item.productId._id,
-                    productName: item.productId.productName,
-                    category: item.productId.category,
-                    brand: item.productId.brand,
-                    salePrice: item.productId.salePrice,
-                    productImage: item.productId.productImage,
-                    quantity: item.productId.quantity // product's available quantity
-                  }]
-                };
-              });
+        const categoriesWithIds = categories.map(category => ({ _id: category._id, name: category.name }));
 
         res.render("shop", {
-            user : userData, 
+            user: userData,
             products: products,
             category: categoriesWithIds,
             totalProducts: totalProducts,
@@ -435,14 +436,12 @@ const loadShopPage = async (req, res) => {
             cartData
         });
 
-        
     } catch (error) {
-        
         console.error("Shop page not found: ", error);
         res.status(500).redirect("/pageNotFound");
-        
     }
 };
+
 
 
 

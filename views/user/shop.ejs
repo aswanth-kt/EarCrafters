@@ -345,7 +345,7 @@
              <p> <%= products[i].salePrice.toLocaleString('en-IN', { style: 'currency', currency: 'INR' }) %> <span class="text-muted"><strike> <%= products[i].regularPrice.toLocaleString('en-IN',{ style: 'currency', currency: 'INR' }) %> </strike></span></p>
            </a>
        
-           <% if (cartData) { %>
+           <% if (locals.cartData) { %>
            <button class="add-to-cart-btn" onclick="addToCart('<%= products[i]._id %>')">Add to Cart</button>
            <% } else { %>
             <a href="/cart">

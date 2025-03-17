@@ -5,6 +5,8 @@ const bcrypt = require('bcrypt');
 const evn = require('dotenv').config();
 const session = require('express-session');
 const { text } = require("express");
+const { name } = require("ejs");
+
 
 
 
@@ -563,7 +565,7 @@ const postAddAddress = async (req, res) => {
             await userAddress.save();
         }
 
-        res.redirect("/userProfile#address");
+        res.redirect("/userProfile");
         
     } catch (error) {
         
@@ -579,8 +581,12 @@ const postAddAddress = async (req, res) => {
 const getEditAddress = async (req, res) => {
     try {
 
+        // const redirectToUserProfile = "/userProfile";
+        // const redirectToCheckout = "/checkout";
+
         const addressId = req.query.id;
         const user = req.session.user;
+        const userData = await User.findById(user);
         const currentAddress = await Address.findOne({"address._id": addressId});
         // console.log("current add: ", currentAddress)
         if (!currentAddress) {
@@ -596,7 +602,12 @@ const getEditAddress = async (req, res) => {
             return res.redirect("/pageNotFound");
         };
 
-        res.render("edit-address", {UserAddress: addresData, user: user});
+        res.render("edit-address", {
+            userAddress: addresData,
+            user: userData || user,
+            // redirectToCheckout,
+            // redirectToUserProfile,
+        });
         
     } catch (error) {
 
@@ -608,54 +619,95 @@ const getEditAddress = async (req, res) => {
 
 
 
-// Edit and update the address
+
 const postEditAddress = async (req, res) => {
     try {
 
-        const data = req.body;
-        const addressId = req.query.id;
-        // const user = req.session.user;
-        // const findAddress = await Address.findOne({"address._id": addressId});
-        const findAddress = await Address.findOne({
-            address: {
-                $elemMatch: {       // "$elemMatch" operator is to find the array address
-                    _id: addressId 
-                }
-            }
-        });
+        let redirectToUserProfile;
+        let redirectToCheckout;
 
+        // Receive user input data from frondend
+        const inputData = req.body;
+        console.log("formData :", inputData);
+
+        const userId = req.session.user;
+        const userData = await User.findById(userId);
+
+        const addressId = inputData.addressId || req.query.addressId;
+        console.log("addressId :", addressId);
+
+        if (req.query.comeIn) {
+            redirectToCheckout = "/checkout";
+        } else {
+            redirectToUserProfile = "/userProfile";
+        }
+
+        const findAddress = await Address.findOne({"address._id": addressId});
         if (!findAddress) {
-            console.log("Address not found");
-            res.redirect("/pageNotFound");
+            return res.status(404).json({
+                status: false,
+                message: "Address Not Found",
+            })
+        }
+
+        // Check if the same pincode exists in another address
+        const addressExists = await Address.findOne({
+            "address.pincode": inputData.pincode,
+            "address._id": { $ne: addressId },
+            userId: userData._id,
+        });
+      
+        if (addressExists) {
+            return res.status(401).json({
+                success: false,
+                message: "This pincode is already associated with another address",
+            });
+        };
+
+        const isDefault = inputData.isDefault === true;
+        if (isDefault) {
+            await Address.updateMany(
+                {userId: userData._id, "address.isDefault": true},
+                {$set: {
+                    "address.$.isDefault": false    // Set other addresses' isDefault to false
+                }}
+            )
         };
 
         await Address.updateOne(
             {"address._id": addressId},
-                {$set: {
-                    "address.$": {      // The "$" operator updates the matched subdocument
-                        _id: addressId,
-                        addressType: data.addressType,
-                        name: data.name,
-                        city: data.city,
-                        landMark: data.landMark,
-                        state: data.state,
-                        pincode: data.pincode,
-                        phone: data.phone,
-                        altPhone: data.altPhone
-                    }
+            {$set: {
+                "address.$": {
+                    _id: addressId,
+                    addressType: inputData.addressType,
+                    name: inputData.name,
+                    city: inputData.city,
+                    landMark: inputData.landMark,
+                    state: inputData.state,
+                    pincode: inputData.pincode,
+                    phone: inputData.phone,
+                    altPhone: inputData.altPhone,
+                    isDefault: isDefault,
                 }
-            }
-        );
+            }}
+        )
 
-        res.redirect("/userProfile");
-
-    } catch (error){
-
-        console.error("Error in Post edit address", error);
-        res.redirect("/pageNotFound");
+        res.status(200).json({
+            status: true,
+            message: "Address updated successfully",
+            redirectToCheckout,
+            redirectToUserProfile
+        })
         
+    } catch (error) {
+        
+        console.error("Error in post edit address", error);
+        res.status(500).json({
+            status: false,
+            message: "Internal server error"
+        })
     }
-};
+}
 
 
 

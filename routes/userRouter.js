@@ -7,6 +7,7 @@ const profileController = require("../controllers/user/profileController");
 const productController = require("../controllers/user/productController");
 const wishlistController = require("../controllers/user/wishlistController");
 const cartController = require("../controllers/user/cartController");
+const checkoutController = require("../controllers/user/checkoutController");
 const {userAuth, adminAuth} = require("../middlewares/auth");
 const passport = require('passport');
 
@@ -127,7 +128,6 @@ router.get("/removeFromWishlist", userAuth, wishlistController.removeProduct);
 
 
 // Cart Management
-
 router.get("/cart", userAuth, cartController.getCartPage);
 
 router.post("/addToCart",userAuth, cartController.addToCart);
@@ -135,10 +135,15 @@ router.post("/addToCart",userAuth, cartController.addToCart);
 router.post("/changeQuantity", userAuth,cartController.changeQuantity);
 
 router.get("/deleteItem", userAuth, cartController.deleteProduct);
+// Update product quantity from product details
+router.put("/cart/update-quantity/:productId", userAuth, cartController.updateCartQuantity);
 
-  // Update product quantity from product details
-  router.put("/cart/update-quantity/:productId", userAuth, cartController.updateCartQuantity);
 
+
+// Checkout Management
+router.get("/checkout", userAuth, checkoutController.getCheckoutPage);
+// Checkout Management Update Default Address
+router.post("/update-default-address", userAuth, checkoutController.updateDefaultAddress);
 
 
 

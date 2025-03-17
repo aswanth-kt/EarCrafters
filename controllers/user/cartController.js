@@ -29,7 +29,7 @@ const { render } = require("ejs");
       // Find and populate the cart
       const cart = await Cart.findOne({ _id: { $in: user.cart } })
         .populate('items.productId');
-      console.log("cart:", cart);
+      // console.log("cart:", cart);
 
       if (!cart) {
         return res.render("cart", {
@@ -301,103 +301,6 @@ const { render } = require("ejs");
 
 
 // Update product quantity from product details
-// const updateCartQuantity = async (req, res) => {
-//   try {
-
-//     const {productId, quantity} = req.body;
-//     const userId = req.session.user;
-
-//     if (!productId && !quantity && !userId) {
-//       console.log("ProductId, Quantity, or userId is not found");
-//       return res.status(400).json({
-//         success: false, 
-//         message: "Something went wrong"
-//       });
-//     };
-
-//     const product = await Product.findOne(
-//       {_id: productId},
-//       {isBlock: false, isSoftDelete: false
-//     });
-
-//     if (!product) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "Product not found or unavailable"
-//       });
-//     }
-
-//     if (quantity > 5) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "Cannot add more than 5 of this product"
-//       });
-//     };
-
-//     const user = await User.findById(userId)
-//     if (!user) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "User not found"
-//       });
-//     }
-
-//     let cart = await Cart.find({ _id: { $in: user.cart } });
-
-//     if (!cart) {
-//       cart = await Cart.create({
-//         userId: userId,
-//         items: [
-//           {
-//             productId,
-//             quantity,
-//             price : product.salePrice,
-//             totalPrice: product.salePrice * quantity,
-//           },
-//         ],
-//       });
-//     } else {
-//       const itemIndex = cart.items.findIndex(
-//         (item) => item.productId.toString() === productId
-//       );
-//       // console.log("itemIndex :", itemIndex);
-
-//       if (itemIndex > -1) {
-//         cart.items[itemIndex].quantity = quantity;
-//         cart.items[itemIndex].totalPrice = cart.items[itemIndex].price * quantity;
-//       } else {
-//         const productPrice = product.salePrice;
-//         cart.items.push({
-//           productId,
-//           quantity,
-//           price: productPrice,
-//           totalPrice: productPrice * quantity,
-//         });
-//       }
-//       await cart.items
-//     };
-    
-//     // Calculate total cart amount
-//     const totalAmount = cart.items.reduce(
-//       (sum, item) => sum + item.totalPrice, 0
-//     );
-
-//     res.status(200).json({
-//       success: true,
-//       cartData: {
-//         items: cart.items,
-//         totalAmount: totalAmount,
-//       },
-//     })
-    
-//   } catch (error) {
-    
-//     console.error("Error in update cart quantity", error);
-//     res.redirect("/pageNotFound");
-    
-//   }
-// }
-
 const updateCartQuantity = async (req, res) => {
   try {
     const { productId, quantity } = req.body;
@@ -439,8 +342,9 @@ const updateCartQuantity = async (req, res) => {
     }
 
     // Get all user's carts
-    let userCarts = await Cart.find({ _id: { $in: user.cart } });
-    console.log(userCarts)
+    let userCarts = await Cart.find({ userId });
+    // let userCarts = await Cart.find({ _id: { $in: user.cart } });
+    console.log("User Carts :", userCarts)
     
     // Find if this product is already in any of the user's carts
     let existingCartWithProduct = null;
@@ -463,7 +367,7 @@ const updateCartQuantity = async (req, res) => {
       // Update existing cart item
       existingCartWithProduct.items[itemIndex].quantity = quantity;
       existingCartWithProduct.items[itemIndex].totalPrice = 
-        existingCartWithProduct.items[itemIndex].price * quantity;
+        existingCartWithProduct.items[itemIndex].price * quantity;  
       
       updatedCart = await existingCartWithProduct.save();
     } else {
@@ -514,11 +418,14 @@ const updateCartQuantity = async (req, res) => {
     });
     
   } catch (error) {
+
     console.error("Error in update cart quantity", error);
+
     res.status(500).json({
       success: false,
       message: "Server error"
     });
+
   }
 };
 
