@@ -101,10 +101,6 @@ const forgotEmailValid = async (req, res) => {
         if (findUser) {
             const otp = generateOtp();
             const emailSent = await sendVerificationEmail(email, otp)
-            // .catch(err => {
-            //     console.error("Error sending email:", err);
-            //     return false;
-            // });
 
             if (emailSent) {
                 req.session.userOtp = otp;
@@ -623,9 +619,6 @@ const getEditAddress = async (req, res) => {
 const postEditAddress = async (req, res) => {
     try {
 
-        let redirectToUserProfile;
-        let redirectToCheckout;
-
         // Receive user input data from frondend
         const inputData = req.body;
         console.log("formData :", inputData);
@@ -695,8 +688,6 @@ const postEditAddress = async (req, res) => {
         res.status(200).json({
             status: true,
             message: "Address updated successfully",
-            redirectToCheckout,
-            redirectToUserProfile
         })
         
     } catch (error) {

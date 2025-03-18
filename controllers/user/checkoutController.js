@@ -109,6 +109,47 @@ const updateDefaultAddress = async (req, res) => {
   
 
 
+  const getEditCheckoutAddress = async (req, res) => {
+    try {
+
+      const addressId = req.query.id;
+      const user = req.session.user;
+      const userData = await User.findById(user);
+      const currentAddress = await Address.findOne({"address._id": addressId});
+
+      if (!currentAddress) {
+        console.log("Current address not found", currentAddress);
+        return res.status(404).json({
+          status: false,
+          message: "Address Not Found"
+        })
+      }
+
+      // Find taht address data in address array
+      const addresData = currentAddress.address.find((item) => {
+        return item._id.toString() === addressId.toString();
+      });
+
+      if (!addresData) {
+        return res.status(404).json({
+          status: false,
+          message: "Address Not Found."
+        })
+      };
+
+      res.render("edit-checkout-address", {
+        userAddress: addresData,
+        user: userData || user,
+      });
+      
+    } catch (error) {
+
+      console.error("Error in Get edit address", error);
+      res.redirect("/pageNotFound");
+        
+    }
+  }
+
 
 
 
@@ -117,4 +158,5 @@ const updateDefaultAddress = async (req, res) => {
 module.exports = {
     getCheckoutPage,
     updateDefaultAddress,
+    getEditCheckoutAddress,
 }

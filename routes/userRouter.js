@@ -144,6 +144,9 @@ router.put("/cart/update-quantity/:productId", userAuth, cartController.updateCa
 router.get("/checkout", userAuth, checkoutController.getCheckoutPage);
 // Checkout Management Update Default Address
 router.post("/update-default-address", userAuth, checkoutController.updateDefaultAddress);
+// When click edit button in checkout page
+router.get("/editCheckoutAddress", userAuth, checkoutController.getEditCheckoutAddress);
+
 
 
 

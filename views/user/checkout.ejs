@@ -381,7 +381,7 @@
                             </p>
 
                             <div class="address-action-buttons">
-                                <a href="/editAddress?id=<%= defaultAddress._id %>&comeIn=checkout">
+                                <a href="/editCheckoutAddress?id=<%= defaultAddress._id %>">
                                 <button class="address-action-btn" id="editAddressBtn" onclick="editAddress('<%= defaultAddress._id %>')">Edit</button>
                                 </a>
                                 <button class="address-action-btn" id="changeAddressBtn">Change Address</button>
@@ -422,6 +422,8 @@
                                 <p>No Address Found</p>
                             <% } %>
                 </div>
+
+                
                 <!-- Change Address Modal -->
                 <div id="changeAddressModal" class="modal fade" tabindex="-1" aria-labelledby="changeAddressModalLabel"
                     aria-hidden="true">
@@ -575,7 +577,7 @@
 
     // function editAddress(addressId) {
     //     console.log("addressId:", addressId);
-    //     fetch("/editAddress", {
+    //     fetch(`/editCheckoutAddress?id=${addressId}`, {
     //         method: "POST",
     //         headers: {
     //             "Content-Type": "application/json"
