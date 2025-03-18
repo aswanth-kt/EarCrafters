@@ -23,12 +23,27 @@ const getCheckoutPage = async (req, res) => {
             });
         };
 
+        let grandTotal = req.session.grandTotal
         const cart = await Cart.findOne({_id: {$in: user.cart}}).populate("items.productId");
+
+        const cartData = cart.items.map((item) => {
+          return {
+            cartQuantity: item.quantity,
+            _id: item.productId._id,
+            productName: item.productId.productName,
+            salePrice: item.productId.salePrice,
+            productImage: item.productId.productImage,
+            color: item.productId.color,
+            productQuantity: item.productId.quantity,
+            totalPrice: item.quantity * item.productId.salePrice
+          }
+        })
 
         const userAddress = await Address.findOne({userId: userId}).select("address");
 
         const notDefaultAddress = userAddress 
-          ? userAddress.address.find((addr) => addr.isDefault === false) : null; 
+        ? userAddress.address.filter((addr) => addr.isDefault === false) : null;  
+
         console.log("notDefaultAddress :", notDefaultAddress);
 
         // Only default address
@@ -42,9 +57,11 @@ const getCheckoutPage = async (req, res) => {
             user,
             cartItems,
             addresses : userAddress ? userAddress.address : [],
-            defaultAddress: defaultAddress || {},
-            userAddress: userAddress,
+            defaultAddress: defaultAddress || {} ,
+            userAddress,
             notDefaultAddress,
+            cartData,
+            grandTotal,
         })
 
     } catch (error) {
@@ -108,50 +125,50 @@ const updateDefaultAddress = async (req, res) => {
   };
   
 
+// Get edit address page and go to address management function
+const getEditCheckoutAddress = async (req, res) => {
+  try {
 
-  const getEditCheckoutAddress = async (req, res) => {
-    try {
+    const addressId = req.query.id;
+    const user = req.session.user;
+    const userData = await User.findById(user);
+    const currentAddress = await Address.findOne({"address._id": addressId});
 
-      const addressId = req.query.id;
-      const user = req.session.user;
-      const userData = await User.findById(user);
-      const currentAddress = await Address.findOne({"address._id": addressId});
-
-      if (!currentAddress) {
-        console.log("Current address not found", currentAddress);
-        return res.status(404).json({
-          status: false,
-          message: "Address Not Found"
-        })
-      }
-
-      // Find taht address data in address array
-      const addresData = currentAddress.address.find((item) => {
-        return item._id.toString() === addressId.toString();
-      });
-
-      if (!addresData) {
-        return res.status(404).json({
-          status: false,
-          message: "Address Not Found."
-        })
-      };
-
-      res.render("edit-checkout-address", {
-        userAddress: addresData,
-        user: userData || user,
-      });
-      
-    } catch (error) {
-
-      console.error("Error in Get edit address", error);
-      res.redirect("/pageNotFound");
-        
+    if (!currentAddress) {
+      console.log("Current address not found", currentAddress);
+      return res.status(404).json({
+        status: false,
+        message: "Address Not Found"
+      })
     }
-  };
+
+    // Find taht address data in address array
+    const addresData = currentAddress.address.find((item) => {
+      return item._id.toString() === addressId.toString();
+    });
+
+    if (!addresData) {
+      return res.status(404).json({
+        status: false,
+        message: "Address Not Found."
+      })
+    };
+
+    res.render("edit-checkout-address", {
+      userAddress: addresData,
+      user: userData || user,
+    });
+    
+  } catch (error) {
+
+    console.error("Error in Get edit address", error);
+    res.redirect("/pageNotFound");
+      
+  }
+};
 
 
-// Load Add Address page
+// Load Add Address page and go to address management 
 const getaddCheckoutAddress = async (req, res) => {
   try {
 

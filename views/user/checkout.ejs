@@ -329,6 +329,34 @@
                 width: 100%;
             }
         }
+
+        .grand-total-wrapper {
+            margin-top: 20px;
+        }
+
+        .total-divider {
+            height: 1px;
+            background-color: #e0e0e0;
+            margin: 15px 0;
+        }
+
+        .grand-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+        }
+
+        .total-label {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .total-amount {
+            font-size: 22px;
+            font-weight: 700;
+            color: #2a2a2a;
+        }
     </style>
 </head>
 <body>
@@ -387,22 +415,23 @@
                                 <button class="address-action-btn" id="changeAddressBtn">Change Address</button>
                             </div>
                         </div>
-                        <% } else if (notDefaultAddress) { %>
+                        <% } else if (addresses) { %>
+                            <% addresses.forEach(function(address) { %>
                             <div class="address-list-container" id="address-list">
                                 <div class="address-card">
 
                                     <div class="address-details">
                                         <strong>
-                                            <%= notDefaultAddress.name %>
+                                            <%= address.name %>
                                         </strong>
                                         <p>
-                                            <%= notDefaultAddress.addressType %>
+                                            <%= address.addressType %>
                                         </p>
                                         <p>
-                                            <%= notDefaultAddress.city %>, <%= notDefaultAddress.state %> - <%=
-                                            userAddress.pincode %>
+                                            <%= address.city %>, <%= address.state %> - <%=
+                                            address.pincode %>
                                         </p>
-                                        <p>Phone: <%= notDefaultAddress.phone %>
+                                        <p>Phone: <%= address.phone %>
                                         </p>
                                     </div>
 
@@ -417,6 +446,7 @@
                                     + Add New Address
                                 </button>
                             </div>
+                            <% }) %>
                         <% } else { %>
                                 <p>No Address Found</p>
                             <% } %>
@@ -537,32 +567,29 @@
             <!-- Order Summary Section -->
             <div class="order-summary">
                 <div class="checkout-section">
-                    <div class="section-title">Order Summary</div>
-
-                    <div class="product-item">
-                        <img src="/api/placeholder/80/80" alt="Product" class="product-img">
-                        <div class="product-details">
-                            <div class="product-name">Premium Wireless Headphones</div>
-                            <div class="product-variant">Color: Black</div>
-                            <div class="product-price">
-                                <span>1 × $199.99</span>
-                                <span>$199.99</span>
+                    <% if(cartData && cartData.length > 0) { %>
+                        <div class="section-title">Order Summary</div>
+                        <% cartData.forEach((cart) => { %> 
+                            <div class="product-item">
+                                <img src="/uploads/re-images/<%= cart.productImage[0] %>" alt="<%= cart.productName %>" class="product-img">
+                                <div class="product-details">
+                                    <div class="product-name"><%= cart.productName %></div>
+                                    <div class="product-variant">Color: <%= cart.color %></div>
+                                    <div class="product-price">
+                                        <span><%= cart.cartQuantity %> × ₹<%= cart.salePrice %></span>
+                                        <span><%= cart.totalPrice %></span>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }) %>
+                        <div class="grand-total-wrapper">
+                            <div class="total-divider"></div>
+                            <div class="grand-total">
+                                <span class="total-label">Grand Total</span>
+                                <span class="total-amount">₹<%= grandTotal %></span>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="product-item">
-                        <img src="/api/placeholder/80/80" alt="Product" class="product-img">
-                        <div class="product-details">
-                            <div class="product-name">Smart Watch Series X</div>
-                            <div class="product-variant">Color: Silver</div>
-                            <div class="product-price">
-                                <span>1 × $299.99</span>
-                                <span>$299.99</span>
-                            </div>
-                            
-                        </div>
-                    </div>
+                        <% } %>
                 </div>
                     <button class="place-order-btn">Proceed to Pay</button>
             </div>

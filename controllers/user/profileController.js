@@ -548,7 +548,14 @@ const postAddAddress = async (req, res) => {
             const newAddress = new Address({
                 userId: userData._id,
                 address: [{
-                    addressType, name, city, landMark, state, pincode, phone, altPhone
+                    addressType,
+                    name, 
+                    city, 
+                    landMark, 
+                    state, 
+                    pincode, 
+                    phone, 
+                    altPhone,
                 }]
             });
             await newAddress.save();
