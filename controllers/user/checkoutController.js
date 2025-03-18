@@ -148,7 +148,24 @@ const updateDefaultAddress = async (req, res) => {
       res.redirect("/pageNotFound");
         
     }
+  };
+
+
+// Load Add Address page
+const getaddCheckoutAddress = async (req, res) => {
+  try {
+
+      const user = req.session.user;
+
+      res.render("add-address", {user: user});
+      
+  } catch (error) {
+
+      console.error("Error in Get address page", error);
+      res.redirect("/pageNotFound");
+      
   }
+};
 
 
 
@@ -159,4 +176,5 @@ module.exports = {
     getCheckoutPage,
     updateDefaultAddress,
     getEditCheckoutAddress,
+    getaddCheckoutAddress,
 }

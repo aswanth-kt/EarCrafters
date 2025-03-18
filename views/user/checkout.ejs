@@ -382,7 +382,7 @@
 
                             <div class="address-action-buttons">
                                 <a href="/editCheckoutAddress?id=<%= defaultAddress._id %>">
-                                <button class="address-action-btn" id="editAddressBtn" onclick="editAddress('<%= defaultAddress._id %>')">Edit</button>
+                                    <button class="address-action-btn" id="editAddressBtn" onclick="editAddress('<%= defaultAddress._id %>')">Edit</button>
                                 </a>
                                 <button class="address-action-btn" id="changeAddressBtn">Change Address</button>
                             </div>
@@ -404,7 +404,6 @@
                                         </p>
                                         <p>Phone: <%= notDefaultAddress.phone %>
                                         </p>
-                                        <p>No Address Found</p>
                                     </div>
 
                                     <div class="address-action-buttons">
@@ -450,7 +449,7 @@
                                         </div>
                                         <% }) %>
                                 </form>
-                                <a href="#" class="btn btn-link" id="addNewAddressBtn">Add New Address</a>
+                                <a href="addCheckoutAddress?id=<%= defaultAddress._id %>" class="btn btn-link" id="addNewAddressBtn">Add New Address</a>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
