@@ -149,6 +149,8 @@ router.get("/editCheckoutAddress", userAuth, checkoutController.getEditCheckoutA
 
 router.get("/addCheckoutAddress", userAuth, checkoutController.getaddCheckoutAddress);
 
+router.post("/checkout/place-order", userAuth, checkoutController.codPlaceOrder)
+
 
 
 

@@ -9,6 +9,11 @@ const orderSchema = new Schema ({
         default : () => uuidv4(),
         unique : true
     },
+    userId: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+    },
     orderItems : [{
         product : {
             type : Schema.Types.ObjectId,
@@ -23,6 +28,15 @@ const orderSchema = new Schema ({
             type :Number,
             default : 0
         },
+        returnStatus: {
+            type: String,
+            enum: ["Not Requested", "Requested", "Returned"],
+            default: "Not Requested",
+        },
+        returnReason: {
+            type: String,
+            required: false,
+        }, // Reason for return
 
     }],
     totalPrice : {
@@ -39,7 +53,7 @@ const orderSchema = new Schema ({
     },
     address : {
         type : Schema.Types.ObjectId,
-        ref : "User",
+        ref : "Address",
         required : true
     },
     invoiceDate : {
@@ -49,7 +63,16 @@ const orderSchema = new Schema ({
     status : {
         type : String,
         required : true,
-        enum : ["Pending", "Processing", "Sipped", "Delivere", "Cancelled", "Return Request", "Returned"]
+        enum : [
+            "Order Placed", 
+            "Processing", 
+            "Sipped", 
+            "Delivere", 
+            "Cancelled",
+            "Return Request",
+            "Returned",
+            "Payment Pending"
+            ]
     },
     createdOn : {
         type : Date,
@@ -59,7 +82,28 @@ const orderSchema = new Schema ({
     coupenApplied : {
         type : Boolean,
         default : false
-    }
+    },
+    paymentMethod: {
+        type: String,
+        enum: ["prepaid", "cod", "wallet"],
+        required: true,
+      },
+      moneySent: {
+        type: Boolean,
+        default: false,
+      },
+      deliveredAt: {
+        type: Date,
+        required: false,
+      },
+      firstDeliveredAt: {
+        type: Date,
+        required: false,
+      },
+      cancellationReason: {
+        type: String,
+        required: false,
+      },
 })
 
 

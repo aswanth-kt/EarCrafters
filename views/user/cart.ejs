@@ -64,11 +64,11 @@
                                             <tr>
                                                 <td class="image product-thumbnail">
                                                     <img src="/uploads/re-images/<%= data[i].productDetails[0].productImage[0] %>"
-                                                        alt="#" />
+                                                        alt="<%= data[i].productDetails[0].productName %>" />
                                                 </td>
                                                 <td class="product-des product-name">
                                                     <h5 class="product-name">
-                                                        <a href="cart">
+                                                        <a href="/productDetails?id=<%= data[i].productDetails[0]._id %>">
                                                             <%= data[i].productDetails[0].productName %>
                                                         </a>
                                                     </h5>

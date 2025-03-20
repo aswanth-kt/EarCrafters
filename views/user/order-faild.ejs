@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Failed</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .order-container {
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            padding: 40px;
+            text-align: center;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .failed-icon {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            background-color: #ffebee;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        
+        .crossmark {
+            display: block;
+            stroke-width: 4;
+            stroke: #f44336;
+            stroke-linecap: round;
+            stroke-dasharray: 100;
+            stroke-dashoffset: 100;
+            animation: draw 1s ease-in-out forwards;
+            width: 52px;
+            height: 52px;
+        }
+        
+        .failed-pulse {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-color: #f44336;
+            opacity: 0.2;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes draw {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(0.95);
+                opacity: 0.7;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 0.3;
+            }
+            100% {
+                transform: scale(0.95);
+                opacity: 0.7;
+            }
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 12px;
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+        
+        p {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        
+        .order-details {
+            background-color: #f8f9fb;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 30px;
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eaedf0;
+        }
+        
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            font-weight: 500;
+            color: #666;
+            font-size: 15px;
+        }
+        
+        .detail-value {
+            font-weight: 600;
+            color: #333;
+            font-size: 15px;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 5px 12px;
+            background-color: #ffebee;
+            color: #f44336;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .button {
+            display: inline-block;
+            background-color: #f44336;
+            color: white;
+            padding: 14px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        
+        .button-secondary {
+            background-color: #e0e0e0;
+            color: #333;
+        }
+        
+        .button:hover {
+            background-color: #e53935;
+        }
+        
+        .button-secondary:hover {
+            background-color: #d5d5d5;
+        }
+        
+        .buttons-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        @media (max-width: 480px) {
+            .buttons-container {
+                flex-direction: column;
+            }
+            
+            .button {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="order-container">
+        <!-- Failed icon with animation -->
+        <div class="failed-icon">
+            <div class="failed-pulse"></div>
+            <svg class="crossmark" viewBox="0 0 52 52">
+                <circle cx="26" cy="26" r="25" fill="none"/>
+                <path fill="none" d="M16,16 L36,36 M36,16 L16,36"/>
+            </svg>
+        </div>
+        
+        <h1>Order Failed</h1>
+        <p>We're sorry, but there was an issue processing your order. Please check the details below and try again.</p>
+        
+        <div class="order-details">
+            <div class="detail-row">
+                <span class="detail-label">Order ID</span>
+                <span class="detail-value">#ORD-78945612</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Amount</span>
+                <span class="detail-value">$259.99</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Status</span>
+                <span class="status">Failed</span>
+            </div>
+        </div>
+        
+        <div class="buttons-container">
+            <a href="#" class="button">Try Again</a>
+            <a href="#" class="button button-secondary">Contact Support</a>
+        </div>
+    </div>
+</body>
+</html>

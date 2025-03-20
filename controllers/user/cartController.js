@@ -290,6 +290,7 @@ const { render } = require("ejs");
           });
         }
       }
+
       
       res.redirect("/cart");
     } catch (error) {

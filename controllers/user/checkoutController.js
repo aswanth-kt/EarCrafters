@@ -2,6 +2,9 @@ const User = require("../../models/userSchema");
 const Address = require("../../models/addressSchema");
 const Product = require("../../models/productSchema");
 const Cart = require("../../models/cartSchema");
+const Order = require("../../models/orderSchema");
+const { v4: uuidv4 } = require('uuid');
+
 
 
 
@@ -28,7 +31,7 @@ const getCheckoutPage = async (req, res) => {
 
         const cartData = cart.items.map((item) => {
           return {
-            cartQuantity: item.quantity,
+            quantity: item.quantity, //Product quantity in cart
             _id: item.productId._id,
             productName: item.productId.productName,
             salePrice: item.productId.salePrice,
@@ -44,7 +47,7 @@ const getCheckoutPage = async (req, res) => {
         const notDefaultAddress = userAddress 
         ? userAddress.address.filter((addr) => addr.isDefault === false) : null;  
 
-        console.log("notDefaultAddress :", notDefaultAddress);
+        // console.log("notDefaultAddress :", notDefaultAddress);
 
         // Only default address
         const defaultAddress = userAddress 
@@ -174,7 +177,9 @@ const getaddCheckoutAddress = async (req, res) => {
 
       const user = req.session.user;
 
-      res.render("add-address", {user: user});
+      res.render("add-address", {
+        user: user
+      });
       
   } catch (error) {
 
@@ -186,6 +191,116 @@ const getaddCheckoutAddress = async (req, res) => {
 
 
 
+// COD Payment
+const codPlaceOrder = async (req, res) => {
+  try {
+
+    // Receive data from frondend
+    const {
+      orderItems, 
+      addressId,
+      totalPrice,
+      discount,
+      finalAmount,
+      status,
+      paymentMethod,
+    } = req.body;
+
+    // console.log(
+    //   `orderData for cod:  
+    //   orderItems: ${orderItems}, 
+    //   addressId ${addressId},
+    //   totalPrice: ${totalPrice},
+    //   discount: ${discount},
+    //   finamAmount: ${finalAmount},
+    //   status: ${status},
+    //   paymentMethod: ${paymentMethod}`
+    // );
+
+    const userId = req.session.user;
+
+    const userData = await User.findOne({_id: userId});
+
+    const userAddress = await Address.find({userId: userData._id});
+    if (!userAddress || userAddress.length === 0) {
+      return res.status(400).json({
+        status: false,
+        message: "No address found"
+      });
+    }
+
+    const defaultAddress = userAddress
+    .flatMap((addr) => addr.address)
+    .find((addr) => addr.isDefault === true);
+    // console.log("defaultAddress :", defaultAddress);
+    
+    if (!defaultAddress) {
+      return res.status(400).json({
+        status: false,
+        message: "No default address found",
+      })
+    };
+
+    const newOrder = new Order({
+      orderId: uuidv4(),
+      userId: userData._id,
+      orderItems,
+      totalPrice,
+      finalAmount,
+      address: defaultAddress._id || addressId,
+      status: status || "Order Placed",
+      createdOn: new  Date(),
+      discount,
+      paymentMethod: paymentMethod || "COD",
+    });
+    console.log("newOrder :", newOrder);
+
+    const savedOrder = await newOrder.save();
+
+    for (const item of orderItems) {
+      console.log('orderItems.product:', item.product);
+      const productId = item.product;
+      const orderedQuantity = item.quantity;
+
+      const product = await Product.findById(productId);
+      if (product) {
+
+        if (product.quantity < orderedQuantity) {
+          return res.status(400).json({
+            staus: false,
+            message: `Not enough stock for product ${product.productName}`,
+          });
+        }
+        product.quantity -= orderedQuantity;
+        await product.save();
+  
+      }
+     
+    };
+
+    // Remove items from cart after order is placed
+    await Cart.findOneAndUpdate(
+      {userId: userData._id},
+      {$pull: 
+        {
+          items: {
+            productId: { $in: orderItems.map((item) => item.product)},
+          }
+        }
+      }
+    )
+
+    res.render("order-success")
+    
+  } catch (error) {
+    
+    console.error("Error in COD  place order", error);
+    res.redirect("/pageNotFound");
+
+  }
+}
+
+
 
 
 
@@ -194,4 +309,5 @@ module.exports = {
     updateDefaultAddress,
     getEditCheckoutAddress,
     getaddCheckoutAddress,
+    codPlaceOrder,
 }
