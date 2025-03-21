@@ -1,0 +1,238 @@
+<%- include("../../views/partials/admin/header") %>
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+    <title>Order Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .search-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+        
+        .search-input {
+            flex: 1;
+            max-width: 400px;
+            position: relative;
+        }
+        
+        .search-input input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .search-button {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        thead {
+            background-color: #f8f9fa;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            font-weight: 600;
+            color: #555;
+        }
+        
+        tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .status {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            text-align: center;
+            min-width: 100px;
+        }
+        
+        .status-completed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .status-processing {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-pending {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-shipped {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+        
+        .details-button {
+            background-color: #4a6cf7;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background-color 0.3s;
+        }
+        
+        .details-button:hover {
+            background-color: #3a5ce4;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            gap: 5px;
+        }
+        
+        .pagination li {
+            display: inline-block;
+        }
+        
+        .pagination a {
+            color: #666;
+            float: left;
+            padding: 8px 16px;
+            text-decoration: none;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        
+        .pagination a.active {
+            background-color: #4a6cf7;
+            color: white;
+            border: 1px solid #4a6cf7;
+        }
+        
+        .pagination a:hover:not(.active) {
+            background-color: #f1f1f1;
+        }
+    </style>
+<!-- </head> -->
+<body>
+    <div class="container">
+        <h1>Order Management</h1>
+
+        <div class="search-container">
+            <form method="get">
+                <div class="search-input">
+                    <input type="text" id="searchInput" placeholder="Search orders..." name="search">
+                    <button type="submit" class="search-button">🔍</button>
+                </div>
+            </form>
+        </div>
+        
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>User Name</th>
+                    <th>Total Price (₹)</th>
+                    <th>Date & Time</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <% orderData.forEach((order) => { %>
+            <tbody>
+                
+                <tr>
+                    <td><%= order.orderId %></td>
+
+                    <td><%= order.userId.name %></td>
+
+                    <td><%= order.finalAmount %></td>
+
+                    <td><%= new Date(order.createdOn).toLocaleString('en-US', { 
+                        weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', 
+                        hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true 
+                    }) %></td>
+
+                    <td><span class="status status-completed"><%= order.status %></span></td>
+
+                    <td><button class="details-button">View Details</button></td>
+                </tr>
+            </tbody>
+            <% }) %>
+
+        </table>
+        
+        <ul class="pagination">
+            <% if (currentPage > 1) { %>
+                <li><a href="?page=<%= currentPage - 1%>"> ›› </a></li>
+            <% } %>
+
+            <% for (let i = 1; i <= totalPages; i++) { %>
+                <li><a href="?page=<%= i %>" class="active"><%= i %></a></li>
+            <% } %>
+
+            <% if (currentPage < totalPages) { %>
+                <li><a href="?page=<%= totalPages - 1 %>">››</a></li>
+            <% } %>
+        </ul>
+    </div>
+</body>
+</html>
+
+
+<%- include("../../views/partials/admin/footer") %>

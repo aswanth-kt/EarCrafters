@@ -380,7 +380,7 @@
 
    <div class="pagination">
       <% for (let i = 1; i <= totalPages; i++) { %>
-        <a class="btn <%= currentPage === i ? 'active' : '' %>" href="/shop?page=<%= i %>&filter=<%= filter %>"><%= i %></a>
+        <a class="btn <%= currentPage === i ? 'active' : '' %>" href="?page=<%= i %>&filter=<%= filter %>"><%= i %></a>
       <% } %>
    </div>
   

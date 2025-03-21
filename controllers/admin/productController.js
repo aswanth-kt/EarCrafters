@@ -353,27 +353,6 @@ const deleteSingleImage = async (req, res) => {
 
 
 
-// const deleteProduct = async (req, res) => {
-//     try {
-
-//         const {id} = req.query;
-//         console.log("id :", id);
-//         const findProduct = await Product.findById(id);
-//         if (!findProduct) {
-//             return res.status(400).json({message: "Product not found"});
-//         }
-//         console.log("findPro:",findProduct);
-        
-//         await Product.findByIdAndDelete(id);
-//         return res.redirect("/admin/products");
-        
-//     } catch (error) {
-        
-//         console.error("Error in Delete product", error);
-//         return res.status(500).json("Internal server error");
-//     }
-// }
-
 const deleteProduct = async (req, res) => {
     try {
 
