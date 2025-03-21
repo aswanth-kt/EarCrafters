@@ -148,7 +148,7 @@
 
                  <li class="nav-item">
                    <a class="nav-link active" id="dashboard-tab" data-bs-toggle="tab" href="#dashboard" role="tab" aria-controls="dashboard" aria-selected="false">
-                     <i class="fi-rs-settings-sliders mr-10"></i>Dashboard
+                     <i class="fi-rs-settings-sliders mr-10"></i>Profile
                    </a>
                  </li>
                  <li class="nav-item">
@@ -203,8 +203,6 @@
                        <strong>Email: <%= user.email %></strong>
                      </p>
                      <a href="/edit-userProfile" class="btn btn-sm btn-success ml-2">Edit Profile</a>
-                     <!-- <a href="/change-email" class="btn btn-sm btn-success ml-2">Change Email</a>
-                     <a href="/change-password" class="btn btn-sm btn-success">Change Password</a> -->
                    </div>
                  </div>
                </div>
@@ -272,38 +270,73 @@
                  </div>
                </div>
 
-
+               <!-- Orders -->
                <div class="tab-pane fade" id="orders" role="tabpanel" aria-labelledby="orders-tab">
-                 <div class="card">
-                   <div class="card-header">
-                     <h5 class="mb-0">Your Orders</h5>
-                   </div>
-                   <div class="card-body">
-                     <div class="table-responsive">
-                       <table class="table">
-                         <thead>
-                           <tr>
-                             <th>Order</th>
-                             <th>Status</th>
-                             <th>Total</th>
-                             <th>Actions</th>
-                           </tr>
-                         </thead>
-                         <tbody>
-                           <tr>
-                             <td></td>
-                             <td></td>
-                             <td></td>
-                             <td>
-                               <a href="" class="btn-small d-block">View</a>
-                             </td>
-                           </tr>
-                         </tbody>
-                       </table>
-                     </div>
-                   </div>
-                 </div>
-               </div>
+                <div class="card">
+                  <div class="card-header">
+                    <h3 class="mb-0">Your Orders</h3>
+                  </div>
+                  <% if (ordersData && ordersData.length > 0) { %>
+                    <% ordersData.forEach((order) => { %>  
+                      <div class="card-body">
+                        <div class="card mb-3">
+                          <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+                              <!-- <div class="fw-bold">Product Name: <span class="text-muted"><%=  %></span></div><br> -->
+                              <div class="fw-bold">Order ID: <span class="text-muted"><%= order.orderId %></span></div>
+                              <div class="text-muted small">Placed on: <%= new Date(order.createdOn).toLocaleDateString() %></div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                              <div class="col-md-4 mb-2 mb-md-0">
+                                <div class="text-muted">Items:
+                                  <span class="fw-semibold"><%= order.orderItems.length %></span>
+                                </div>
+                                
+                              </div>
+                              
+                              <div class="col-md-4 mb-2 mb-md-0">
+                                <div class="text-muted">Payment method:</div>
+                                <div class="fw-semibold"><%= order.paymentMethod.toUpperCase() %></div>
+                              </div>
+                              
+                              <div class="col-md-4">
+                                <div class="text-muted">Status:</div>
+                                <span class="badge bg-primary rounded-pill px-3 py-2"><%= order.status %></span>
+                              </div>
+                            </div>
+                            
+                            <div class="text-end">
+                              <a href="#" class="btn-small btn-outline-secondary me-2">Track Package</a>
+                              <a href="/order-details?orderId=<%= order.orderId %>" class="btn-small d-inline-block">Order Details</a>
+                            </div>
+                          </div>
+                        </div>                    
+                      </div>
+                    <% }) %>
+                  <% } else {%>
+                    <div>
+                      No Orders Found
+                      <a href="/shop">
+                      <button>Shop</button>
+                      </a>
+                    </div>
+                    <% } %>
+                </div>
+                <ul class="pagination">
+                  <% if (currentPage > 1) { %>
+                      <li><a href="?page=<%= currentPage - 1%>"> « </a></li>
+                  <% } %>
+      
+                  <% for (let i = 1; i <= totalPages; i++) { %>
+                      <li><a href="?page=<%= i %>" class="<%= i === currentPage ? 'active' : '' %>"><%= i %></a></li>
+                  <% } %>
+      
+                  <% if (currentPage < totalPages) { %>
+                      <li><a href="?page=<%= totalPages + 1 %>"> » </a></li>
+                  <% } %>
+              </ul>
+              </div>
 
 
                <div class="tab-pane fade" id="track-orders" role="tabpanel" aria-labelledby="track-orders-tab">
@@ -374,6 +407,25 @@
    </div>
  </section>
 </main>
+
+<script>
+
+  // Check if there's a hash in the URL
+  document.addEventListener('DOMContentLoaded', function() {
+    // If URL has a hash that matches a tab ID
+    if(window.location.hash) {
+      const tabId = window.location.hash.substring(1); // Remove the # character
+      
+      // Find the tab link and click it programmatically
+      const tabLink = document.querySelector(`#${tabId}-tab`);
+      if(tabLink) {
+        tabLink.click();
+      }
+    }
+  });
+
+</script>
+
 <%- include("../../views/partials/user/footer") %>
 
 

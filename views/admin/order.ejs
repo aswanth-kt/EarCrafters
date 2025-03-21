@@ -219,15 +219,15 @@
         
         <ul class="pagination">
             <% if (currentPage > 1) { %>
-                <li><a href="?page=<%= currentPage - 1%>"> ›› </a></li>
+                <li><a href="?page=<%= currentPage - 1%>"> « </a></li>
             <% } %>
 
             <% for (let i = 1; i <= totalPages; i++) { %>
-                <li><a href="?page=<%= i %>" class="active"><%= i %></a></li>
+                <li><a href="?page=<%= i %>" class="<%= i === currentPage ? 'active' : '' %>"><%= i %></a></li>
             <% } %>
 
             <% if (currentPage < totalPages) { %>
-                <li><a href="?page=<%= totalPages - 1 %>">››</a></li>
+                <li><a href="?page=<%= totalPages + 1 %>"> » </a></li>
             <% } %>
         </ul>
     </div>

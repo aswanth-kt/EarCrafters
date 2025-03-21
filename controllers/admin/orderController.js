@@ -58,10 +58,6 @@ const getOrderList = async (req, res) => {
         
         console.error("Error in get order list", error);
         return res.status(500).send("Internal server error")
-        // .json({
-        //     status: false,
-        //     message: "Internal server error",
-        // });
         
     }
 };

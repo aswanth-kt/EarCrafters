@@ -234,10 +234,18 @@
             </div>
         </div>
         
-        <a href="#" class="button">Track Your Order</a>
+        <a href="/userProfile#orders" class="button">Track Your Order</a>
     </div>
 </body>
 </html>
+
+
+<script>
+    // This small script ensures animations only run after page load
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelector('.order-container').style.display = 'block';
+    });
+</script>
 
 
 <%- include("../../views/partials/user/footer") %>

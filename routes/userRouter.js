@@ -8,6 +8,7 @@ const productController = require("../controllers/user/productController");
 const wishlistController = require("../controllers/user/wishlistController");
 const cartController = require("../controllers/user/cartController");
 const checkoutController = require("../controllers/user/checkoutController");
+const orderController = require("../controllers/user/userOrderController");
 const {userAuth, adminAuth} = require("../middlewares/auth");
 const passport = require('passport');
 
@@ -153,6 +154,12 @@ router.post("/checkout/place-order", userAuth, checkoutController.codPlaceOrder)
 
 router.get("/order-success", userAuth, checkoutController.getOrderSuccess);
 
+
+
+// User Order Management
+router.get("/order-details", userAuth, orderController.getOrderDetails);
+
+router.post("/profile/order-details/cancel-product", userAuth, orderController.cancelOrder);
 
 
 

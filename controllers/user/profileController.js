@@ -1,11 +1,13 @@
 const User = require("../../models/userSchema");
 const Address = require("../../models/addressSchema");
+const Order = require("../../models/orderSchema");
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 const evn = require('dotenv').config();
 const session = require('express-session');
 const { text } = require("express");
 const { name } = require("ejs");
+const Product = require("../../models/productSchema");
 
 
 
@@ -233,11 +235,33 @@ const getUserProfilePage = async (req, res) => {
         if (!userId) {
             console.log("UserId is not found!!");
             res.redirect("/login");
-        } else {
+        }
         const userData = await User.findById(userId);
         const addressData = await Address.findOne({userId: userId});
-        res.render("profile", {user: userData, userAddress: addressData});
-        }
+
+        // Fetch the Order details with pagination
+        const page = parseInt(req.query.page) || 1;
+        const limit = 3;
+        const skip = (page - 1) * limit;
+
+        const totalOrders = await Order.countDocuments({userId: userId});
+
+        const orders = await Order.find({userId: userData._id})
+        .populate("orderItems.product", "productName productImage")
+        .sort({createdOn: -1})
+        .skip(skip)
+        .limit(limit)
+        .exec();
+
+        const totalPages = Math.ceil(totalOrders / limit);
+
+        res.render("profile", {
+            user: userData,
+            userAddress: addressData,
+            ordersData: orders,
+            totalPages,
+            currentPage: page,
+        })
         
     } catch (error) {
 
@@ -422,7 +446,7 @@ const updateEmail = async (req, res) => {
 
         if (newEmail && user) {
             await User.findOneAndUpdate(user, {email: newEmail});
-            res.redirect("/userProfile");
+            res.redirect("/userProfile#profile");
         } else {
             console.log("Not found new email or session user");
             res.status(400).json({message: "Some error are occured"});
@@ -568,7 +592,7 @@ const postAddAddress = async (req, res) => {
             await userAddress.save();
         }
 
-        res.redirect("/userProfile");
+        res.redirect("/userProfile#address");
         
     } catch (error) {
         
@@ -639,7 +663,7 @@ const postEditAddress = async (req, res) => {
         if (req.query.comeIn) {
             redirectToCheckout = "/checkout";
         } else {
-            redirectToUserProfile = "/userProfile";
+            redirectToUserProfile = "/userProfile#address";
         }
 
         const findAddress = await Address.findOne({"address._id": addressId});
@@ -729,7 +753,7 @@ const deleteAddress = async (req, res) => {
             }}
         );
 
-        res.redirect("/userProfile");
+        res.redirect("/userProfile#address");
         
     } catch (error) {
         
@@ -751,6 +775,7 @@ module.exports = {
     getResetPassPage,
     resendOtp,
     updatePassword,
+
     getUserProfilePage,
     getEditUserProfilePage,
     editProfile,
