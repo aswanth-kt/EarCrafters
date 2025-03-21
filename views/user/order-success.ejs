@@ -1,3 +1,5 @@
+<%- include("../../views/partials/user/header") %>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,7 +16,6 @@
         
         body {
             background-color: #f5f7fa;
-            display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
@@ -26,7 +27,7 @@
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             width: 100%;
-            max-width: 500px;
+            /* max-width: 500px; */
             padding: 40px;
             text-align: center;
             overflow: hidden;
@@ -218,15 +219,15 @@
         <div class="order-details">
             <div class="detail-row">
                 <span class="detail-label">Order ID</span>
-                <span class="detail-value">#ORD-78945612</span>
+                <span class="detail-value"><%= order.orderId %></span>
             </div>
             <div class="detail-row">
                 <span class="detail-label">Amount</span>
-                <span class="detail-value">$259.99</span>
+                <span class="detail-value"><%= order.finalAmount %></span>
             </div>
             <div class="detail-row">
                 <span class="detail-label">Status</span>
-                <span class="status">Confirmed</span>
+                <span class="status"><%= order.status %></span>
             </div>
         </div>
         
@@ -234,3 +235,6 @@
     </div>
 </body>
 </html>
+
+
+<%- include("../../views/partials/user/footer") %>

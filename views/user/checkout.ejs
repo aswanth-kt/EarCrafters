@@ -891,16 +891,27 @@
             .then(data => {
                 document.getElementById("loadingOverlay").classList.add("d-none");
                 if (data.status) {
-                    window.location.href = data.redirectUrl || '/order-success';
+                    window.location.href = `/order-success?orderId=${data.orderId}`;
                 } else {
-                    alert(data.message || 'Something went wrong');
+                    // alert(data.message || 'Something went wrong');
+                    Swal.fire({
+                        icon: "info",
+                        title: data.message,
+                        text:  "Something went wrong",
+                        timer: 3000,
+                    });
                     this.disabled = false;
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
                 document.getElementById("loadingOverlay").classList.add("d-none");
-                alert('Something went wrong. Please try again.');
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: data.message || "Something went wrong",
+                    timer: 3000,
+                });
                 this.disabled = false;
             });
         }

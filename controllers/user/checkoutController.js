@@ -290,15 +290,66 @@ const codPlaceOrder = async (req, res) => {
       }
     )
 
-    res.render("order-success")
+    // After processing the order successfully
+    return res.status(200).json({
+      status: true,
+      message: "Order placed successfully!",
+      orderId: savedOrder.orderId
+    });
     
   } catch (error) {
     
     console.error("Error in COD  place order", error);
-    res.redirect("/pageNotFound");
+    res.status(500).json({
+      status: false,
+      message: "Internal server error",
+    })
 
   }
-}
+};
+
+
+
+// Load Order success page
+const getOrderSuccess = async (req, res) => {
+  try {
+
+    const orderId = req.query.orderId;
+    const userId = req.session.user;
+
+    const userData = await User.findById(userId).select('name email');
+    console.log("userData :", userData);
+
+    const cart = await Cart.findOne({userId: userData._id});
+
+    const cartItems = cart ? cart.items : [];
+
+    const order = await Order.findOne({orderId: orderId})
+    if (!order) {
+      return res.status(404).json({
+        status: false,
+        message: "Order not found",
+      });
+    };
+
+    res.render("order-success", {
+      order,
+      status: true,
+      message: "Your order has been successfully placed!",
+      user: userData,
+      cartItems,
+    });
+    
+  } catch (error) {
+    
+    console.error("Error in get order success", error);
+    return res.status(500).json({
+      status: false,
+      message: "Internal server error",
+    });
+    
+  }
+};
 
 
 
@@ -310,4 +361,5 @@ module.exports = {
     getEditCheckoutAddress,
     getaddCheckoutAddress,
     codPlaceOrder,
+    getOrderSuccess,
 }
