@@ -3,8 +3,32 @@ const Address = require("../../models/addressSchema");
 const Product = require("../../models/productSchema");
 const Cart = require("../../models/cartSchema");
 const Order = require("../../models/orderSchema");
-const { v4: uuidv4 } = require('uuid');
+const Counter = require("../../models/counterSchema");  // For Generate OrderId last Digit
+// const { v4: uuidv4 } = require('uuid');
 
+
+
+
+
+
+
+// Generate OrderId
+const generateOrderId = async () => {
+    const now = new Date();
+    const day = String(now.getDate()).padStart(2, '0');
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const year = now.getFullYear();
+
+    // Find and update the counter atomically
+    let counter = await Counter.findOneAndUpdate(
+        { name: 'orderId' },
+        { $inc: { lastOrderNumber: 1 } }, // Increment order number
+        { new: true, upsert: true } // Create if doesn't exist
+    );
+
+    const orderId = `#ORD-${day}${month}${year}-${counter.lastOrderNumber}`;
+    return orderId;
+};
 
 
 
@@ -241,8 +265,10 @@ const codPlaceOrder = async (req, res) => {
       })
     };
 
+    const orderId = await generateOrderId();  // Generate unique order id
+
     const newOrder = new Order({
-      orderId: uuidv4(),
+      orderId,
       userId: userData._id,
       orderItems,
       totalPrice,
@@ -253,12 +279,12 @@ const codPlaceOrder = async (req, res) => {
       discount,
       paymentMethod: paymentMethod || "COD",
     });
-    console.log("newOrder :", newOrder);
+    // console.log("newOrder :", newOrder);
 
     const savedOrder = await newOrder.save();
 
     for (const item of orderItems) {
-      console.log('orderItems.product:', item.product);
+      // console.log('orderItems.product:', item.product);
       const productId = item.product;
       const orderedQuantity = item.quantity;
 
@@ -294,7 +320,7 @@ const codPlaceOrder = async (req, res) => {
     return res.status(200).json({
       status: true,
       message: "Order placed successfully!",
-      orderId: savedOrder.orderId
+      orderId: savedOrder._id,
     });
     
   } catch (error) {
@@ -318,13 +344,15 @@ const getOrderSuccess = async (req, res) => {
     const userId = req.session.user;
 
     const userData = await User.findById(userId).select('name email');
-    console.log("userData :", userData);
+    // console.log("userData :", userData);
 
     const cart = await Cart.findOne({userId: userData._id});
 
     const cartItems = cart ? cart.items : [];
 
-    const order = await Order.findOne({orderId: orderId})
+    const order = await Order.findOne({_id: orderId})
+    // .populate("orderItems.product");
+
     if (!order) {
       return res.status(404).json({
         status: false,

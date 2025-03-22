@@ -189,7 +189,7 @@
             <span>or</span>
         </div>
 
-        <form id="sign-form" method="post" action="/signup">
+        <form id="sign-form" method="post" action="/signup" novalidate>
             <div class="form-group">
                 <label for="name">Full Name</label>
                 <input name="name" type="text" id="name" required placeholder="Enter your full name" value="<%= locals.name %>">

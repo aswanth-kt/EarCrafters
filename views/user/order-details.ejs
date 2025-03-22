@@ -191,7 +191,7 @@
       <tbody>
         <% order.orderItems.forEach((item, index) => { %> 
             <tr>
-            <td><img src="/uploads/re-images/<%= item.product.productImage %>" alt="<%= item.product.productName %>" class="product-image"></td>
+            <td><img src="/uploads/re-images/<%= item.product.productImage[0] %>" alt="<%= item.product.productName %>" class="product-image"></td> 
             <td class="product-name"><%= item.product.productName %></td>
             <td class="product-price"><%= item.price %></td>
             <td class="product-quantity" data-quantity="<%= item.quantity %>"><%= item.quantity %></td>

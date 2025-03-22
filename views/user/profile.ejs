@@ -308,7 +308,7 @@
                             
                             <div class="text-end">
                               <a href="#" class="btn-small btn-outline-secondary me-2">Track Package</a>
-                              <a href="/order-details?orderId=<%= order.orderId %>" class="btn-small d-inline-block">Order Details</a>
+                              <a href="/order-details?orderId=<%= order._id %>" class="btn-small d-inline-block">Order Details</a>
                             </div>
                           </div>
                         </div>                    
@@ -329,7 +329,7 @@
                   <% } %>
       
                   <% for (let i = 1; i <= totalPages; i++) { %>
-                      <li><a href="?page=<%= i %>" class="<%= i === currentPage ? 'active' : '' %>"><%= i %></a></li>
+                      <li><a href="#orders?page=<%= i %>" class="<%= i === currentPage ? 'active' : '' %>"><%= i %></a></li>
                   <% } %>
       
                   <% if (currentPage < totalPages) { %>
