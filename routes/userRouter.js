@@ -93,6 +93,8 @@ router.post("/verify-email-otp", userAuth, profileController.verifyChangeEmailOt
 
 router.post("/update-email", userAuth, profileController.updateEmail);
 
+router.post("/verify-new-email-otp", userAuth, profileController.verifyNewEmail);
+
 router.get("/change-password", userAuth, profileController.loadChangePasswordPage);
 
 router.post("/change-password", userAuth, profileController.changePasswordValid);

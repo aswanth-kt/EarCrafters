@@ -355,7 +355,10 @@ const editProfile = async (req, res) => {
 const loadChangeEmailPage = async (req, res) => {
     try {
         console.log("User session at load email: ", req.session.user)
-        return res.render("change-email", {message: null, user: req.session.user});
+        return res.render("change-email", {
+            message: null, 
+            user: req.session.user
+        });
         
     } catch (error) {
         
@@ -374,14 +377,14 @@ const changeEmailValid = async (req, res) => {
         const {email} = req.body;
         const userExists = await User.findOne({email: email});
 
-        if (userExists && userExists.email === req.session.user.email) {
+        if (userExists && userExists.email === email) {
 
             const otp = generateOtp();
             const emailSent = await sendVerificationEmail(email, otp);
 
             if (emailSent) {
                 req.session.userOtp = otp;
-                req.session.userData = req.body;
+                req.session.userData = req.body;                                
                 req.session.email = email;
 
                 // console.log("userOtp: ",req.session.userOtp);
@@ -416,9 +419,9 @@ const verifyChangeEmailOtp = async (req, res) => {
 
         const enteredOtp = req.body.otp;
         if (enteredOtp === req.session.userOtp) {
-            req.session.userData = req.body.userData;
+            // req.session.userData = req.body.userData;  
 
-            res.render("new-email", {user: req.session.userData});
+            res.render("new-email", {user: req.session.user});
         } else {
             res.render("change-email-otp", {
                 message: "OTP not maching...",
@@ -437,7 +440,7 @@ const verifyChangeEmailOtp = async (req, res) => {
 
 
 
-// Update email
+// Generate OTP and send to new email
 const updateEmail = async (req, res) => {
     try {
 
@@ -445,11 +448,21 @@ const updateEmail = async (req, res) => {
         const user = req.session.user;
 
         if (newEmail && user) {
-            await User.findOneAndUpdate(user, {email: newEmail});
-            res.redirect("/userProfile#profile");
-        } else {
-            console.log("Not found new email or session user");
-            res.status(400).json({message: "Some error are occured"});
+            const otp = generateOtp();
+            const emailSent = sendVerificationEmail(newEmail, otp);
+
+            if (emailSent) {
+                req.session.userOtp = otp;
+                req.session.newEmail = newEmail;
+                // req.session.userData = req.body;
+
+                res.render("new-email-otp", {
+                    user: req.session.user,
+                });
+
+                console.log(`Send to ${newEmail},
+                    OTP is ${otp}`);
+            }
         }
         
     } catch (error) {
@@ -459,6 +472,34 @@ const updateEmail = async (req, res) => {
         
     }
 };
+
+
+// Verify new email with OTP and update new email
+const verifyNewEmail = async (req, res) => {
+    try {
+
+        const user = req.session.user;
+        const enteredOtp = req.body.otp;
+        const newEmail = req.session.newEmail;
+        console.log("new email:", newEmail, " user:", user)
+
+        if (req.session.userOtp === enteredOtp) {
+            await User.findByIdAndUpdate(user, {email: newEmail});
+            res.redirect("/userProfile#profile");
+        } else {
+            return res.render("new-email-otp", {
+                user: req.session.user,
+                message: "OTP is not maching...",
+            })
+        }
+        
+    } catch (error) {
+
+        console.error("Error in verify new email", error);
+        res.redirect("/pageNotFound");
+
+    }
+}
 
 
 
@@ -783,6 +824,7 @@ module.exports = {
     changeEmailValid,
     verifyChangeEmailOtp,
     updateEmail,
+    verifyNewEmail,
     loadChangePasswordPage,
     changePasswordValid,
     verifyChangePassOtp,
