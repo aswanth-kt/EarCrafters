@@ -61,15 +61,28 @@ const loadHomepage = async (req, res) => {
         // Show only 4 new products
         ProductData = ProductData.slice(0, 4);
 
-        
         if (user) {
             
             const userData = await User.findOne({_id : user._id});
-            return res.render("home", {user : userData, products: ProductData, banner: findBanner || []});   //When reaching home, pass user data to frontend
+
+            // For disply how may cart item at cat logo
+            const cart = await Cart.findOne({userId: userData._id});
+            const cartLength = cart.items.length;
+
+            return res.render("home", {
+                user : userData,
+                products: ProductData, 
+                banner: findBanner || [],
+                cartLength,
+            });   //When reaching home, pass user data to frontend
 
         } else {
 
-            return res.render("home", {user : null, products: ProductData, banner: findBanner || []});
+            return res.render("home", {
+                user : null,
+                products: ProductData,
+                banner: findBanner || [],
+            });
 
         }
         
@@ -375,7 +388,7 @@ const loadShopPage = async (req, res) => {
 
             if (userData && userData.cart && userData.cart.length > 0) {
                 const cart = await Cart.findOne({ _id: { $in: userData.cart } }).populate('items.productId');
-                
+
                 if (cart && cart.items.length > 0) {
                     cartData = cart.items.map(item => ({
                         quantity: item.quantity,
@@ -393,7 +406,6 @@ const loadShopPage = async (req, res) => {
                 }
             }
         }
-
         // Fetch categories
         const categories = await Category.find({ isListed: true, isSoftDelete: false });
         const categoryIds = categories.map((category) => category._id.toString());
@@ -433,7 +445,8 @@ const loadShopPage = async (req, res) => {
             currentPage: page,
             totalPages: totalPages,
             filter: null,
-            cartData
+            cartData,
+            cartLength : cartData.length
         });
 
     } catch (error) {

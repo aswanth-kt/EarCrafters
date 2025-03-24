@@ -484,7 +484,12 @@ const verifyNewEmail = async (req, res) => {
         console.log("new email:", newEmail, " user:", user)
 
         if (req.session.userOtp === enteredOtp) {
-            await User.findByIdAndUpdate(user, {email: newEmail});
+            await User.findByIdAndUpdate(
+                user, 
+                {email: newEmail},
+                {new: true},
+            );
+
             res.redirect("/userProfile#profile");
         } else {
             return res.render("new-email-otp", {

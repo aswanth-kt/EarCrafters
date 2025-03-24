@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const {Schema} = mongoose;
-const {v4 : uudv4} = require('uuid');
 
 
 const orderSchema = new Schema ({
@@ -66,8 +65,8 @@ const orderSchema = new Schema ({
         enum : [
             "Order Placed", 
             "Processing", 
-            "Sipped", 
-            "Delivere", 
+            "Shipped", 
+            "Delivered", 
             "Cancelled",
             "Return Request",
             "Returned",

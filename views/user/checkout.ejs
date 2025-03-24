@@ -381,6 +381,7 @@
         <div class="container">
             <div class="breadcrumb">
                 <a href="/" rel="nofollow">Home</a>
+                <span></span> <a href="/shop" rel="nofollow">Shop</a>
                 <span></span> <a href="/cart" rel="nofollow">Cart</a>
                 <span></span> Checkout
             </div>
@@ -856,7 +857,7 @@
         this.disabled = true; // Disable the button to prevent multiple clicks
 
         const orderItems = JSON.parse(cartItemsDataJson); //to convert that string back into a JavaScript object
-        console.log("cartItemsDataJson :", cartItemsDataJson)
+        // console.log("cartItemsDataJson :", cartItemsDataJson)
         const addressId = '<%= defaultAddress._id %>';
         // const totalPrice = parseInt('<%= cartData.totalPrice %>');
         const totalPrice = parseInt('<%= grandTotal %>') || 0;
@@ -889,11 +890,11 @@
             })
             .then(response => response.json())
             .then(data => {
+                console.log("Full data :", data)    //
                 document.getElementById("loadingOverlay").classList.add("d-none");
                 if (data.status) {
                     window.location.href = `/order-success?orderId=${data.orderId}`;
                 } else {
-                    // alert(data.message || 'Something went wrong');
                     Swal.fire({
                         icon: "info",
                         title: data.message,

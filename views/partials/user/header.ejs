@@ -214,12 +214,6 @@
    <header class="header">
        <div class="container">
            <div class="row">
-               <!-- <div class="col-lg-3 col-md-3">
-                   <div class="header__logo">
-                       <a href="/"><img src="/img/earcrafters-logo.svg" alt="EarCrafters-logo"></a>
-                   </div>
-               </div> -->
-
 
                <!-- Logo start -->
                <div class="header__logo" style="width: auto;">
@@ -276,10 +270,12 @@
                        <%if(locals.user ){%>
                         
                         <a href="/wishlist"><i class="fa-sharp-duotone fa-solid fa-heart"></i></i></a>
-                        <a href="/cart"><i class="fa-sharp-duotone fa-solid fa-cart-shopping"></i> <span>0</span></a>
-
+                        <a href="/cart"><i class="fa-sharp-duotone fa-solid fa-cart-shopping"></i>
+                          <% if (locals.cartLength) { %>
+                          <span> <%= cartLength %> </span></a>
+                          <% } %>
                            <div class="dropdown">
-                                <a href="#" class="sign-in-link"><%=locals.user.name%> </a>
+                                <a href="/userProfile" class="sign-in-link"><%=locals.user.name%> </a>
 
                                 <div class="dropdown-content">                                   
                                    <a href="/logout" style="text-align: center;"><i class="fa-solid fa-right-from-bracket fa-rotate-180" style="color: #000000;"></i> Logout</a>
