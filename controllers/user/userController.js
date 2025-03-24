@@ -67,7 +67,7 @@ const loadHomepage = async (req, res) => {
 
             // For disply how may cart item at cat logo
             const cart = await Cart.findOne({userId: userData._id});
-            const cartLength = cart.items.length;
+            const cartLength = cart ? cart.items.length : [];
 
             return res.render("home", {
                 user : userData,

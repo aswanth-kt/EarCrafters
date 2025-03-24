@@ -121,9 +121,58 @@
  transition: transform 0.3s ease;
 }
 
-
 .breadcrumb a:hover::after {
  transform: scaleX(1);
+}
+
+
+/* Pagination */
+.pagination {
+  margin: 2rem 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.pagination ul {
+  display: flex;
+  gap: 0.5rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  justify-content: center;
+}
+
+.pagination li a {
+  display: block;
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.pagination li a:hover {
+  background-color: #f0f0f0;
+  border-color: #ccc;
+}
+
+.pagination li a.active {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+  cursor: default;
+}
+
+.pagination li.ellipsis span {
+  display: block;
+  padding: 0.5rem 1rem;
+  color: #666;
+  cursor: default;
+}
+
+.pagination li a.arrow {
+  font-weight: bold;
+  background-color: #f8f9fa;
 }
 </style>
 
@@ -323,19 +372,59 @@
                     </div>
                     <% } %>
                 </div>
-                <ul class="pagination">
-                  <% if (currentPage > 1) { %>
-                      <li><a href="?page=<%= currentPage - 1%>"> « </a></li>
-                  <% } %>
-      
-                  <% for (let i = 1; i <= totalPages; i++) { %>
-                      <li><a href="#orders?page=<%= i %>" class="<%= i === currentPage ? 'active' : '' %>"><%= i %></a></li>
-                  <% } %>
-      
-                  <% if (currentPage < totalPages) { %>
-                      <li><a href="?page=<%= totalPages + 1 %>"> » </a></li>
-                  <% } %>
-              </ul>
+
+                <!-- <div class="pagination">
+                  <ul>
+                    <% if (currentPage > 1) { %>
+                        <li><a href="?page=<%= currentPage - 1%>"> « </a></li>
+                    <% } %>
+        
+                    <% for (let i = 1; i <= totalPages; i++) { %>
+                        <li><a href="#orders?page=<%= i %>" class="<%= i === currentPage ? 'active' : '' %>"><%= i %></a></li>
+                    <% } %>
+        
+                    <% if (currentPage < totalPages) { %>
+                        <li><a href="?page=<%= totalPages + 1 %>"> » </a></li>
+                    <% } %>
+                  </ul>
+                </div> -->
+
+                <div class="pagination">
+                  <ul>
+                    <% if (currentPage > 1) { %>
+                      <li><a href="?page=<%= currentPage - 1 %>/#orders" class="arrow">&laquo;</a></li>
+                    <% } %>
+                
+                    <% 
+                      let startPage = Math.max(1, currentPage - 2);
+                      let endPage = Math.min(totalPages, currentPage + 2);
+                
+                      if (startPage > 1) { 
+                    %>
+                      <li><a href="?page=1/#orders">1</a></li>
+                      <% if (startPage > 2) { %>
+                        <li class="ellipsis"><span>...</span></li>
+                      <% } %>
+                    <% } %>
+                
+                    <% for (let i = startPage; i <= endPage; i++) { %>
+                      <li><a href="?page=<%= i %>/#orders" class="<%= i === currentPage ? 'active' : '' %>"><%= i %></a></li>
+                    <% } %>
+                
+                    <% if (endPage < totalPages) { %>
+                      <% if (endPage < totalPages - 1) { %>
+                        <li class="ellipsis"><span>...</span></li>
+                      <% } %>
+                      <li><a href="?page=<%= totalPages %>/#orders"><%= totalPages %></a></li>
+                    <% } %>
+                
+                    <% if (currentPage < totalPages) { %>
+                      <li><a href="?page=<%= currentPage + 1 %>/#orders" class="arrow">&raquo;</a></li>
+                    <% } %>
+                  </ul>
+                </div>
+                
+
               </div>
 
 
