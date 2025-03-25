@@ -331,7 +331,6 @@
                         <div class="card mb-3">
                           <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
-                              <!-- <div class="fw-bold">Product Name: <span class="text-muted"><%=  %></span></div><br> -->
                               <div class="fw-bold">Order ID: <span class="text-muted"><%= order.orderId %></span></div>
                               <div class="text-muted small">Placed on: <%= new Date(order.createdOn).toLocaleDateString() %></div>
                             </div>
@@ -363,15 +362,19 @@
                         </div>                    
                       </div>
                     <% }) %>
-                  <% } else {%>
-                    <div>
-                      No Orders Found
+                 
+                </div>
+                <% } else {%>
+                  <div >
+                    <br><br>
+                    <h4 class="d-flex justify-content-center align-middle">No Orders Found go to</h4> <br>
+                    <div class="d-flex justify-content-center align-middle">
                       <a href="/shop">
-                      <button>Shop</button>
+                        <button class="btn btn-outline-info ">Shop</button>
                       </a>
                     </div>
-                    <% } %>
-                </div>
+                  </div>
+                  <% } %>
 
                 <!-- <div class="pagination">
                   <ul>

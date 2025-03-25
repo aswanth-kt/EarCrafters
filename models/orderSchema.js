@@ -27,6 +27,17 @@ const orderSchema = new Schema ({
             type :Number,
             default : 0
         },
+        cancellationStatus: {
+            type: String,
+            enum: ["Cancelled", "Not Cancelled"],
+            default: "Not Cancelled",
+            required: false,
+        },
+        cancellationReason: {
+            type: String,
+            required: false,
+        },  //Reason for cancellation
+
         returnStatus: {
             type: String,
             enum: ["Not Requested", "Requested", "Returned"],
@@ -55,10 +66,6 @@ const orderSchema = new Schema ({
         ref : "Address",
         required : true
     },
-    invoiceDate : {
-        type : Date,
-        // default : Date.now
-    },
     status : {
         type : String,
         required : true,
@@ -70,8 +77,13 @@ const orderSchema = new Schema ({
             "Cancelled",
             "Return Request",
             "Returned",
-            "Payment Pending"
-            ]
+            'Return Declined',
+            "Payment Pending",
+        ]
+    },
+    invoiceDate : {
+        type : Date,
+        // default : Date.now
     },
     createdOn : {
         type : Date,

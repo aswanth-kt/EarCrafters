@@ -201,6 +201,7 @@
         </tr>
       </thead>
       <tbody>
+        <!-- <% let isCancelled = order.orderItems.every(item => item.cancellationStatus === "Cancelled"); %> -->
         <% order.orderItems.forEach((item, index) => { %> 
             <tr>
             <td><img src="/uploads/re-images/<%= item.product.productImage[0] %>" alt="<%= item.product.productName %>" class="product-image"></td> 
@@ -208,7 +209,13 @@
             <td class="product-price"><%= item.price %></td>
             <td class="product-quantity" data-quantity="<%= item.quantity %>"><%= item.quantity %></td>
             <td><%= order.status %></td>
-            <td><button class="cancel-btn" onclick="showCancelConfirmation('<%= item.product._id %>', '<%= index %>')">Cancel Order</button></td>
+            <td>
+              <!-- <% if (isCancelled === false) { %> -->
+                <button class="cancel-btn" onclick="showCancelConfirmation('<%= item.product._id %>', '<%= index %>')">Cancel Order</button>
+              <!-- <% } else { %> -->
+                <a href="/shop"><button class="btn btn-outline-info">Shop again</button></a>
+              <!-- <% } %> -->
+            </td>
             </tr>
         <% }) %>
       </tbody>

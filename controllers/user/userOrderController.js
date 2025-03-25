@@ -2,6 +2,7 @@ const User = require("../../models/userSchema");
 const Order = require("../../models/orderSchema");
 const Address = require("../../models/addressSchema");
 const Product = require("../../models/productSchema");
+const mongoose = require("mongoose");
 
 
 
@@ -23,11 +24,13 @@ const getOrderDetails = async (req, res) => {
             "productName productImage"
         )
         .exec();
-        console.log("order :", order)
+
         if (!order) {
             return res.status(404).json({ message: "Order not found" });
         };
 
+        // const isAllItemCancelled = order.orderItems.filter(item => item.cancellationStatus).length === order.orderItems.length;
+        // console.log("All item cancelled :", isAllItemCancelled)
 
         const userAddress = await Address.findOne({userId: userData._id})
 
@@ -38,6 +41,7 @@ const getOrderDetails = async (req, res) => {
             user: userData,
             address,
             order,
+            // isAllItemCancelled
         })
     } catch (error) {
         
@@ -85,7 +89,7 @@ const cancelOrder = async (req, res) => {
             {$inc: {quantity: quantityToAdd}},    // add cancel product quantity in to DB
             {new: true}
         );
-        console.log("Updated product result:", updateProduct);
+        // console.log("Updated product result:", updateProduct);
 
         if (!updateProduct) {
             return res.status(404).json({
@@ -94,33 +98,56 @@ const cancelOrder = async (req, res) => {
         };
 
         // Update order
-        const updatedOrderDetails = await Order.findOneAndUpdate(
-            { 
-                _id: order._id,
-                "orderItems.product": productId,
-            },
-            {$set : 
-                {
-                    cancellationReason: reason || otherReason,
-                    status: "Cancelled",
-                    "orderItems.$.quantity": Math.max(0, orderItem.quantity - quantityToAdd),
-                }
-            },
-            { new: true }
-        );
-        console.log("Updated order details:", updatedOrderDetails);
-        
-        // For Delete order
-        // const updatedOrder = await Order.findByIdAndUpdate(
-        //     order._id,
-        //     {
-        //         $pull: {
-        //             orderItems: { product: productId }
+        // const updatedOrderDetails = await Order.findOneAndUpdate(
+        //     { 
+        //         _id: order._id,
+        //         "orderItems.product": productId,
+        //     },
+        //     {$set : 
+        //         {
+        //             "orderItems.$.cancellationReason": reason || otherReason,
+        //             "orderItems.$.cancellationStatus": "Cancelled",
+        //             "orderItems.$.quantity": Math.max(0, orderItem.quantity - quantityToAdd),
         //         }
         //     },
         //     { new: true }
         // );
-        // console.log("Updated order after removal:", updatedOrder);
+        // console.log("Updated order details:", updatedOrderDetails);
+
+        
+
+        const updatedOrderDetails = await Order.findOneAndUpdate(
+            { _id: order._id },
+            {
+                $set: {
+                    "orderItems.$[elem].cancellationReason": reason || otherReason || "No reason provided",
+                    "orderItems.$[elem].cancellationStatus": "Cancelled",
+                    "orderItems.$[elem].quantity": Math.max(0, orderItem.quantity - quantityToAdd)
+                }
+            },
+            {
+                new: true,
+                arrayFilters: [{ "elem.product": new mongoose.Types.ObjectId(productId) }]
+            }
+        );
+
+        console.log("Before update:", order.orderItems);
+        console.log("Updated order details:", updatedOrderDetails);
+
+        const isAllItemCancelled = updatedOrderDetails.orderItems.every(item => item.cancellationStatus === "Cancelled");
+        console.log("is all item cancelled? :", isAllItemCancelled)
+        if (isAllItemCancelled) {
+            await Order.findOneAndUpdate(
+                {
+                    _id: order._id,
+                    "orderItems.product": productId,
+                },
+                {$set: 
+                    {status : "Cancelled"}  // If all cancelled set to status cancelled
+                },
+                {new: true}
+            )
+        }
         
 
         return res.status(200).json({
@@ -135,6 +162,10 @@ const cancelOrder = async (req, res) => {
         });
     }
 };
+
+
+
+
 
 
 

@@ -134,8 +134,8 @@
         </div>
         
         <div class="order-details">
-            <h2>Order : <span><%= order.orderId %></span></h2>
-            <p>Current Status: <strong id="current-status"><%= order.status %></strong></p>
+            <h3>Order : <span><%= order.orderId %></span></h3>
+            <p>Current Status: <strong id="current-status"><%= order.orderId %></strong></p>
             <p>Estimated Delivery: <strong><%= new Date(new Date(order.createdOn).setDate(new Date(order.createdOn).getDate() + 5)).toLocaleDateString() %></strong></p>
         </div>
     </div>
