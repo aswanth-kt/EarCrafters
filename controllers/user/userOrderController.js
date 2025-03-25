@@ -55,7 +55,7 @@ const getOrderDetails = async (req, res) => {
 
 const cancelOrder = async (req, res) => {
     try {
-        const {productId, reason, otherReason, cancelQuantity, cancelledAt} = req.body;
+        const {productId, reason, otherReason, cancelQuantity, orderId ,cancelledAt} = req.body;
         console.log("Body :", req.body);
 
         if (!req.body) {
@@ -66,9 +66,9 @@ const cancelOrder = async (req, res) => {
 
         const quantityToAdd = parseInt(cancelQuantity);
 
-        const order = await Order.findOne({"orderItems.product": productId})
-        .populate("orderItems.product");
-        
+        const order = await Order.findOne({orderId: orderId}).populate("orderItems.product")
+        console.log("Order with orderId:", order)
+
         if (!order) {
             return res.status(404).json({
                 message: "Order not found"
@@ -89,7 +89,6 @@ const cancelOrder = async (req, res) => {
             {$inc: {quantity: quantityToAdd}},    // add cancel product quantity in to DB
             {new: true}
         );
-        // console.log("Updated product result:", updateProduct);
 
         if (!updateProduct) {
             return res.status(404).json({
@@ -97,32 +96,14 @@ const cancelOrder = async (req, res) => {
             });
         };
 
-        // Update order
-        // const updatedOrderDetails = await Order.findOneAndUpdate(
-        //     { 
-        //         _id: order._id,
-        //         "orderItems.product": productId,
-        //     },
-        //     {$set : 
-        //         {
-        //             "orderItems.$.cancellationReason": reason || otherReason,
-        //             "orderItems.$.cancellationStatus": "Cancelled",
-        //             "orderItems.$.quantity": Math.max(0, orderItem.quantity - quantityToAdd),
-        //         }
-        //     },
-        //     { new: true }
-        // );
-        // console.log("Updated order details:", updatedOrderDetails);
-
-        
-
-        const updatedOrderDetails = await Order.findOneAndUpdate(
-            { _id: order._id },
+        // Update order details
+        const updatedOrder = await Order.findByIdAndUpdate(
+            order._id ,
             {
                 $set: {
-                    "orderItems.$[elem].cancellationReason": reason || otherReason || "No reason provided",
+                    "orderItems.$[elem].cancellationReason": otherReason || reason || "No reason provided",
                     "orderItems.$[elem].cancellationStatus": "Cancelled",
-                    "orderItems.$[elem].quantity": Math.max(0, orderItem.quantity - quantityToAdd)
+                    // "orderItems.$[elem].quantity": Math.max(0, orderItem.quantity - quantityToAdd)
                 }
             },
             {
@@ -131,20 +112,15 @@ const cancelOrder = async (req, res) => {
             }
         );
 
-        console.log("Before update:", order.orderItems);
-        console.log("Updated order details:", updatedOrderDetails);
+        // console.log("Before update:", order.orderItems);
+        // console.log("Updated order details:", updatedOrder);
 
-        const isAllItemCancelled = updatedOrderDetails.orderItems.every(item => item.cancellationStatus === "Cancelled");
+        const isAllItemCancelled = updatedOrder.orderItems.every(item => item.cancellationStatus === "Cancelled");
         console.log("is all item cancelled? :", isAllItemCancelled)
         if (isAllItemCancelled) {
-            await Order.findOneAndUpdate(
-                {
-                    _id: order._id,
-                    "orderItems.product": productId,
-                },
-                {$set: 
-                    {status : "Cancelled"}  // If all cancelled set to status cancelled
-                },
+            await Order.findByIdAndUpdate(
+                order._id,
+                {$set: {status : "Cancelled"} },  // If all cancelled set to status cancelled
                 {new: true}
             )
         }
@@ -152,7 +128,8 @@ const cancelOrder = async (req, res) => {
 
         return res.status(200).json({
             success: true,
-            message: "Order cancelled successfully"
+            message: "Order cancelled successfully",
+            updatedOrder,
         });
         
     } catch (error) {
@@ -162,8 +139,6 @@ const cancelOrder = async (req, res) => {
         });
     }
 };
-
-
 
 
 

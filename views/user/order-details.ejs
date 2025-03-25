@@ -210,11 +210,11 @@
             <td class="product-quantity" data-quantity="<%= item.quantity %>"><%= item.quantity %></td>
             <td><%= order.status %></td>
             <td>
-              <!-- <% if (isCancelled === false) { %> -->
-                <button class="cancel-btn" onclick="showCancelConfirmation('<%= item.product._id %>', '<%= index %>')">Cancel Order</button>
-              <!-- <% } else { %> -->
+              <% if (item.cancellationStatus === "Not Cancelled") { %>
+                <button class="cancel-btn" onclick="showCancelConfirmation('<%= item.product._id %>', '<%= index %>', '<%= order.orderId %>')">Cancel Order</button>
+              <% } else { %>
                 <a href="/shop"><button class="btn btn-outline-info">Shop again</button></a>
-              <!-- <% } %> -->
+              <% } %>
             </td>
             </tr>
         <% }) %>
@@ -229,7 +229,7 @@
 
   <script>
     
-    function showCancelConfirmation(productId, rowIndex) {
+    function showCancelConfirmation(productId, rowIndex, orderId) {
       Swal.fire({
         title: 'Cancel Order',
         html: `
@@ -284,13 +284,13 @@
       }).then((result) => {
         if (result.isConfirmed) {
           // Save cancellation data to the database
-          saveCancellationToDB(productId, result.value.reason, result.value.otherReason, result.value.cancelQuantity);
+          saveCancellationToDB(productId, result.value.reason, result.value.otherReason, result.value.cancelQuantity, orderId);
         }
       });
     }
 
     // Function to save cancellation data to database
-    function saveCancellationToDB(productId, reason, otherReason, cancelQuantity) {
+    function saveCancellationToDB(productId, reason, otherReason, cancelQuantity, orderId) {
       // Show loading indicator
       Swal.fire({
         title: 'Processing...',
@@ -307,11 +307,12 @@
         reason: reason,
         otherReason: reason === 'other' ? otherReason : '',
         cancelQuantity: cancelQuantity,
-        cancelledAt: new Date().toISOString()
+        cancelledAt: new Date().toISOString(),
+        orderId: orderId,
       };
       
       // Send data to server using fetch API
-      fetch('/profile/order-details/cancel-product', {
+      fetch('/cancel-product', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

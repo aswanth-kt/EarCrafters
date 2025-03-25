@@ -161,9 +161,9 @@ router.get("/order-success", userAuth, checkoutController.getOrderSuccess);
 // User Order Management
 router.get("/order-details", userAuth, orderController.getOrderDetails);
 
-router.post("/profile/order-details/cancel-product", userAuth, orderController.cancelOrder);
+router.post("/cancel-product", userAuth, orderController.cancelOrder);
 
-router.get("/profile/orders/track-orders", userAuth, orderController.loadTrackOrders);
+router.get("/track-orders", userAuth, orderController.loadTrackOrders);
 
 
 

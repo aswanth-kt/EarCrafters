@@ -31,7 +31,7 @@ const orderSchema = new Schema ({
             type: String,
             enum: ["Cancelled", "Not Cancelled"],
             default: "Not Cancelled",
-            required: false,
+            required: true,
         },
         cancellationReason: {
             type: String,
