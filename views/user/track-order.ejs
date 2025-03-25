@@ -1,0 +1,186 @@
+<%- include("../../views/partials/user/header") %>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Order Tracking</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            /* max-width: 600px; */
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        .order-tracking {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+
+        .progress-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .progress-bar {
+            position: absolute;
+            height: 4px;
+            background-color: #e0e0e0;
+            width: 100%;
+            z-index: 1;
+        }
+
+        .progress-bar-fill {
+            position: absolute;
+            height: 4px;
+            background-color: #4CAF50;
+            width: 0;
+            z-index: 2;
+            transition: width 0.5s ease;
+        }
+
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 3;
+            background-color: white;
+            padding: 0 10px;
+        }
+
+        .progress-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid #e0e0e0;
+            background-color: white;
+            margin-bottom: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .progress-icon img {
+            width: 25px;
+            height: 25px;
+        }
+
+        .active .progress-icon {
+            border-color: #4CAF50;
+            background-color: #4CAF50;
+        }
+
+        .active .progress-icon img {
+            filter: brightness(0) invert(1);
+        }
+
+        .status-label {
+            text-align: center;
+            color: #666;
+            font-size: 0.8em;
+        }
+
+        .order-details {
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <br>
+    <% if (order) { %>
+    <div class="order-tracking">
+        <div class="progress-container">
+            <div class="progress-bar"></div>
+            <div class="progress-bar-fill"></div>
+            
+            <div class="progress-step" data-status="Order Placed">
+                <div class="progress-icon">
+                    <img src="/api/placeholder/30/30?text=📦" alt="Order Placed">
+                </div>
+                <div class="status-label">Order Placed</div>
+            </div>
+            
+            <div class="progress-step" data-status="Processing">
+                <div class="progress-icon">
+                    <img src="/api/placeholder/30/30?text=🔄" alt="Processing">
+                </div>
+                <div class="status-label">Processing</div>
+            </div>
+            
+            <div class="progress-step" data-status="Shipped">
+                <div class="progress-icon">
+                    <img src="/api/placeholder/30/30?text=🚚" alt="Shipped">
+                </div>
+                <div class="status-label">Shipped</div>
+            </div>
+            
+            <div class="progress-step" data-status="Delivered">
+                <div class="progress-icon">
+                    <img src="/api/placeholder/30/30?text=✅" alt="Delivered">
+                </div>
+                <div class="status-label">Delivered</div>
+            </div>
+        </div>
+        
+        <div class="order-details">
+            <h2>Order : <span><%= order.orderId %></span></h2>
+            <p>Current Status: <strong id="current-status"><%= order.status %></strong></p>
+            <p>Estimated Delivery: <strong><%= new Date(new Date(order.createdOn).setDate(new Date(order.createdOn).getDate() + 5)).toLocaleDateString() %></strong></p>
+        </div>
+    </div>
+    <% } %>
+<br>    
+</body>
+
+<script>
+    function updateOrderTracking(status) {
+        const statuses = [
+            "Order Placed", 
+            "Processing", 
+            "Shipped", 
+            "Delivered"
+        ];
+
+        const currentIndex = statuses.indexOf(status);
+        const progressSteps = document.querySelectorAll('.progress-step');
+        const progressBarFill = document.querySelector('.progress-bar-fill');
+        const currentStatusElement = document.getElementById('current-status');
+
+        // Reset all steps
+        progressSteps.forEach(step => step.classList.remove('active'));
+        
+        // Activate steps up to current status
+        for (let i = 0; i <= currentIndex; i++) {
+            progressSteps[i].classList.add('active');
+        }
+
+        // Update progress bar
+        const progressPercentage = (currentIndex / (statuses.length - 1)) * 100;
+        progressBarFill.style.width = `${progressPercentage}%`;
+
+        // Update current status text
+        currentStatusElement.textContent = status;
+    }
+
+    // Initial setup with current status
+    updateOrderTracking("Processing");
+
+    // Optional: Add event listeners or fetch real-time status
+    // updateOrderTracking could be called with different statuses
+</script>
+
+</html>
+
+
+<%- include("../../views/partials/user/footer") %>

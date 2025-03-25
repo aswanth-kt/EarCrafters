@@ -360,7 +360,7 @@
 
 
 <!-- Pagination -->
-   <!-- <div class="pagination">
+   <div class="pagination">
 
     <% if (currentPage > 1) { %>
         <a class="btn" href="/shop?page=<%= currentPage - 1 %>">Prev</a>
@@ -376,13 +376,13 @@
         <a class="btn" href="/shop?page=<%= currentPage + 1 %>">Next</a>
       <% } %>
  
-   </div> -->
+   </div>
 
-   <div class="pagination">
+   <!-- <div class="pagination">
       <% for (let i = 1; i <= totalPages; i++) { %>
         <a class="btn <%= currentPage === i ? 'active' : '' %>" href="?page=<%= i %>&filter=<%= filter %>"><%= i %></a>
       <% } %>
-   </div>
+   </div> -->
   
  </section>
 </div>

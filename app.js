@@ -43,8 +43,10 @@ app.use((req, res, next) => {
 
 app.set("view engine" , "ejs");     //set view engine
 
-app.set("views" , [path.join(__dirname, "views/user"), 
-    path.join(__dirname, "views/admin")]);      //set views path for user & admin
+app.set("views" , [
+    path.join(__dirname, "views/user"), 
+    path.join(__dirname, "views/admin"),
+]);      //set views path for user & admin
 
 app.use(express.static(path.join(__dirname, "public")));     //mension static folder
 

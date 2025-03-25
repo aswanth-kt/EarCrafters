@@ -163,6 +163,8 @@ router.get("/order-details", userAuth, orderController.getOrderDetails);
 
 router.post("/profile/order-details/cancel-product", userAuth, orderController.cancelOrder);
 
+router.get("/profile/orders/track-orders", userAuth, orderController.loadTrackOrders);
+
 
 
 

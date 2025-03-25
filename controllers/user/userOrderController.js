@@ -103,7 +103,7 @@ const cancelOrder = async (req, res) => {
                 {
                     cancellationReason: reason || otherReason,
                     status: "Cancelled",
-                    // "orderItems.$.quantity": Math.max(0, orderItem.quantity - quantityToAdd),
+                    "orderItems.$.quantity": Math.max(0, orderItem.quantity - quantityToAdd),
                 }
             },
             { new: true }
@@ -138,6 +138,40 @@ const cancelOrder = async (req, res) => {
 
 
 
+// Load Tracking page
+const loadTrackOrders = async (req, res) => {
+    try {
+        
+        const orderId = req.query.orderId;
+        const user = req.session.user;
+
+        const order = await Order.findById(orderId);
+        console.log("order in track:", order)
+        if (!order) {
+            return res.status(404).json({
+                status: false,
+                message: "Order not found"
+            });
+        };
+
+        res.render("track-order", {
+            user,
+            order,
+        })
+
+        
+    } catch (error) {
+        
+        console.error("Error in load order track", error);
+        return res.status(500).json({
+            status: false,
+            message: "Internal server error",
+        })
+    }
+}
+
+
+
 
 
 
@@ -146,4 +180,5 @@ const cancelOrder = async (req, res) => {
 module.exports = {
     getOrderDetails,
     cancelOrder,
+    loadTrackOrders,
 }
