@@ -115,28 +115,32 @@
             
             <div class="progress-step" data-status="Order Placed">
                 <div class="progress-icon">
-                    <img src="/api/placeholder/30/30?text=📦" alt="Order Placed">
+                    <i>📦</i>
+                    <!-- <img src="/admin-assets/imgs/orderTracking/process.jpg?text=📦" alt="Order Placed"> -->
                 </div>
                 <div class="status-label">Order Placed</div>
             </div>
             
             <div class="progress-step" data-status="Processing">
                 <div class="progress-icon">
-                    <img src="/api/placeholder/30/30?text=🔄" alt="Processing">
+                    <i>🔄</i>
+                    <!-- <img src="/pu/admin-assets/imgs/orderTracking/?text=🔄" alt="Processing"> -->
                 </div>
                 <div class="status-label">Processing</div>
             </div>
             
             <div class="progress-step" data-status="Shipped">
                 <div class="progress-icon">
-                    <img src="/api/placeholder/30/30?text=🚚" alt="Shipped">
+                    <i>🚚</i>
+                    <!-- <img src="/api/placeholder/30/30?text=🚚" alt="Shipped"> -->
                 </div>
                 <div class="status-label">Shipped</div>
             </div>
             
             <div class="progress-step" data-status="Delivered">
                 <div class="progress-icon">
-                    <img src="/api/placeholder/30/30?text=✅" alt="Delivered">
+                    <i>✅</i>
+                    <!-- <img src="/api/placeholder/30/30?text=✅" alt="Delivered"> -->
                 </div>
                 <div class="status-label">Delivered</div>
             </div>
@@ -183,7 +187,7 @@
     }
 
     // Initial setup with current status
-    updateOrderTracking("Processing");
+    updateOrderTracking("<%= order.status %>");
 
     // Optional: Add event listeners or fetch real-time status
     // updateOrderTracking could be called with different statuses

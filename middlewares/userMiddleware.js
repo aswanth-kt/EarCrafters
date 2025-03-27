@@ -3,8 +3,8 @@ const User = require("../models/userSchema");
 const loginMiddleware = (req, res, next) => {
     try {
 
-        if (req.session.user_id) {
-            console.log(req.session.user_id);
+        if (req.session.user) {
+            console.log(req.session.user);
             
             return res.redirect('/');
         } else {

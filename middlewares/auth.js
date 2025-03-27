@@ -53,14 +53,18 @@ const userAuth = (req, res, next) => {
     User.findById(req.session.user)
         .then(data => {
             if (data && !data.isBlock) {
+
                 next();     // Proceed to next
+
             } else {
                 res.redirect("/login");
             }
         })
         .catch(error => {
+
             console.error("Error in user auth middleware", error);
             res.status(500).send("Internal Server Error");
+            
         });
 };
 

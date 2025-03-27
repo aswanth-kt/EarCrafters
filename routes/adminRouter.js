@@ -103,6 +103,8 @@ router.get("/orderList", adminAuth, orderController.getOrderList);
 
 router.get("/orders/details", adminAuth, orderController.loadOrderDetailsPage);
 
+router.put("/order/details/updateOrderStatus", adminAuth, orderController.updateOrderStatus);
+
 
 
 

@@ -59,7 +59,7 @@ router.get("/auth/google/callback", passport.authenticate("google", {failureRedi
 
 
 // Login Management
-router.get("/login",userMiddleware, userController.loadLogin);
+router.get("/login",userAuth, userController.loadLogin);
 
 router.post("/login", userController.login);
 

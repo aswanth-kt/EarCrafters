@@ -100,13 +100,13 @@
         <div class="order-actions">
             
             <% if (order.status === "Order Placed") { %>
-            <button class="action-btn btn-processing" data-id="<%= order._id %>">Processing</button>
+            <button class="action-btn btn-processing" data-id="<%= order._id %>" data-status="Processing">Processing</button>
             <% } else if (order.status === "Processing") { %>
-            <button class="action-btn btn-shipped">Shipped</button>
+            <button class="action-btn btn-shipped" data-id="<%= order._id %>" data-status="Shipped">Shipped</button>
             <% } else if (order.status === "Shipped") { %>
-            <button class="action-btn btn-delivered">Delivered</button>
+            <button class="action-btn btn-delivered" data-id="<%= order._id %>" data-status="Delivered">Delivered</button>
             <% } else if (order.status === "Delivered") { %>
-            <button class="action-btn btn-return">Return Request</button>
+            <button class="action-btn btn-return" data-id="<%= order._id %>" data-status="Return Request">Return Request</button>
             <% } %>
 
             <% if (order.status === "Cancelled") { %>
@@ -129,7 +129,7 @@
             <% } %>
 
             <% if (order.status !== 'Cancelled' && order.status !== 'Returned') { %>
-                <button class="action-btn btn btn-danger status-btn" data-status="Cancelled">Cancel</button>
+                <button class="action-btn btn btn-danger status-btn" data-id="<%= order._id %>" data-status="Cancelled">Cancel</button>
                 <% } %>
         </div>
 
@@ -227,8 +227,58 @@
 <script>
 
     $(document).on("click", ".action-btn", function() {
-        var orderId = $(this).
-    })
+        var orderId = $(this).data("id");
+        var status = $(this).data("status");
+        // console.log("id:", orderId, "status:", status);
+
+        Swal.fire({
+            title: `Are you sure you want to mark this order as ${status}?`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: `Yes, ${status}!`,
+            cancelButtonText: "No, Cancel",
+            reverseButtons: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    type: "PUT",
+                    url: "/admin/order/details/updateOrderStatus",
+                    data: {orderId, status},
+                    success: (responce) => {
+                        if (responce.status) {
+                            Swal.fire({
+                                icon: "success",
+                                title: responce.message,
+                                showCancelButton: false,
+                                timer: 1500,
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Error",
+                                text: "An error occurred while updating the order status. Please try again.",
+                            });
+                        }
+                    },
+                    error: (error) => {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Request Failed",
+                            text: "There was an issue connecting to the server. Please try again.",
+                        });
+                    },
+                })
+            } else {
+                Swal.fire(
+                    "Cancelled", 
+                    "Order status change was cancelled.", 
+                    "info"
+                );
+            }
+        });
+    });
 
 </script>
 

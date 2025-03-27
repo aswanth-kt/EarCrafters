@@ -100,7 +100,45 @@ const loadOrderDetailsPage = async (req, res) => {
         })
         
     }
-}
+};
+
+
+
+// Update order status for tracking
+const updateOrderStatus = async (req, res) => {
+    try {
+
+        const {orderId, status} = req.body;
+
+        const order = await Order.findById(orderId);
+
+        if (!order) {
+            return res.status(404).json({
+                status: false,
+                message: "Order not found,"
+            });
+        };
+
+        // Update order status
+        order.status = status;
+
+        // Save order updates
+        await order.save();
+
+        res.status(200).json({
+            status: true,
+            message: `Order status updated to ${status}`,
+        })
+        
+    } catch (error) {
+        
+        console.error("Error in update order status", error);
+        res.status(500).json({
+            status: false,
+            message: "Internal server errror"
+        })
+    }
+};
 
 
 
@@ -112,4 +150,5 @@ const loadOrderDetailsPage = async (req, res) => {
 module.exports = {
     getOrderList,
     loadOrderDetailsPage,
+    updateOrderStatus,
 }
