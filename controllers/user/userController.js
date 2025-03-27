@@ -63,7 +63,7 @@ const loadHomepage = async (req, res) => {
 
         if (user) {
             
-            const userData = await User.findOne({_id : user._id});
+            const userData = await User.findOne({_id : user});
 
             // For disply how may cart item at cat logo
             const cart = await Cart.findOne({userId: userData._id});

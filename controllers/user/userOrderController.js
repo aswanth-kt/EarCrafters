@@ -66,8 +66,10 @@ const cancelOrder = async (req, res) => {
 
         const quantityToAdd = parseInt(cancelQuantity);
 
-        const order = await Order.findOne({orderId: orderId}).populate("orderItems.product")
-        console.log("Order with orderId:", order)
+        const order = await Order.findOne({orderId: orderId})
+        .populate("orderItems.product");
+
+        // console.log("Order with orderId:", order)
 
         if (!order) {
             return res.status(404).json({

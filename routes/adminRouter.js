@@ -101,6 +101,8 @@ router.get("/deleteBanner", adminAuth, bannerController.deleteBanner);
 // Order Management
 router.get("/orderList", adminAuth, orderController.getOrderList);
 
+router.get("/orders/details", adminAuth, orderController.loadOrderDetailsPage);
+
 
 
 

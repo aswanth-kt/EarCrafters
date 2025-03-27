@@ -64,6 +64,45 @@ const getOrderList = async (req, res) => {
 
 
 
+// Load admin order details
+const loadOrderDetailsPage = async (req, res) => {
+    try {
+
+        const userId = req.session.user
+        const orderId = req.query.orderId;
+
+        const order = await Order.findById(orderId)
+        .populate("orderItems.product", "productName productImage");
+        
+        if (!order) {
+            return res.status(404).json({
+                status: false,
+                message: "Order not found",
+            });
+        };
+
+        const userAddresses = await Address.findOne({userId: userId}).select("address");
+
+        const defaultAddress = userAddresses
+        ? userAddresses.address.find(addr => addr.isDefault) : null;
+
+        res.render("admin-order-details", {
+            order,
+            defaultAddress,
+        })
+        
+    } catch (error) {
+        
+        console.error("Error in load order details page", error);
+        req.status(500).json({
+            status: false,
+            Message: "Internal server error"
+        })
+        
+    }
+}
+
+
 
 
 
@@ -72,4 +111,5 @@ const getOrderList = async (req, res) => {
 
 module.exports = {
     getOrderList,
+    loadOrderDetailsPage,
 }

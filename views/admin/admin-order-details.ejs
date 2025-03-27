@@ -1,0 +1,236 @@
+<%- include("../../views/partials/admin/header") %>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Order Details - Admin Panel</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            /* padding: 20px; */
+            line-height: 1.6;
+        }
+        .order-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+        .order-actions {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+        .action-btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        .btn-processing {
+            background-color: #FFA500;
+            color: white;
+        }
+        .btn-shipped {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .btn-delivered {
+            background-color: #2196F3;
+            color: white;
+        }
+        .btn-return {
+            background-color: #9C27B0;
+            color: white;
+        }
+        .action-btn:hover {
+            opacity: 0.9;
+            transform: scale(1.05);
+        }
+        .section-title {
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+        }
+        .product-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .product-table th {
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        .product-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            vertical-align: middle;
+        }
+        .product-image {
+            max-width: 80px;
+            max-height: 80px;
+            object-fit: cover;
+        }
+    </style>
+</head>
+
+<body>
+    <br>
+    <div class="order-container">
+        <div class="order-actions">
+            
+            <% if (order.status === "Order Placed") { %>
+            <button class="action-btn btn-processing" data-id="<%= order._id %>">Processing</button>
+            <% } else if (order.status === "Processing") { %>
+            <button class="action-btn btn-shipped">Shipped</button>
+            <% } else if (order.status === "Shipped") { %>
+            <button class="action-btn btn-delivered">Delivered</button>
+            <% } else if (order.status === "Delivered") { %>
+            <button class="action-btn btn-return">Return Request</button>
+            <% } %>
+
+            <% if (order.status === "Cancelled") { %>
+                <% if (order.paymentMethod === "wallet" || order.paymentMethod === "upi") { %>
+                <div style="text-align: center;">
+                    <p
+                    style="color: red;">
+                    Order cancelled</p> 
+                    <p
+                    style="color: green;">
+                    Money has sent to your wallet
+                    </p>
+                </div>
+                <% } else if (order.paymentMethod === "cod") { %>
+                    <div>
+                        <p style="color: red; text-align: center;">Order cancelled</p>
+                        <p style="color: #2196F3; text-align: center;">No payment is required</p>
+                    </div>
+                <% } %>
+            <% } %>
+
+            <% if (order.status !== 'Cancelled' && order.status !== 'Returned') { %>
+                <button class="action-btn btn btn-danger status-btn" data-status="Cancelled">Cancel</button>
+                <% } %>
+        </div>
+
+        <h2 class="section-title">Order Information</h2>
+        <div class="info-grid">
+            <div class="info-item">
+                <strong>Order ID:</strong>
+                <span><%= order.orderId %></span>
+            </div>
+            <div class="info-item">
+                <strong>Payment Method:</strong>
+                <span><%= order.paymentMethod.toUpperCase() %></span>
+            </div>
+            <div class="info-item">
+                <strong>User Name:</strong>
+                <span><%= defaultAddress.name %></span>
+            </div>
+            <!-- <div class="info-item">
+                <strong>Total Price:</strong>
+                <span>₹1311</span>
+            </div> -->
+            <div class="info-item">
+                <strong>Discount:</strong>
+                <span>₹<%= order.discount %></span>
+            </div>
+            <div class="info-item">
+                <strong>Final Amount:</strong>
+                <span>₹<%= order.finalAmount %></span>
+            </div>
+            <div class="info-item">
+                <strong>Status:</strong>
+                <span><%= order.status %></span>
+            </div>
+            <div class="info-item">
+                <strong>Coupon Applied:</strong>
+                <span>No</span>
+            </div>
+            <div class="info-item">
+                <strong>Order Date:</strong>
+                <span><%= new Date(order.createdOn).toLocaleDateString() %></span>
+            </div>
+        </div>
+
+        <h2 class="section-title">Shipping Address</h2>
+        <div class="info-grid">
+            <div class="info-item">
+                <strong>Name:</strong>
+                <span><%= defaultAddress.name %></span>
+            </div>
+            <div class="info-item">
+                <strong>City:</strong>
+                <span><%= defaultAddress.city %></span>
+            </div>
+            <div class="info-item">
+                <strong>Landmark:</strong>
+                <span><%= defaultAddress.landMark %></span>
+            </div>
+            <div class="info-item">
+                <strong>State:</strong>
+                <span><%= defaultAddress.state %></span>
+            </div>
+            <div class="info-item">
+                <strong>Pincode:</strong>
+                <span><%= defaultAddress.pincode %></span>
+            </div>
+        </div>
+
+        <h2 class="section-title">Ordered Items</h2>
+        <table class="product-table">
+            <thead>
+                <tr>
+                    <th>Product Image</th>
+                    <th>Product Name</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% order.orderItems.forEach((item) => { %> 
+                <tr>
+                    <td>
+                        <img src="/uploads/re-images/<%= item.product.productImage[0] %>" alt="<%= item.product.productName %>" class="product-image">
+                    </td>
+                    <td><%= item.product.productName %></td>
+                    <td><%= item.price %></td>
+                    <td><%= item.quantity %></td>
+                </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
+
+<script>
+
+    $(document).on("click", ".action-btn", function() {
+        var orderId = $(this).
+    })
+
+</script>
+
+
+<%- include("../../views/partials/admin/footer") %>

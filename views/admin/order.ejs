@@ -210,7 +210,11 @@
 
                     <td><span class="status status-completed"><%= order.status %></span></td>
 
-                    <td><button class="details-button">View Details</button></td>
+                    <td>
+                        <a href="/admin/orders/details?orderId=<%=order._id%>">
+                            <button class="details-button">View Details</button>
+                        </a>
+                    </td>
                 </tr>
             </tbody>
             <% }) %>
