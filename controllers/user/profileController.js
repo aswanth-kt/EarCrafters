@@ -1,6 +1,7 @@
 const User = require("../../models/userSchema");
 const Address = require("../../models/addressSchema");
 const Order = require("../../models/orderSchema");
+const Wallet = require("../../models/walletSchema");
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 const evn = require('dotenv').config();
@@ -254,6 +255,11 @@ const getUserProfilePage = async (req, res) => {
         .exec();
 
         const totalPages = Math.ceil(totalOrders / limit);
+
+        
+        // Fetch Wallet details
+        const wallet = await Wallet.findOne({userId: userData._id});
+        
 
         res.render("profile", {
             user: userData,

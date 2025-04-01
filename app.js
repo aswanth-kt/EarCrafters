@@ -35,9 +35,14 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 
-// To prevent data store in browser cache
+// // To prevent data store in browser cache
+// app.use((req, res, next) => {
+//     res.set('cache-control' , 'no-store')
+//     next();
+// });
+
 app.use((req, res, next) => {
-    res.set('cache-control' , 'no-store')
+    res.header("Cache-Control", "no-cache,  no-store, must-revalidate");
     next();
 });
 
@@ -49,7 +54,6 @@ app.set("views" , [
 ]);      //set views path for user & admin
 
 app.use(express.static(path.join(__dirname, "public")));     //mension static folder
-
 
 
 // Routes

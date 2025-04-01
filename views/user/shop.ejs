@@ -231,6 +231,48 @@
  .category-brand-container {
    text-align: center;
  }
+
+ .marquee-container {
+      overflow: hidden;
+      position: relative;
+      width: 100%;
+      background: #f9f9f9;
+      padding: 20px 0;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .marquee-content {
+      display: flex;
+      animation: marquee 30s linear infinite;
+      width: max-content;
+    }
+    
+    .brandLogo {
+      height: 50px;
+      margin: 0 30px;
+      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+      transition: transform 0.3s ease;
+    }
+    
+    .brandLogo:hover {
+      transform: scale(1.1);
+    }
+    
+    @keyframes marquee {
+      0% {
+        transform: translateX(0);
+      }
+      100% {
+        transform: translateX(-50%);
+      }
+    }
+    
+    /* Pause animation on hover */
+    .marquee-container:hover .marquee-content {
+      animation-play-state: paused;
+    }
+
 </style>
 
 <div class="page-header breadcrumb-wrap">
@@ -241,6 +283,45 @@
       </div>
   </div>
 </div>
+
+<br>
+<div class="marquee-container">
+  <div class="marquee-content">
+    <img class="brandLogo" src="/img/BrandLogos/apple.png" alt="">
+    <img class="brandLogo" src="/img/BrandLogos/jbl.jpeg" alt="">
+    <img class="brandLogo" src="/img/BrandLogos/skullcandy.png" alt="">
+    <img class="brandLogo" src="/img/BrandLogos/Sony_logo.svg" alt="">
+    <img class="brandLogo" src="/img/BrandLogos/AKG_logo.svg" alt="">
+    <img class="brandLogo" src="/img/BrandLogos/austian.jpeg" alt="">
+    <img class="brandLogo" src="/img/BrandLogos/beats.png" alt="">
+    <img class="brandLogo" src="/img/BrandLogos/bose.jpeg" alt="">
+    <img class="brandLogo" src="/img/BrandLogos/bowers.png" alt="">
+    <img class="brandLogo" src="/img/BrandLogos/hifi.png" alt="">
+    <img class="brandLogo" src="/img/BrandLogos/NEW-A-T-Blog-Cover-Photo-12.png" alt="">
+    <img class="brandLogo" src="/img/BrandLogos/philips.png" alt="">
+    <img class="brandLogo" src="/img/BrandLogos/sennheiser.png" alt="">
+    <img class="brandLogo" src="/img/BrandLogos/skull.png" alt="">
+    <img class="brandLogo" src="/img/BrandLogos/noice.png" alt="">
+    
+    <!-- Duplicate logos to create seamless loop -->
+    <img class="brandLogo" src="/img/BrandLogos/apple.png" alt="">
+    <img class="brandLogo" src="/img/BrandLogos/jbl.jpeg" alt="">
+    <img class="brandLogo" src="/img/BrandLogos/skullcandy.png" alt="">
+    <img class="brandLogo" src="/img/BrandLogos/Sony_logo.svg" alt="">
+    <img class="brandLogo" src="/img/BrandLogos/AKG_logo.svg" alt="">
+    <img class="brandLogo" src="/img/BrandLogos/austian.jpeg" alt="">
+    <img class="brandLogo" src="/img/BrandLogos/beats.png" alt="">
+    <img class="brandLogo" src="/img/BrandLogos/bose.jpeg" alt="">
+    <img class="brandLogo" src="/img/BrandLogos/bowers.png" alt="">
+    <img class="brandLogo" src="/img/BrandLogos/hifi.png" alt="">
+    <img class="brandLogo" src="/img/BrandLogos/NEW-A-T-Blog-Cover-Photo-12.png" alt="">
+    <img class="brandLogo" src="/img/BrandLogos/philips.png" alt="">
+    <img class="brandLogo" src="/img/BrandLogos/sennheiser.png" alt="">
+    <img class="brandLogo" src="/img/BrandLogos/skull.png" alt="">
+    <img class="brandLogo" src="/img/BrandLogos/noice.png" alt="">
+  </div>
+</div>
+
 
 <div class="main-container">
  <section class="shop-page container">

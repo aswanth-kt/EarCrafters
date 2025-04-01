@@ -208,12 +208,12 @@
             <td class="product-name"><%= item.product.productName %></td>
             <td class="product-price"><%= item.price %></td>
             <td class="product-quantity" data-quantity="<%= item.quantity %>"><%= item.quantity %></td>
-            <td><%= item.cancellationStatus %></td>
+            <td><%= order.status %></td>
             <td>
               <% if (item.cancellationStatus === "Not Cancelled") { %>
                 <button class="cancel-btn" onclick="showCancelConfirmation('<%= item.product._id %>', '<%= index %>', '<%= order.orderId %>')">Cancel Order</button>
-              <% } else { %>
-                <a href="/shop"><button class="btn btn-outline-info">Shop again</button></a>
+              <% } else if (order.status === "Delivered") { %>
+                <a href="#"><button class="btn btn-outline-info">Return</button></a>
               <% } %>
             </td>
             </tr>

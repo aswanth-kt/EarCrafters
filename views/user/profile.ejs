@@ -426,11 +426,10 @@
                     <% } %>
                   </ul>
                 </div>
-                
-
               </div>
 
 
+              <!-- Wallet -->
                <div class="tab-pane fade" id="track-orders" role="tabpanel" aria-labelledby="track-orders-tab">
                  <div class="card">
                    <div class="card-header">
@@ -453,6 +452,34 @@
                </div>
 
 
+              <!-- Modal for Adding Money -->
+              <div class="modal fade" id="addMoneyModal" tabindex="-1" role="dialog" aria-labelledby="addMoneyModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="addMoneyModalLabel">Add Money to Wallet</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <form id="addMoneyForm">
+                      <div class="modal-body">
+                        <div class="form-group">
+                          <label for="amount">Amount</label>
+                          <input type="number" class="form-control" id="amount" name="amount" required placeholder="Enter amount to add" min="0.01" step="0.01">
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Add Money</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+
+
+               <!-- Wallet History -->
                <div class="tab-pane fade" id="wallet-history" role="tabpanel" aria-labelledby="orders-tab">
                  <div class="card">
                    <div class="card-header">
@@ -464,12 +491,14 @@
                          <thead>
                            <tr>
                              <th>Date</th>
-                             <th>Status</th>
+                             <th>Transaction</th>
                              <th>Amount</th>
+                             <th>Balance</th>
                            </tr>
                          </thead>
                          <tbody>
                            <tr>
+                             <td></td>
                              <td></td>
                              <td></td>
                              <td></td>
@@ -501,6 +530,27 @@
 </main>
 
 <script>
+
+  fetch("/wallet/add-money", {
+    method: "PUT",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({amount}),
+  })
+  .then(responce => responce.json())
+  .then(data => {
+    if (data.message) {
+      // Display success alert with the wallet balance
+      Swal.fire({
+        title: "Success!",
+        text: data.message + '\nNew Balnce: ₹' + data.wallet.balance.tofixed(2),  // Change to Rs
+        icon: "success",
+        confirmationButtonText: "OK",
+      }).then(() => {
+        location.reload()
+      })
+    }
+  })
+
 
   // Check if there's a hash in the URL
   document.addEventListener('DOMContentLoaded', function() {
