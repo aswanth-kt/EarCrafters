@@ -1,0 +1,245 @@
+<%- include("../../views/partials/admin/header") %>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Coupons</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            /* padding: 20px; */
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .search-bar {
+            display: flex;
+            gap: 10px;
+            width: 50%;
+        }
+        
+        .search-bar input {
+            flex-grow: 1;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .search-bar button {
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .add-coupon-btn {
+            padding: 10px 16px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .coupon-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        .coupon-table th, .coupon-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .coupon-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        
+        .coupon-table tr:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .status-active {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        
+        .status-expired {
+            color: #f44336;
+            font-weight: bold;
+        }
+        
+        .list-btn, .unlist-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+        
+        .list-btn {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .unlist-btn {
+            background-color: #FFC107;
+            color: black;
+        }
+        
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+        
+        .edit-btn {
+            background-color: #2196F3;
+            color: white;
+        }
+        
+        .delete-btn {
+            background-color: #f44336;
+            color: white;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+        }
+        
+        .pagination button {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background-color: #fff;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        
+        .pagination button.active {
+            background-color: #2196F3;
+            color: white;
+            border-color: #2196F3;
+        }
+        
+        .pagination button:hover:not(.active) {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Manage Coupons</h1>
+        
+        <div class="header">
+            <div class="search-bar">
+                <input type="text" placeholder="Search coupons...">
+                <button>Search</button>
+            </div>
+            <a href="/admin/createCoupon">
+                <button class="add-coupon-btn">+ Add Coupon</button>
+            </a>
+        </div>
+        
+        <table class="coupon-table">
+            <thead>
+                <tr>
+                    <th>Coupon Name</th>
+                    <th>Offer Price (Min)</th>
+                    <th>Purchase Amount</th>
+                    <th>Created On</th>
+                    <th>Expire On</th>
+                    <th>Status</th>
+                    <th>List / Unlist</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <% if (coupons && coupons.length > 0) { %>
+                    <% coupons.forEach((coupon) => { %> 
+                        <% let today = new Date(); %>
+                        <tr>
+                            <td><%= coupon.name %></td>
+                            <td><%= coupon.offerPrice %></td>
+                            <td><%= coupon.minimumPrice %></td>
+                            <td><%= new Date(coupon.createdOn).toLocaleDateString() %></td>
+                            <td><%= new Date(coupon.expireOn).toLocaleDateString() %></td>
+
+                            <% if (today <= coupon.expireOn) { %>
+                                <td><span class="status-active">Active</span></td>
+                            <% } else { %>
+                                <td><span class="status-expired">Expired</span></td>
+                            <% } %>
+                            <td>
+                                <% if (today <= coupon.isList === false) { %>
+                                    <button class="list-btn">List</button>
+                                <% } else {%>
+                                    <button class="unlist-btn">Unlist</button>
+                                <% } %>
+                            </td>
+                            <td>
+                                <a href="/admin/coupons/edit-copon?couponId=<%= coupon._id %>">
+                                    <button class="action-btn edit-btn">Edit</button>
+                                </a>
+                                <button class="action-btn delete-btn">Delete</button>
+                            </td>
+                        </tr>
+                    <% }) %>
+                <% } %>
+                
+            </tbody>
+        </table>
+        
+        <div class="pagination">
+            <button>&laquo;</button>
+            <button class="active">1</button>
+            <button>2</button>
+            <button>3</button>
+            <button>4</button>
+            <button>5</button>
+            <button>&raquo;</button>
+        </div>
+    </div>
+</body>
+</html>
+
+
+<%- include("../../views/partials/admin/footer") %>
