@@ -209,10 +209,10 @@
                                 <td><span class="status-expired">Expired</span></td>
                             <% } %>
                             <td>
-                                <% if (today <= coupon.isList === false) { %>
-                                    <button class="list-btn">List</button>
+                                <% if (coupon.isList === false) { %>
+                                    <button class="list-btn" id="listed" onclick="listed('<%= coupon._id %>')">List</button>
                                 <% } else {%>
-                                    <button class="unlist-btn">Unlist</button>
+                                    <button class="unlist-btn" id="unListed" onclick="unListed('<%= coupon._id %>')">Unlist</button>
                                 <% } %>
                             </td>
                             <td>
@@ -241,5 +241,50 @@
 </body>
 </html>
 
+<script>
+
+    function listed(couponId) {
+        console.log("CouponId:", couponId)
+        $.ajax({
+            method:"PUT",
+            url: "/admin/coupon/listed",
+            data: {couponId},
+            success: ((response) => {
+                console.log("responce:", response)
+                if (response.status) {
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: response.message || 'Coupon listed success, visible to customers',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
+                } else {
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'info',
+                        title: response.message,
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
+                }
+                location.reload()
+            }),
+            error: ((err) => {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'error',
+                    title: response.message,
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+            })
+        })
+    };
+
+</script>
 
 <%- include("../../views/partials/admin/footer") %>

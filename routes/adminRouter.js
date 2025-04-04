@@ -116,6 +116,8 @@ router.post("/createCoupon", adminAuth, couponController.createCoupon);
 
 router.get("/coupons/edit-copon", adminAuth, couponController.loadEditCoupon);
 
+router.put("/coupon/listed", adminAuth, couponController.couponListed);
+
 
 
 

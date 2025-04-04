@@ -129,6 +129,41 @@ const loadEditCoupon = async (req, res) => {
 
 
 
+// Coupon listed
+const couponListed = async (req, res) => {
+    try {
+        
+        const couponId = req.body.couponId;
+        console.log("couponId :", couponId);
+        const updatedCoupon = await Coupon.findByIdAndUpdate(couponId, {
+            $set: { isList: true },
+        });
+
+        if (!updatedCoupon) {
+            return res.status(404).json({
+                status: false,
+                message: "Coupon not found or not updated",
+            })
+        };
+
+        return res.status(200).json({
+            status: true,
+            message: "Coupon listed, Now visible to customers.",
+        })
+
+    } catch (error) {
+        
+        console.error("Error in coupon listed", error);
+        return res.status(500).json({
+            status: false,
+            message: "Internal server error"
+        })
+        
+    }
+}
+
+
+
 
 
 
@@ -137,4 +172,5 @@ module.exports = {
     loadCreateCoupon,
     createCoupon,
     loadEditCoupon,
+    couponListed,
 }
