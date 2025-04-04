@@ -74,7 +74,6 @@
                                                     </h5>
                                                     <p class="font-xs">
                                                         <%= data[i].productDetails[0].category %><br />
-                                                            <%= data[i].productDetails[0].brand %>.
                                                     </p>
                                                 </td>
                                                 <td class="price" data-title="Price">₹<span> <text
@@ -95,25 +94,6 @@
 
 
                                                     <td class="text-center" data-title="Stock">
-                                                        <!-- <div class="detail-qty border radius m-auto"> -->
-                                                            <!-- <div class="quantity-control d-flex">
-
-
-                                                                <div class="quantity-controls">
-                                                                    <button class="btn btn-sm increment-button plus"
-                                                                        onclick="changeQuantity('<%= data[i].productDetails[0]._id %>', '<%= data[i].quantity %>', 1, '<%= data[i].productDetails[0].salePrice %>',  '<%= data[i].productDetails[0].id %>', '<%= data[i].productDetails[0].quantity%>')">+</button>
-                                                                    <span class="input-group-btn">
-                                                                <input class="quantity-input"
-                                                                    id="cartProductQuantity<%= data[i].productDetails[0].id %>"
-                                                                    value="<%= data[i].quantity %>" style="width: 45px;"
-                                                                    type="text" readonly value="">
-                                                                        </span>
-                                                                <button class="btn btn-sm decrement-button minus"
-                                                                    onclick="changeQuantity('<%= data[i].productDetails[0]._id %>', '<%= data[i].quantity %>', -1, '<%= data[i].productDetails[0].salePrice %>',  '<%= data[i].productDetails[0].id %>', '<%= data[i].productDetails[0].quantity%>')">-</button>
-                                                                </div>
-
-                                                            </div> -->
-
                                                             <div class="quantity-control d-flex">
                                                                 <div class="quantity-controls">
                                                                     <button class="btn btn-sm increment-button plus"
@@ -147,6 +127,9 @@
 
                                                 <td colspan="2" class="text-center">
                                                     <p class="lead mb-4">No item found in Cart</p>
+                                                    <a href="/shop" class="btn">
+                                                        Go to Shop
+                                                    </a>
                                                 </td>
                                             </tr>
                                             <% } %>
@@ -181,7 +164,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        <a href="/checkout?userId=<%= user._id %>" class="btn "> <i class="fi-rs-box-alt mr-10"></i>
+                        <a href="/checkout?userId=<%= user._id %>" class="btn"> <i class="fi-rs-box-alt mr-10"></i>
                             Proceed To CheckOut</a>
                     </div>
                 </div>

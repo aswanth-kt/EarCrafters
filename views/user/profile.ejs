@@ -438,12 +438,17 @@
                    <div class="card-body contact-from-area">
                      <div class="row">
                        <div class="col-lg-8 mx-auto text-center mt-90">
-                         <form>
+                         <form id="addMoneyForm">
                            <div class="form-group">
                              <label for="walletAmount" class="h4">Amount</label>
-                             <div class="h3"></div>
+                             <!-- <div class="h3">0.00</div> -->
+                             <% if (wallet && wallet.balance !== undefined) { %>
+                              <p class="h5 text-muted mb-0">&#8377; <%= wallet.balance.toFixed(2) %></p>
+                              <% } else { %>
+                              <p class="h5 text-muted mb-0">&#8377; 0.00</p>
+                              <% } %>
                            </div>
-                           <button type="button" class="btn btn-success" onclick="">Add Money</button>
+                           <button type="button" class="btn btn-success" onclick="addMoney()" data-toggle="modal" data-target="#addMoneyModal">Add Money</button>
                          </form>
                        </div>
                      </div>
@@ -471,7 +476,7 @@
                       </div>
                       <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Add Money</button>
+                        <button type="submit" class="btn btn-primary" onclick="addMoney()">Add Money</button>
                       </div>
                     </form>
                   </div>
@@ -496,8 +501,9 @@
                              <th>Balance</th>
                            </tr>
                          </thead>
-                         <tbody>
+                         <tbody id="walletHistoryBody">
                            <tr>
+                            <td colspan="4" class="text-center">Loading transaction history...</td>
                              <td></td>
                              <td></td>
                              <td></td>
@@ -529,27 +535,134 @@
  </section>
 </main>
 
+
 <script>
 
-  fetch("/wallet/add-money", {
-    method: "PUT",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({amount}),
-  })
-  .then(responce => responce.json())
-  .then(data => {
-    if (data.message) {
-      // Display success alert with the wallet balance
+  // Function to open the add money modal
+function addMoney() {
+  $('#addMoneyModal').modal('show');
+}
+
+  document.getElementById("addMoneyForm").addEventListener("submit", function(e){
+    e.preventDefault();
+    const amount = parseFloat(document.getElementById("amount").value); // convert to number
+    console.log("Submitting amount:", amount);
+
+    if (isNaN(amount) || amount <= 0) {
       Swal.fire({
-        title: "Success!",
-        text: data.message + '\nNew Balnce: ₹' + data.wallet.balance.tofixed(2),  // Change to Rs
-        icon: "success",
-        confirmationButtonText: "OK",
-      }).then(() => {
-        location.reload()
+        title: "Error",
+        text: "Please enter a valid amount greater that zero",
+        icon: "error",
+        timer: 1500,
+      });
+      return;
+    };
+
+     // Show loading state
+    const submitButton = this.querySelector('button[type="submit"]');
+    const originalText = submitButton.innerHTML;
+    submitButton.disabled = true;
+    submitButton.innerHTML = 'Processing...';
+
+    fetch("/wallet/add-money", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({amount}),
+    })
+    .then(response => {
+      console.log("Response data:", response.data); // Debugging
+      return response.json();
+    })
+    .then(data => { 
+      console.log("data:", data); // Debugging
+
+      // Reset button state
+      submitButton.disabled = false;
+      submitButton.innerHTML = originalText;
+
+      if (data.status) {
+        // Display success alert with the wallet balance
+        Swal.fire({
+          title: "Success!",
+          text: data.message + '\nNew Balance: ₹' + data.wallet.balance.toFixed(2),  // Change to Rs
+          icon: "success",
+          confirmationButtonText: "OK",
+        }).then(() => {
+          // location.reload();
+          document.querySelector('.card-body .h5').textContent = `₹${data.wallet.balance.toFixed(2)}` //Change to rs
+          $('#addMoneyModal').modal('hide');  // Hide the model after success
+          // location.reload()
+          // window.location.href = "/userProfile/#wallet"
+          
+          document.getElementById("amount").value = ''; // Optionally clear the input
+        });
+
+      } else {
+        Swal.fire({
+          title: 'Error',
+          text: data.message || 'Failed to add money to wallet.',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+      }
+    }).catch(err => {
+      // Reset button state
+      submitButton.disabled = false;
+      submitButton.innerHTML = originalText;
+      console.error("Error:", err); // Debugging
+      Swal.fire({
+        title: 'Error',
+        text: 'An error occurred while adding money.',
+        icon: 'error',
+        confirmButtonText: 'OK'
       })
-    }
-  })
+    })
+  });
+
+
+  // Load wallet history when the tab is clicked
+document.getElementById('track-orders-tab').addEventListener('click', function(e) {
+  if (e.target.getAttribute('href') === '#wallet-history') {
+    loadWalletHistory();
+  }
+});
+
+function loadWalletHistory() {
+  fetch('/wallet/history')
+    .then(response => response.json())
+    .then(data => {
+      const historyTableBody = document.getElementById('walletHistoryBody');
+      
+      if (data.status && data.transactions && data.transactions.length > 0) {
+        // Clear loading message
+        historyTableBody.innerHTML = '';
+        
+        // Add transaction rows
+        data.transactions.forEach(transaction => {
+          const date = new Date(transaction.createdAt).toLocaleDateString();
+          const type = transaction.type === 'credit' ? 'Added to wallet' : 'Withdrawn from wallet';
+          const amount = transaction.type === 'credit' ? `+₹${transaction.amount.toFixed(2)}` : `-₹${transaction.amount.toFixed(2)}`;
+          const amountClass = transaction.type === 'credit' ? 'text-success' : 'text-danger';
+          
+          historyTableBody.innerHTML += `
+            <tr>
+              <td>${date}</td>
+              <td>${transaction.description}</td>
+              <td class="${amountClass}">${amount}</td>
+              <td>₹${transaction.balance.toFixed(2)}</td>
+            </tr>
+          `;
+        });
+      } else {
+        historyTableBody.innerHTML = '<tr><td colspan="4" class="text-center">No transaction history found</td></tr>';
+      }
+    })
+    .catch(error => {
+      console.error('Error loading wallet history:', error);
+      document.getElementById('walletHistoryBody').innerHTML = 
+        '<tr><td colspan="4" class="text-center text-danger">Failed to load transaction history</td></tr>';
+    });
+}
 
 
   // Check if there's a hash in the URL

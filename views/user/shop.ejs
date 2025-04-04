@@ -273,6 +273,32 @@
       animation-play-state: paused;
     }
 
+    .wishlist-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      /* background-color: rgba(255, 255, 255, 0.8); */
+      padding: 10px;
+      border-radius: 50%;
+      color: #ff6b6b;
+      font-size: 18px;
+      z-index: 10;
+      transition: background-color 0.3s, color 0.3s, transform 0.3s;
+  }
+
+
+  .wishlist-btn:hover {
+      /* background-color: rgba(255, 255, 255, 1); */
+      color: #ff4c4c;
+      transform: translateY(-2px);
+  }
+
+
+  .wishlist-btn:active {
+      transform: translateY(1px);
+  }
+
+
 </style>
 
 <div class="page-header breadcrumb-wrap">
@@ -418,7 +444,7 @@
      <main class="product-grid">
         <% for(let i = 0; i < products.length; i++) { %>
          <div class="product-card">
-           <span class="wishlist-btn" onclick="addToWishlist('<%= products[i]._id %>')">❤️</span>
+           <span class="wishlist-btn" onclick="addToWishlist('<%= products[i]._id %>')"><i class="fas fa-heart"></i></span>
            <a href="/productDetails?id=<%= products[i]._id %>">
              <img src="/uploads/re-images/<%= products[i].productImage[0] %>" alt="<%= products[i].productName %>" />
              <h4><%= products[i].productName %></h4>
@@ -520,29 +546,29 @@
         method: "POST",
         data: { productId: productId },
         success: (response) => {
-            if (response.status === true) {
-                Swal.fire({
-                    title: response.message || "Product Added",
-                    text: "Product has been added to your cart",
-                    icon: "success",
-                    timer: 3000
-                })
-            } else {
-                Swal.fire({
-                    title: "Product already in cart",
-                    text: response.message || "Check your cart",
-                    icon: "info",
-                    timer: 3000
-                })
-            }
+          if (response.status === true) {
+              Swal.fire({
+                title: response.message || "Product Added",
+                text: "Product has been added to your cart",
+                icon: "success",
+                timer: 3000
+              })
+          } else {
+              Swal.fire({
+                title: "Product already in cart",
+                text: response.message || "Check your cart",
+                icon: "info",
+                timer: 3000
+              })
+          }
         },
         error: (error) => {
-            Swal.fire({
+          Swal.fire({
             title: "Error",
             text: error.message || "There was an error in adding the product to cart",
             icon: "error",
             timer: 3000
-            })
+          })
         }
     })
   };

@@ -4,6 +4,8 @@ const Product = require("../../models/productSchema");
 const Cart = require("../../models/cartSchema");
 const Order = require("../../models/orderSchema");
 const Counter = require("../../models/counterSchema");  // For Generate OrderId last Digit
+const Wallet = require("../../models/walletSchema");
+const Transaction = require("../../models/transactionSchema");
 const nodeMailer = require('nodemailer');
 
 
@@ -529,6 +531,166 @@ const getOrderSuccess = async (req, res) => {
 };
 
 
+// Wallet Payment
+const walletPlaceOrder = async (req, res) => {
+  try {
+
+    // Receive data from frondend
+    const {
+      orderItems, 
+      addressId,
+      totalPrice,
+      discount,
+      finalAmount,
+      status,
+      paymentMethod,
+    } = req.body;
+
+
+    console.log(
+      `orderData for cod:  
+      orderItems: ${orderItems}, 
+      addressId ${addressId},
+      totalPrice: ${totalPrice},
+      discount: ${discount},
+      finamAmount: ${finalAmount},
+      status: ${status},
+      paymentMethod: ${paymentMethod}`
+    );
+
+    const userId = req.session.user;
+    const userData = await User.findById(userId);
+
+    if (!userData) {
+      return res.status(404).json({
+        status: false,
+        message: "User not found"
+      });
+    };
+
+    // Find defalt user address
+    const userAddress = await Address.findOne(
+      { userId: userData._id, "address.isDefault": true }, 
+      { "address.$": 1, _id: addressId } 
+    );
+  
+    if (!userAddress) {
+      return res.status(404).json({
+        status: false,
+        message: "Address not found"
+      });
+    };
+
+    const wallet = await Wallet.findOne({userId: userData._id});
+
+    if (!wallet) {
+      return res.status(404).json({
+        status: false,
+        message: "Wallet data not found"
+      });
+    };
+
+    if (!wallet && wallet.balance < finalAmount) {
+      return res.status(400).json({
+        status: false,
+        message: "Insufficient Wallet Balance",
+      });
+    };
+
+    // Deduct the amount from wallet
+    wallet.balance -= finalAmount;
+    await wallet.save();
+
+    // Create a transaction history
+    const transaction = new Transaction({
+      userId: userData._id,
+      type: "Purchased using wallet - Debit",
+      amount: finalAmount,
+      balance: wallet.balance,
+    });
+    await transaction.save();
+
+    // Create order
+    const orderId = await generateOrderId();  // Generate unique order id
+    const newOrder = new Order({
+      orderId,
+      userId: userData._id,
+      orderItems,
+      totalPrice,
+      finalAmount,
+      address: addressId,
+      status: status || "Order Placed",
+      createdOn: new  Date(),
+      discount,
+      paymentMethod: paymentMethod,
+    });
+    const saveOrder = await newOrder.save();
+
+    // Check product qty and update
+    for (const item of orderItems) {
+      // console.log('orderItems.product:', item.product);
+      const productId = item.product;
+      const orderedQuantity = item.quantity;
+
+      const product = await Product.findById(productId)
+
+      if (product) {
+
+        if (product.quantity < orderedQuantity) {
+          return res.status(400).json({
+            staus: false,
+            message: `Not enough stock for product ${product.productName}`,
+          });
+        }
+        product.quantity -= orderedQuantity;
+        await product.save();
+      }
+    };
+    
+    // Remove items from cart after order is placed
+    await Cart.findOneAndUpdate(
+      {userId: userData._id},
+      {$pull: 
+        {
+          items: {
+            productId: { $in: orderItems.map((item) => item.product)},
+          }
+        }
+      }
+    );
+
+    const userEmail = userData.email;
+    const emailSent = await sendOrderConfirmationEmail(
+      userEmail,
+      saveOrder,
+      userAddress
+    );
+
+    if (!emailSent) {
+      return res.status(500).json({
+        status: false,
+        message: "Failed to send order confirmation email.",
+      });
+    };
+
+    return res.status(200).json({
+      redirectUrl: "/order-success",
+      status: true,
+      message: "Order placed successfully!",
+      orderId: saveOrder._id,
+    })
+    
+  } catch (error) {
+    
+    console.error("Error in wallet place order", error);
+    return res.status(500).json({
+      status: false,
+      message: "Internal server error",
+    });
+
+  }
+}
+
 
 
 
@@ -542,4 +704,5 @@ module.exports = {
     getaddCheckoutAddress,
     codPlaceOrder,
     getOrderSuccess,
+    walletPlaceOrder,
 }

@@ -44,7 +44,7 @@ const productDetails = async (req, res) => {
             totalOffer: totalOffer,
             category: findCategory,
             relatedProducts, //Recomented product
-            cartItemQty //cart qty
+            cartItemQty: cartItemQty || null, //cart qty
         })
         
     } catch (error) {

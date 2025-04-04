@@ -171,7 +171,7 @@ const { render } = require("ejs");
         return res.json({ 
           status: true, 
           cartLength: userCart.items.length, 
-          user: userId 
+          user: userId,
         });
       }
     } catch (error) {
