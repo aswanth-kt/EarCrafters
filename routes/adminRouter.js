@@ -114,9 +114,15 @@ router.get("/createCoupon", adminAuth, couponController.loadCreateCoupon);
 
 router.post("/createCoupon", adminAuth, couponController.createCoupon);
 
-router.get("/coupons/edit-copon", adminAuth, couponController.loadEditCoupon);
+router.get("/coupon/edit-copon", adminAuth, couponController.loadEditCoupon);
+
+router.put("/coupon/edit-coupon", adminAuth, couponController.editCoupon);
 
 router.put("/coupon/listed", adminAuth, couponController.couponListed);
+
+router.put("/coupon/unListed", adminAuth, couponController.couponUnlisted);
+
+router.delete("/coupon/delete-coupon", adminAuth, couponController.deleteCoupon);
 
 
 

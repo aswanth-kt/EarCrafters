@@ -19,7 +19,7 @@
         
         .container {
             max-width: 800px;
-            margin: 0 auto;
+            margin: 25px auto;
             background-color: #fff;
             padding: 30px;
             border-radius: 8px;
@@ -216,42 +216,86 @@
                 </div>
             </div>
             
-            <div class="checkbox-group">
+            <!-- <div class="checkbox-group">
                 <label class="checkbox-label">
                     <input type="checkbox" id="isActive" name="isActive" checked>
                     Active Coupon
                 </label>
-            </div>
+            </div> -->
             
             <!-- <div class="checkbox-group">
                 <label class="checkbox-label">
-                    <input type="checkbox" id="isListed" name="isListed" checked>
+                    <input type="checkbox" id="isListed" name="isListed" <%= coupon.isList ? 'checked' : '' %>>
                     Listed (visible to customers)
                 </label>
             </div> -->
             
             <div class="button-group">
-                <button type="submit" class="btn btn-primary">Update Coupon</button>
+                <button type="submit" class="btn btn-primary" id="update-coupon" data-id="<%= couponId %>">Update Coupon</button>
                 <button type="button" class="btn btn-cancel" onclick="window.history.back()">Cancel</button>
             </div>
         </form>
     </div>
 
     <script>
-        // Set min date to today
-        window.onload = function() {
-            const today = new Date();
-            const todayFormatted = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-            document.getElementById('expirationDate').setAttribute('min', todayFormatted);
-        }
         
         // Form submission handler
         document.getElementById('editCouponForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            // Here you would typically handle the form submission,
-            // such as sending the data to a server via AJAX
-            alert('Coupon updated successfully!');
-            // Redirect back to coupons list
+            const form = e.target;
+            const formData = new FormData(form);
+
+            const couponId = document.getElementById('update-coupon').dataset.id;
+
+            // Convert FormData to plain object
+            const plainData = Object.fromEntries(formData.entries());
+            console.log("Sending data:", plainData);
+
+            fetch("/admin/coupon/edit-coupon", {
+                method: "PUT",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({plainData, couponId}),
+            })
+            .then(responce => {
+                if (!responce.ok) {
+                    throw new Error("Something went wrong")
+                }
+                return responce.json();
+            })
+            .then(data => {
+                if (data.status) {
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: data.message,
+                        showConfirmButton: false,
+                        timer: 3000
+                    })
+                    .then(() => {
+                        location.href = data.redirectUrl
+                    })
+                } else {
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'info',
+                        title: data.message,
+                        showConfirmButton: false,
+                        timer: 3000
+                    })
+                }
+            })
+            .catch((err) => {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'error',
+                    title: err.message,
+                    showConfirmButton: false,
+                    timer: 3000
+                })
+            })
         });
     </script>
 </body>
