@@ -6,6 +6,7 @@ const Order = require("../../models/orderSchema");
 const Counter = require("../../models/counterSchema");  // For Generate OrderId last Digit
 const Wallet = require("../../models/walletSchema");
 const Transaction = require("../../models/transactionSchema");
+const Coupon = require("../../models/couponSchema");
 const nodeMailer = require('nodemailer');
 
 
@@ -62,6 +63,7 @@ const sendOrderConfirmationEmail = async (email, order, defaultAddress) => {
     .join("");
 
     const totalAmount = order.finalAmount;
+    const discount = order.discount;
     const paymentMethod = order.paymentMethod.toUpperCase() || "Cash On Delivery (COD)";
 
     const deliveryAddress = `
@@ -113,6 +115,10 @@ const sendOrderConfirmationEmail = async (email, order, defaultAddress) => {
             ${orderItems}
           </tbody>
           <tfoot>
+            <tr>
+              <td colspan="2" style="padding: 15px; text-align: right; font-weight: solid;">Discount:</td>
+              <td style="padding: 15px; text-align: right; font-weight: solid;">₹${discount}</td>
+            </tr>
             <tr>
               <td colspan="2" style="padding: 15px; text-align: right; font-weight: bold;">Total Amount:</td>
               <td style="padding: 15px; text-align: right; font-weight: bold;">₹${totalAmount}</td>
@@ -213,6 +219,23 @@ const getCheckoutPage = async (req, res) => {
         const cartItems = cart ? cart.items : [];
         // console.log(userAddress.address[0].name)
 
+        // Fetch Coupons for show at checkout
+        const coupons = await Coupon.find({});
+
+        // Check the coupons are valid date
+        const currentDate = new Date();
+        const validCoupons = coupons.filter((coupon) => {
+          const expiredDate = new Date(coupon.expireOn);
+          return expiredDate >= currentDate; 
+        });
+
+        if (!validCoupons) {
+          return res.status(404).join({
+            status: false,
+            message: "Coupon not found"
+          })
+        }
+
         res.render("checkout",{
             user,
             cartItems,
@@ -222,6 +245,7 @@ const getCheckoutPage = async (req, res) => {
             notDefaultAddress,
             cartData,
             grandTotal,
+            coupons: validCoupons,
         })
 
     } catch (error) {
@@ -363,16 +387,7 @@ const codPlaceOrder = async (req, res) => {
       paymentMethod,
     } = req.body;
 
-    // console.log(
-    //   `orderData for cod:  
-    //   orderItems: ${orderItems}, 
-    //   addressId ${addressId},
-    //   totalPrice: ${totalPrice},
-    //   discount: ${discount},
-    //   finamAmount: ${finalAmount},
-    //   status: ${status},
-    //   paymentMethod: ${paymentMethod}`
-    // );
+    // console.log("frondend passing datas: ",req.body);
 
     const userId = req.session.user;
 

@@ -49,7 +49,6 @@ const { render } = require("ejs");
             id: item.productId._id,
             productName: item.productId.productName,
             category: item.productId.category,
-            // brand: item.productId.brand,
             salePrice: item.productId.salePrice,
             productImage: item.productId.productImage,
             quantity: item.productId.quantity // product's available quantity

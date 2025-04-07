@@ -515,7 +515,7 @@
                 </div>
 
                 <!-- Coupon Section -->
-                <div class="checkout-section">
+                <!-- <div class="checkout-section">
                     <div class="section-title">Apply Coupon</div>
 
                     <div class="coupon-section">
@@ -524,16 +524,22 @@
                     </div>
 
                     <div class="coupon-list" id="coupon-list">
-                        <div class="coupon-item">
-                            <div>
-                                <div class="coupon-code">WELCOME20</div>
-                                <div class="coupon-details">20% off on your first order</div>
-                                <div class="coupon-validity">Valid till: April 30, 2025</div>
-                            </div>
-                            <div>
-                                <button class="coupon-button">Apply</button>
-                            </div>
-                        </div>
+                        <% if (coupons && coupons.length > 0) { %>
+                            <% coupons.forEach((coupon) => { %> 
+                                <div class="coupon-item">
+                                    <li>
+                                    <div>
+                                        <div class="coupon-code"><%= coupon.name %></div>
+                                        <span class="coupon-details">Off: <%= coupon.offerPrice %></span>
+                                        <span class="coupon-validity">Valid till: <%= coupon.expireOn.toLocaleDateString() %></span>
+                                    </div>
+                                    </li>
+                                    <div>
+                                        <button class="coupon-button">Apply</button>
+                                    </div>
+                                </div>
+                            <% }) %>
+                        <% } %>
 
                         <div class="coupon-item">
                             <div>
@@ -553,9 +559,107 @@
                                 <div class="coupon-validity expired">Expired on: February 28, 2025</div>
                             </div>
                             <div>
-                                <button class="coupon-button" disabled style="background-color: #ccc;">Expired</button>
+                                <button class="coupon-button" disabled style="background-color: #ce1111;">Expired</button>
                             </div>
                         </div>
+                    </div>
+                </div> -->
+
+                <!-- <div class="coupons mt-4 bg-white p-4 rounded">
+                    <hr />
+                    <div class="row">
+                      <div class="col-md-8">
+                        <label for="couponInput">Enter Coupon Code:</label>
+                        <input type="text" id="couponInput" class="form-control" placeholder="Enter coupon code" />
+                        <div id="couponList" class="dropdown-menu" style="display: none;"></div>
+                      </div>
+                      <div class="col-md-4">
+                        <button id="applyCouponBtn" class="btn btn-info" style="margin-top: 32px;">Apply</button>
+                      </div>
+                    </div>
+                    <div id="discountMessage" class="mt-2"></div>
+                    <% if (coupons && coupons.length > 0) { %>
+                      <div class="row">
+                          <div class="col-md-12">
+                              <h6 class="text-muted pb-2">Available Coupons</h6>
+                              <% coupons.forEach(function(couponItem) { %>
+                                <p>
+                                  <%= couponItem.name %> |
+                                  Expire on: <%= new Date(couponItem.expireOn).toLocaleDateString() %>
+                              </p>
+                              <% }); %>
+                          </div>
+                      </div>
+                  <% } else { %>
+                      <p>No coupons available at the moment.</p>
+                  <% } %>
+                    
+                </div> -->
+
+                <!-- new -->
+                <div class="checkout-section">
+                    <div class="section-title">Apply Coupon</div>
+                    
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="form-group">
+                                <label for="couponInput">Enter Coupon Code:</label>
+                                <input type="text" id="couponInput" class="form-control" placeholder="Enter coupon code">
+                                <div id="couponList" class="dropdown-menu" style="display: none;"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <button id="applyCouponBtn" class="btn btn-primary mt-4">Apply</button>
+                            <!-- Remove coupon button will be inserted here by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div id="discountMessage" class="mt-2"></div>
+                    
+                    <!-- Available coupons section -->
+                    <% if (coupons && coupons.length > 0) { %>
+                        <div class="mt-3">
+                            <h6 class="text-muted pb-2">Available Coupons</h6>
+                            <div class="row">
+                                <% coupons.forEach(function(couponItem) { %>
+                                    <div class="col-md-6 mb-2">
+                                        <div class="coupon-item p-2 border rounded">
+                                            <div class="coupon-code font-weight-bold"><%= couponItem.name %></div>
+                                            <div class="coupon-details small">
+                                                Discount: ₹<%= couponItem.offerPrice %><br>
+                                                Min. Purchase: ₹<%= couponItem.minimumPrice %><br>
+                                                Expires: <%= new Date(couponItem.expireOn).toLocaleDateString() %>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <% }); %>
+                            </div>
+                        </div>
+                    <% } else { %>
+                        <p class="text-muted mt-3">No coupons available at the moment.</p>
+                    <% } %>
+                </div>
+
+                <!-- Order Summary Section - Make sure it includes these elements for coupon integration -->
+                <div class="price-details">
+                    <div class="price-row">
+                        <span class="price-label">Subtotal</span>
+                        <span>₹<%= grandTotal %></span>
+                    </div>
+                    
+                    <div class="price-row">
+                        <span class="price-label">Discount</span>
+                        <span id="discountAmount">₹0</span>
+                    </div>
+                    
+                    <div class="price-row">
+                        <span class="price-label">Shipping</span>
+                        <span>₹0</span>
+                    </div>
+                    
+                    <div class="price-row total-row">
+                        <span class="price-label">Total</span>
+                        <span id="totalAmount">₹<%= grandTotal %></span>
                     </div>
                 </div>
 
@@ -567,19 +671,19 @@
                         <div class="payment-method selected">
                             <input type="radio" id="upi" class="payment-radio" name="paymentMethod">
                             <label for="upi" class="payment-name">UPI</label>
-                            <img src="/api/placeholder/40/24" alt="UPI" class="payment-logo">
+                            <img src="/img/PaymentLogo/upi.png" alt="UPI" class="payment-logo">
                         </div>
 
                         <div class="payment-method">
                             <input type="radio" id="cod" class="payment-radio" name="paymentMethod" checked>
                             <label for="cod" class="payment-name">Cash On Delivery</label>
-                            <img src="/api/placeholder/40/24" alt="COD" class="payment-logo">
+                            <img src="/img/PaymentLogo/cod.jpeg" alt="COD" class="payment-logo">
                         </div>
 
                         <div class="payment-method">
                             <input type="radio" id="wallet" class="payment-radio" name="paymentMethod">
                             <label for="wallet" class="payment-name">Wallet</label>
-                            <img src="/api/placeholder/40/24" alt="Wallet" class="payment-logo">
+                            <img src="/img/PaymentLogo/wallet.jpeg" alt="Wallet" class="payment-logo">
                         </div>
                     </div>
                 </div>
@@ -861,7 +965,8 @@
         const addressId = '<%= defaultAddress._id %>';
         // const totalPrice = parseInt('<%= cartData.totalPrice %>');
         const totalPrice = parseInt('<%= grandTotal %>') || 0;
-        const discount = 0;
+        const discount = parseInt(document.getElementById('discountAmount').textContent.replace('₹', '').trim());
+        console.log("Discount:",discount, typeof discount)
         const finalAmount = totalPrice - discount;
         const status = "Order Placed";
 
@@ -945,7 +1050,230 @@
         } else {
             
         }
-    })
+    });
+
+
+    // Coupon
+document.addEventListener("DOMContentLoaded", function() {
+  const couponInput = document.getElementById('couponInput');
+  const couponList = document.getElementById('couponList');
+  const applyCouponBtn = document.getElementById('applyCouponBtn');
+  const discountMessage = document.getElementById('discountMessage');
+  
+  // Add references to total and discount elements that should exist in your HTML
+  const discountAmountElement = document.getElementById('discountAmount');
+  const totalAmountElement = document.getElementById('totalAmount');
+  
+  // Create a remove coupon button
+  const removeCouponBtn = document.createElement('button');
+  removeCouponBtn.className = 'btn btn-danger';
+  removeCouponBtn.textContent = 'Remove Coupon';
+  removeCouponBtn.style.display = 'none'; // Initially hidden
+  
+  // Get total from the page
+  let totalPrice = parseInt('<%= grandTotal %>');  
+  let discount = 0;
+  let appliedCouponCode = '';
+
+  // Show available coupons on input focus
+  couponInput.addEventListener('focus', async () => {
+    try {
+      const response = await fetch('/checkout/coupon');
+      const coupons = await response.json();
+      
+      couponList.innerHTML = '';
+      if (coupons && coupons.length > 0) {
+        coupons.forEach(coupon => {
+          if (totalPrice >= coupon.minimumPrice) {
+            const couponItem = document.createElement('div');
+            couponItem.className = 'dropdown-item';
+            couponItem.textContent = `${coupon.name} - ₹${coupon.offerPrice} - min. purchase: ₹${coupon.minimumPrice}`;
+            couponItem.onclick = () => {
+              couponInput.value = coupon.name;
+              couponList.style.display = 'none';
+            };
+            couponList.appendChild(couponItem);
+          }
+        });
+      }
+      couponList.style.display = couponList.children.length > 0 ? 'block' : 'none';
+    } catch (error) {
+      console.error('Error fetching coupons:', error);
+    }
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    if (e.target !== couponInput && e.target !== couponList) {
+      couponList.style.display = 'none';
+    }
+  });
+
+  // Apply coupon button handler
+  applyCouponBtn.addEventListener('click', async () => {
+    const couponCode = couponInput.value.trim();
+    
+    if (!couponCode) {
+      showAlert('error', 'Please enter a valid coupon code.');
+      return;
+    }
+
+    try {
+      const response = await fetch('/checkout/apply-coupon', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          code: couponCode,
+          totalPrice
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (data.status) { // Changed from data.success to data.status to match backend
+        // Store the applied coupon
+        appliedCouponCode = couponCode;
+        discount = data.offerPrice;
+        totalPrice = data.newTotalPrice;
+
+        // Update the UI
+        if (discountAmountElement) {
+          discountAmountElement.textContent = `₹${discount}`;
+        }
+        if (totalAmountElement) {
+          totalAmountElement.textContent = `₹${totalPrice}`;
+        }
+
+        // Update the total amount displayed in the grand total section
+        const totalAmountDisplay = document.querySelector('.total-amount');
+        if (totalAmountDisplay) {
+          totalAmountDisplay.textContent = `₹${totalPrice}`;
+        }
+
+        // Show success message
+        discountMessage.innerHTML = `
+          <div class="alert alert-success">
+            Coupon applied! You saved ₹${discount}.
+          </div>
+        `;
+
+        // Toggle buttons
+        applyCouponBtn.style.display = 'none';
+        
+        // Add remove button if not already there
+        if (!document.contains(removeCouponBtn)) {
+          applyCouponBtn.parentNode.appendChild(removeCouponBtn);
+        }
+        removeCouponBtn.style.display = 'block';
+        
+        // Disable input
+        couponInput.disabled = true;
+      } else {
+        // Show error message
+        discountMessage.innerHTML = `
+          <div class="alert alert-danger">
+            ${data.message}
+          </div>
+        `;
+      }
+    } catch (error) {
+      console.error('Error applying coupon:', error);
+      discountMessage.innerHTML = `
+        <div class="alert alert-danger">
+          An unexpected error occurred. Please try again.
+        </div>
+      `;
+    }
+  });
+
+  // Remove coupon button handler
+  removeCouponBtn.addEventListener('click', async () => {
+    try {
+      // Call the remove-coupon endpoint
+      const response = await fetch('/checkout/remove-coupon', { // Updated path
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          code: appliedCouponCode
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (data.status) { // Changed to match backend
+        // Reset values
+        totalPrice = data.originalPrice || (totalPrice + discount);
+        discount = 0;
+        appliedCouponCode = '';
+
+        // Update UI
+        if (discountAmountElement) {
+          discountAmountElement.textContent = '₹0';
+        }
+        if (totalAmountElement) {
+          totalAmountElement.textContent = `₹${totalPrice}`;
+        }
+
+        // Update the total amount displayed in the grand total section
+        const totalAmountDisplay = document.querySelector('.total-amount');
+        if (totalAmountDisplay) {
+          totalAmountDisplay.textContent = `₹${totalPrice}`;
+        }
+
+        // Show success message
+        discountMessage.innerHTML = `
+          <div class="alert alert-info">
+            Coupon removed.
+          </div>
+        `;
+
+        // Toggle buttons
+        applyCouponBtn.style.display = 'block';
+        removeCouponBtn.style.display = 'none';
+        
+        // Enable input
+        couponInput.disabled = false;
+        couponInput.value = '';
+      } else {
+        discountMessage.innerHTML = `
+          <div class="alert alert-danger">
+            ${data.message}
+          </div>
+        `;
+      }
+    } catch (error) {
+      console.error('Error removing coupon:', error);
+      discountMessage.innerHTML = `
+        <div class="alert alert-danger">
+          An unexpected error occurred while removing the coupon.
+        </div>
+      `;
+    }
+  });
+
+  // Helper function for showing alerts if SweetAlert is available
+  function showAlert(type, message) {
+    if (typeof Swal !== 'undefined') {
+      Swal.fire({
+        icon: type,
+        title: type === 'error' ? 'Error!' : 'Success!',
+        text: message,
+        confirmButtonText: 'OK'
+      });
+    } else {
+      // Fallback to simple alert or custom message
+      discountMessage.innerHTML = `
+        <div class="alert alert-${type === 'error' ? 'danger' : 'success'}">
+          ${message}
+        </div>
+      `;
+    }
+  }
+});
 
 
 </script>
