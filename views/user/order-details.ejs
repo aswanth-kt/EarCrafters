@@ -173,6 +173,11 @@
           <p><span class="order-status"><%= order.status %></span></p>
         </div>
         <div class="order-info">
+          <h3>Total Amount</h3>
+          <p class="font-weight-bold"><%= order.finalAmount %>
+          </p>
+        </div>
+        <div class="order-info">
           <h3>Expected Delivery</h3>
           <p><%= new Date(new Date(order.createdOn).setDate(new Date(order.createdOn).getDate() + 5)).toLocaleDateString() %>
           </p>

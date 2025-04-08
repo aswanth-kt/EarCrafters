@@ -162,7 +162,7 @@ router.post("/payment/wallet", userAuth, checkoutController.walletPlaceOrder);
 
 router.post("/payment/razorpay-order-success", userAuth, checkoutController.razorpayOrderSuccess);
 
-router.post("/payment/razorpay-order-failed", userAuth, checkoutController.razorpayOrderFaild);
+router.get("/payment/razorpay-order-failed", userAuth, checkoutController.getRazorpayOrderFaild);
 
 
 

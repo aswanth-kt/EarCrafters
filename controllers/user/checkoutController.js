@@ -872,7 +872,7 @@ const razorpayOrderSuccess = async (req,res) => {
 };
 
 
-const razorpayOrderFaild = async (req, res) => {
+const getRazorpayOrderFaild = async (req, res) => {
   try {
 
     const {orderId} = req.query;
@@ -891,7 +891,7 @@ const razorpayOrderFaild = async (req, res) => {
     const cart = await Cart.findOne({userId: userData._id});
     const cartItems = cart ? cart.items : [];
 
-    const order = await Order.findOne({orderId: orderId});
+    const order = await Order.findById(orderId);
 
     if (!order) {
       return res.status(400).json({
@@ -937,5 +937,5 @@ module.exports = {
   getOrderSuccess,
   walletPlaceOrder,
   razorpayOrderSuccess,
-  razorpayOrderFaild,
+  getRazorpayOrderFaild,
 }

@@ -206,20 +206,20 @@
         <div class="order-details">
             <div class="detail-row">
                 <span class="detail-label">Order ID</span>
-                <span class="detail-value">#ORD-78945612</span>
+                <span class="detail-value"><%= order.orderId %></span>
             </div>
             <div class="detail-row">
                 <span class="detail-label">Amount</span>
-                <span class="detail-value">$259.99</span>
+                <span class="detail-value"><%= order.finalAmount %></span>
             </div>
             <div class="detail-row">
                 <span class="detail-label">Status</span>
-                <span class="status">Failed</span>
+                <span class="status"><%= order.status %></span>
             </div>
         </div>
         
         <div class="buttons-container">
-            <a href="#" class="button">Try Again</a>
+            <a href="/shop" class="button">Try Again</a>
             <a href="#" class="button button-secondary">Contact Support</a>
         </div>
     </div>
