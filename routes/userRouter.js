@@ -160,6 +160,10 @@ router.get("/order-success", userAuth, checkoutController.getOrderSuccess);
 
 router.post("/payment/wallet", userAuth, checkoutController.walletPlaceOrder);
 
+router.post("/payment/razorpay-order-success", userAuth, checkoutController.razorpayOrderSuccess);
+
+router.post("/payment/razorpay-order-failed", userAuth, checkoutController.razorpayOrderFaild);
+
 
 
 // User Order Management

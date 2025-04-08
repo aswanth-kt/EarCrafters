@@ -743,7 +743,7 @@
     </div>
 </body> <br>
 
-
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 <script>
 
@@ -966,9 +966,13 @@
         // const totalPrice = parseInt('<%= cartData.totalPrice %>');
         const totalPrice = parseInt('<%= grandTotal %>') || 0;
         const discount = parseInt(document.getElementById('discountAmount').textContent.replace('₹', '').trim());
-        console.log("Discount:",discount, typeof discount)
+        // console.log("Discount:",discount, typeof discount)
         const finalAmount = totalPrice - discount;
         const status = "Order Placed";
+        const couponApplied = discount > 0;
+        const customerName = '<%= user.name %>';
+        const customerEmail = '<%= user.email %>';
+        console.log("Customer name:", customerName, "Customer email:", customerEmail)
 
         const orderData = {
             orderItems: orderItems,
@@ -977,6 +981,8 @@
             discount: discount,
             finalAmount: finalAmount,
             status: status,
+            customerName,
+            customerEmail,
         };
 
         const paymentMethod = document.querySelector("input[name='paymentMethod']:checked").id;
@@ -1047,13 +1053,268 @@
                 this.disabled = false;
                 document.getElementById('loadingOverlay').classList.add('d-none')
             });
-        } else {
-            
+
+            // Razorpay
+        } else if (paymentMethod === 'upi') {
+            console.log("Starting razorpay payment process...");
+
+            document.getElementById('loadingOverlay').classList.remove("d-none");
+            document.getElementById('paymentMethodBtn').disabled = true;
+
+            fetch("/payment/razorpay-order-success", {
+                method: "POST",
+                headers: {"Content-Type" : "application/json"},
+                body:JSON.stringify(orderData),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Server responded with status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+
+                document.getElementById('loadingOverlay').classList.add('d-none');
+                document.getElementById('paymentMethodBtn').disabled = false;
+
+                console.log("Data :", data)
+                if (data.status) {
+                    // Check if Razorpay is defined
+                    if (typeof Razorpay === 'undefined') {
+                        console.error("Razorpay is not loaded!");
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Payment Error',
+                            text: 'Payment gateway not available. Please try again later.'
+                        });
+                        return;
+                    };
+
+                    var options = {
+                        key: data.razorpayKey,
+                        amount: data.amount,
+                        currency: data.currency,
+                        name: "EarCrafters",
+                        description: "Order Payment",
+                        order_id: data.razorpayOrderId,
+                        handler: function(response) {
+                            console.log("Payment successful, response:", response);
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'success',
+                                title: 'Your payment has been successfully completed.',
+                                showConfirmButton: false,
+                                timer: 3000
+                            })
+                            .then(() => {
+                                window.location.href = `/order-success?orderId=${data.orderId}`;
+                            });
+                        },
+                        // Adding a failure handler to the razorpay options
+                        "prefill": {
+                            name: orderData.customerName,
+                            email: orderData.customerEmail,
+                        },
+                        "theme": {
+                            "color": "#F37254"
+                        },
+                        "modal": {
+                            "ondismiss": function() {
+                            console.log('Payment window was closed before completing.');
+                            }
+                        },
+                    };
+                    
+                    console.log("Razorpay options:", options);
+                    
+                    var rzp1 = new Razorpay(options);
+                    try {
+
+                        console.log("Razorpay open");
+                        rzp1.open();
+                        
+                    } catch (error) {
+                        console.error("Error opening Razorpay window:", error);
+                        window.location.href = `/payment/razorpay-order-failed?orderId=${data.orderId}`;     // Redirect to the failure page
+                    }
+
+                    // Handle Razorpay payment failure
+                    rzp1.on('payment.failed', function(response) {
+                        console.log("Payment failed:", response);
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'error',
+                            title: 'Payment failed. Please try again later',
+                            showConfirmButton: false,
+                            timer: 3000
+                        })
+                        .then(() => {
+                            window.location.href = `/payment/razorpay-order-failed?orderId=${data.orderId}`;
+                        })
+                    })
+                } else {
+                    console.log('Error');
+                }
+            })
+            .catch((error) => {
+                console.log('Error:', error);
+                document.getElementById('loadingOverlay').classList.add('d-none');
+                document.getElementById('usePaymentMethodBtn').disabled = false; // Re-enable the button
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'error',
+                    title: 'Payment failed. Please try again later.',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+            });
         }
+
+
+    //     } else if (paymentMethod === 'upi') {
+    //         console.log("Starting razorpay payment process...");
+
+    //         document.getElementById('loadingOverlay').classList.remove("d-none");
+            
+    //         fetch("/payment/razorpay-order-success", {
+    //             method: "POST",
+    //             headers: {"Content-Type" : "application/json"},
+    //             body: JSON.stringify(orderData),
+    //         })
+    //         .then(response => {
+    //             if (!response.ok) {
+    //                 throw new Error(`Server responded with status: ${response.status}`);
+    //             }
+    //             return response.json();
+    //         })
+    //         .then(data => {
+    //             document.getElementById('loadingOverlay').classList.add('d-none');
+    //             document.getElementById('paymentMethodBtn').disabled = false;
+
+    //             if (data.status) {
+    //                 // Check if Razorpay is defined
+    //                 if (typeof Razorpay === 'undefined') {
+    //                     console.error("Razorpay is not loaded!");
+    //                     Swal.fire({
+    //                         icon: 'error',
+    //                         title: 'Payment Error',
+    //                         text: 'Payment gateway not available. Please try again later.'
+    //                     });
+    //                     return;
+    //                 }
+
+    //                 var options = {
+    //                     key: data.razorpayKey,
+    //                     amount: data.amount,
+    //                     currency: data.currency,
+    //                     name: "EarCrafters",
+    //                     description: "Order Payment",
+    //                     order_id: data.orderId,
+    //                     handler: function(response) {
+    //                         console.log("Payment successful, response:", response);
+                            
+    //                         // Verify payment on server
+    //                         fetch('/payment/verify-payment', {
+    //                             method: 'POST',
+    //                             headers: { 'Content-Type': 'application/json' },
+    //                             body: JSON.stringify({
+    //                                 razorpay_payment_id: response.razorpay_payment_id,
+    //                                 razorpay_order_id: response.razorpay_order_id,
+    //                                 razorpay_signature: response.razorpay_signature,
+    //                                 orderId: data.orderId
+    //                             })
+    //                         })
+    //                         .then(resp => resp.json())
+    //                         .then(result => {
+    //                             if (result.status) {
+    //                                 Swal.fire({
+    //                                     icon: 'success',
+    //                                     title: 'Payment Successful',
+    //                                     text: 'Your order has been placed successfully!'
+    //                                 }).then(() => {
+    //                                     window.location.href = `/order-success?orderId=${data.orderId}`;
+    //                                 });
+    //                             } else {
+    //                                 Swal.fire({
+    //                                     icon: 'error',
+    //                                     title: 'Payment Verification Failed',
+    //                                     text: 'Please contact support.'
+    //                                 });
+    //                             }
+    //                         });
+    //                     },
+    //                     prefill: {
+    //                         name: orderData.customerName,
+    //                         email: orderData.customerEmail,
+    //                     },
+    //                     theme: {
+    //                         color: "#F37254"
+    //                     },
+    //                     modal: {
+    //                         ondismiss: function() {
+    //                             console.log('Payment window was closed before completing.');
+    //                             document.getElementById('paymentMethodBtn').disabled = false;
+    //                         }
+    //                     }
+    //                 };
+                    
+    //                 console.log("Razorpay options:", options);
+                    
+    //                 try {
+    //                     var rzp1 = new Razorpay(options);
+    //                     rzp1.on('payment.failed', function(response) {
+    //                         console.log("Payment failed:", response.error);
+    //                         Swal.fire({
+    //                             icon: 'error',
+    //                             title: 'Payment Failed',
+    //                             text: response.error.description || 'Payment could not be processed'
+    //                         }).then(() => {
+    //                             window.location.href = `/payment/razorpay-order-failed?orderId=${data.orderId}`;
+    //                         });
+    //                     });
+                        
+    //                     console.log("Opening Razorpay...");
+    //                     rzp1.open();
+    //                     console.log("Razorpay open call completed");
+    //                 } catch (error) {
+    //                     console.error("Error opening Razorpay window:", error);
+    //                     Swal.fire({
+    //                         icon: 'error',
+    //                         title: 'Payment Gateway Error',
+    //                         text: 'Unable to open payment window. Please try again later.'
+    //                     });
+    //                 }
+    //             } else {
+    //                 console.error('Error in server response:', data);
+    //                 Swal.fire({
+    //                     icon: 'error',
+    //                     title: 'Order Processing Failed',
+    //                     text: data.message || 'Unable to create order. Please try again.'
+    //                 });
+    //             }
+    //         })
+    //         .catch((error) => {
+    //             console.error('Error in payment processing:', error);
+    //             document.getElementById('loadingOverlay').classList.add('d-none');
+    //             document.getElementById('paymentMethodBtn').disabled = false;
+    //             Swal.fire({
+    //                 icon: 'error',
+    //                 title: 'Payment Processing Error',
+    //                 text: 'An error occurred. Please try again later.'
+    //             });
+    //         });
+    //     }
+
+    
     });
 
+    // next invoice here.........
 
-    // Coupon
+
+// Coupon
 document.addEventListener("DOMContentLoaded", function() {
   const couponInput = document.getElementById('couponInput');
   const couponList = document.getElementById('couponList');

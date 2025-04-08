@@ -8,6 +8,11 @@ const orderSchema = new Schema ({
         required : true,
         unique : true
     },
+    razorpayOrderId : {
+        type : String,
+        required : false,
+        unique : true
+    },
     userId: {
         type: Schema.Types.ObjectId,
         ref: "User",
@@ -90,13 +95,13 @@ const orderSchema = new Schema ({
         default : Date.now,
         required : true
     },
-    coupenApplied : {
+    couponApplied : {
         type : Boolean,
         default : false
     },
     paymentMethod: {
         type: String,
-        enum: ["prepaid", "cod", "wallet"],
+        enum: ["upi", "cod", "wallet"],
         required: true,
       },
       moneySent: {
