@@ -211,17 +211,17 @@
                    </a>
                  </li>
                  <li class="nav-item">
-                   <a class="nav-link" id="track-orders-tab" data-bs-toggle="tab" href="#track-orders" role="tab" aria-controls="track-orders" aria-selected="false">
+                   <a class="nav-link" id="track-wallet-tab" data-bs-toggle="tab" href="#track-orders" role="tab" aria-controls="track-orders" aria-selected="false">
                      <i class="fi-rs-shopping-cart-check mr-10"></i>Wallet Status
                    </a>
                  </li>
                  <li class="nav-item">
-                   <a class="nav-link" id="track-orders-tab" data-bs-toggle="tab" href="#wallet-history" role="tab" aria-controls="track-orders" aria-selected="false">
+                   <a class="nav-link" id="track-wallet-history-tab" data-bs-toggle="tab" href="#wallet-history" role="tab" aria-controls="track-orders" aria-selected="false">
                      <i class="fi-rs-shopping-cart-check mr-10"></i>Wallet History
                    </a>
                  </li>
                  <li class="nav-item">
-                   <a class="nav-link" id="track-orders-tab" data-bs-toggle="tab" href="#referal" role="tab" aria-controls="track-orders" aria-selected="false">
+                   <a class="nav-link" id="track-referal-tab" data-bs-toggle="tab" href="#referal" role="tab" aria-controls="track-orders" aria-selected="false">
                      <i class="fi-rs-shopping-cart-check mr-10"></i>Referals
                    </a>
                  </li>
@@ -458,16 +458,16 @@
 
 
               <!-- Modal for Adding Money -->
-              <div class="modal fade" id="addMoneyModal" tabindex="-1" role="dialog" aria-labelledby="addMoneyModalLabel" aria-hidden="true">
+              <div class="modal fade" id="addMoneyModal" tabindex="-1" role="dialog" aria-labelledby="addMoneyModalLabel" >
                 <div class="modal-dialog modal-dialog-centered" role="document">
                   <div class="modal-content">
                     <div class="modal-header">
                       <h5 class="modal-title" id="addMoneyModalLabel">Add Money to Wallet</h5>
                       <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
+                        <span >&times;</span>
                       </button>
                     </div>
-                    <form id="addMoneyForm">
+                    <form id="addMoneyModalForm">
                       <div class="modal-body">
                         <div class="form-group">
                           <label for="amount">Amount</label>
@@ -485,7 +485,7 @@
 
 
                <!-- Wallet History -->
-               <div class="tab-pane fade" id="wallet-history" role="tabpanel" aria-labelledby="orders-tab">
+               <div class="tab-pane fade" id="wallet-history" role="tabpanel" aria-labelledby="history-tab">
                  <div class="card">
                    <div class="card-header">
                      <h5 class="mb-0">Wallet History</h5>
@@ -502,13 +502,19 @@
                            </tr>
                          </thead>
                          <tbody id="walletHistoryBody">
-                           <tr>
-                            <td colspan="4" class="text-center">Loading transaction history...</td>
-                             <td></td>
-                             <td></td>
-                             <td></td>
-                             <td></td>
-                           </tr>
+                          <!-- <% if (wallet.transactions && wallet.transactions.length > 0) { 
+                             wallet.transactions.sort((a, b) => new Date(b.date) - new Date(a.date)) 
+                             wallet.transactions.forEach((transaction) => { 
+                          %> -->
+                              <tr>
+                                <!-- <td colspan="4" class="text-center">Loading transaction history...</td> -->
+                                <td id="createdAt"></td>
+                                <td id="description"></td>
+                                <td id="amount" class=""></td>
+                                <td id="balance"></td>
+                              </tr>
+                            <!-- <% }) %>
+                           <% } %> -->
                          </tbody>
                        </table>
                      </div>
@@ -540,10 +546,11 @@
 
   // Function to open the add money modal
 function addMoney() {
-  $('#addMoneyModal').modal('show');
+  document.activeElement.blur(); // clears focus from modal
+  $('#addMoneyModal').modal('hide');
 }
 
-  document.getElementById("addMoneyForm").addEventListener("submit", function(e){
+  document.getElementById("addMoneyModalForm").addEventListener("submit", function(e){
     e.preventDefault();
     const amount = parseFloat(document.getElementById("amount").value); // convert to number
     console.log("Submitting amount:", amount);
@@ -570,7 +577,6 @@ function addMoney() {
       body: JSON.stringify({amount}),
     })
     .then(response => {
-      console.log("Response data:", response.data); // Debugging
       return response.json();
     })
     .then(data => { 
@@ -586,7 +592,7 @@ function addMoney() {
           title: "Success!",
           text: data.message + '\nNew Balance: ₹' + data.wallet.balance.toFixed(2),  // Change to Rs
           icon: "success",
-          confirmationButtonText: "OK",
+          confirmButtonText: "OK",
         }).then(() => {
           // location.reload();
           document.querySelector('.card-body .h5').textContent = `₹${data.wallet.balance.toFixed(2)}` //Change to rs
@@ -621,27 +627,84 @@ function addMoney() {
 
 
   // Load wallet history when the tab is clicked
-document.getElementById('track-orders-tab').addEventListener('click', function(e) {
-  if (e.target.getAttribute('href') === '#wallet-history') {
-    loadWalletHistory();
-  }
+// document.getElementById('track-wallet-history-tab').addEventListener('click', function(e) {
+//   if (e.target.getAttribute('href') === '#wallet-history') {
+//     loadWalletHistory();
+//     console.log("Call loadWalletHistory()")
+//   }
+// });
+
+// // document.getElementById('track-wallet-history-tab').addEventListener('click', function(e) {
+// //   const targetTab = document.querySelector('#wallet-history');
+// //   if (targetTab && targetTab.classList.contains('active')) {
+// //     loadWalletHistory();
+// //     console.log("Call loadWalletHistory()")
+// //   }
+// // });
+
+// function loadWalletHistory() {
+//   console.log("Load wallet history")
+//   fetch('/wallet/history')
+//     .then(response => response.json())
+//     .then(data => {
+//       const historyTableBody = document.getElementById('walletHistoryBody');
+//       // Clear loading message
+//       historyTableBody.innerHTML = '';
+      
+//       if (data.status && data.transactions && data.transactions.length > 0) {
+//         data.transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+        
+//         // Add transaction rows
+//         data.transactions.forEach(transaction => {
+//           const date = new Date(transaction.createdAt).toLocaleDateString();
+//           const type = transaction.type;
+//           // const amount = transaction.type === 'credit' ? `+₹${transaction.amount.toFixed(2)}` : `-₹${transaction.amount.toFixed(2)}`;
+//           const amount = transaction.amount;
+//           const amountClass = transaction.type === 'credit' ? 'text-success' : 'text-danger';
+          
+//           historyTableBody.innerHTML += `
+//             <tr>
+//               <td>${date}</td>
+//               <td>${transaction.description}</td>
+//               <td class="${amountClass}">${amount}</td>
+//               <td>₹${transaction.balance.toFixed(2)}</td>
+//             </tr>
+//           `;
+//         });
+//       } else {
+//         historyTableBody.innerHTML = '<tr><td colspan="4" class="text-center">No transaction history found</td></tr>';
+//       }
+//     })
+//     .catch(error => {
+//       console.error('Error loading wallet history:', error);
+//       document.getElementById('walletHistoryBody').innerHTML = 
+//         '<tr><td colspan="4" class="text-center text-danger">Failed to load transaction history</td></tr>';
+//     });
+// }
+
+document.getElementById('track-wallet-history-tab').addEventListener('click', function(e) {
+  // Load the wallet history when this tab is clicked
+  loadWalletHistory();
+  console.log("Call loadWalletHistory()");
 });
 
 function loadWalletHistory() {
+  console.log("Load wallet history");
   fetch('/wallet/history')
     .then(response => response.json())
     .then(data => {
       const historyTableBody = document.getElementById('walletHistoryBody');
+      // Clear loading message
+      historyTableBody.innerHTML = '';
       
       if (data.status && data.transactions && data.transactions.length > 0) {
-        // Clear loading message
-        historyTableBody.innerHTML = '';
+        data.transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
         
         // Add transaction rows
         data.transactions.forEach(transaction => {
           const date = new Date(transaction.createdAt).toLocaleDateString();
-          const type = transaction.type === 'credit' ? 'Added to wallet' : 'Withdrawn from wallet';
-          const amount = transaction.type === 'credit' ? `+₹${transaction.amount.toFixed(2)}` : `-₹${transaction.amount.toFixed(2)}`;
+          const type = transaction.type;
+          const amount = transaction.amount;
           const amountClass = transaction.type === 'credit' ? 'text-success' : 'text-danger';
           
           historyTableBody.innerHTML += `

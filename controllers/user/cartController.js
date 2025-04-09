@@ -133,6 +133,11 @@ const { render } = require("ejs");
         await User.findByIdAndUpdate(userId, {
           $push: { cart: savedCart._id }
         });
+
+        // If add to cart remove the product from wishlist
+        const index = user.wishlist.indexOf(productId);   // find index that product in wishlist array
+        user.wishlist.splice(index, 1)  // Remove the product from wishlist array
+        await user.save();
         
         return res.json({ 
           status: true, 

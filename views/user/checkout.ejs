@@ -1038,6 +1038,7 @@
             })
             .then(response => response.json())
             .then(data => {
+                console.log("Data:", data); //Debug
                 document.getElementById("loadingOverlay").classList.add("d-none");
                 if (data.status) {
                     window.location.href = data.redirectUrl || '';

@@ -6,12 +6,12 @@ const orderSchema = new Schema ({
     orderId : {
         type : String,
         required : true,
-        unique : true
+        unique : true,
     },
     razorpayOrderId : {
         type : String,
         required : false,
-        unique : true
+        unique : true,
     },
     userId: {
         type: Schema.Types.ObjectId,

@@ -68,11 +68,12 @@ const getOrderList = async (req, res) => {
 const loadOrderDetailsPage = async (req, res) => {
     try {
 
-        const userId = req.session.user
         const orderId = req.query.orderId;
 
         const order = await Order.findById(orderId)
-        .populate("orderItems.product", "productName productImage");
+        .populate("userId")
+        .populate("orderItems.product")
+        .exec();
         
         if (!order) {
             return res.status(404).json({
@@ -81,10 +82,17 @@ const loadOrderDetailsPage = async (req, res) => {
             });
         };
 
-        const userAddresses = await Address.findOne({userId: userId}).select("address");
+        const userAddresses = await Address.findOne({userId: order.userId}).select("address");
+        if (!userAddresses) {
+            return res.status(404).json({
+                status: false,
+                message: "User address not found",
+            });
+        };
 
         const defaultAddress = userAddresses
         ? userAddresses.address.find(addr => addr.isDefault) : null;
+        console.log("Default address:", defaultAddress, "User address:", userAddresses);
 
         res.render("admin-order-details", {
             order,
@@ -94,7 +102,7 @@ const loadOrderDetailsPage = async (req, res) => {
     } catch (error) {
         
         console.error("Error in load order details page", error);
-        req.status(500).json({
+        res.status(500).json({
             status: false,
             Message: "Internal server error"
         })

@@ -19,8 +19,8 @@ const getWalletHistory = async (req, res) => {
 
         // Find wallet and populate transactions
         const wallet = await Wallet.findOne({userId: userData._id})
-                                  .populate('transactions')
-                                  .sort({'transactions.createdAt': -1});
+        .populate('transactions')
+        .sort({'transactions.createdAt': -1});
         
         if (!wallet) {
             return res.status(404).json({
@@ -29,17 +29,20 @@ const getWalletHistory = async (req, res) => {
             });
         }
 
+        // console.log("Wallet.transactions", wallet.transactions)
         return res.status(200).json({
             status: true,
             transactions: wallet.transactions || []
         });
         
     } catch (error) {
+
         console.error("Error fetching wallet history", error);
         return res.status(500).json({
             status: false,
             message: "Internal server error"
         });
+
     }
 };
 
@@ -68,7 +71,7 @@ const addMoneyToWallet = async (req, res) => {
             });
         };
 
-        const wallet = await Wallet.findOne({userId: userData._id});
+        let wallet = await Wallet.findOne({userId: userData._id});
 
         // Create wallet if it doesn't exist
         if (!wallet) {
@@ -90,7 +93,8 @@ const addMoneyToWallet = async (req, res) => {
             type: 'credit',
             amount: inputAmount,
             description: 'Added money to wallet',
-            balance: wallet.balance
+            balance: wallet.balance,
+            createdAt: new Date(),
         });
         
         const savedWallet = await wallet.save();    //Save wallet details

@@ -117,7 +117,7 @@
                     Order cancelled</p> 
                     <p
                     style="color: green;">
-                    Money has sent to your wallet
+                    Money has sent to customer wallet
                     </p>
                 </div>
                 <% } else if (order.paymentMethod === "cod") { %>
@@ -165,7 +165,7 @@
             </div>
             <div class="info-item">
                 <strong>Coupon Applied:</strong>
-                <span>No</span>
+                <span><%= order.couponApplied%></span>
             </div>
             <div class="info-item">
                 <strong>Order Date:</strong>
