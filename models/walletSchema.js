@@ -42,7 +42,7 @@ const walletSchema = new Schema({
         default: 0,
     },
     lastTransactionDate: {
-        type: Number,
+        type: Date,
         default: Date.now,
     },
     createdAt: {

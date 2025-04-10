@@ -5,6 +5,72 @@ const Wallet = require("../../models/walletSchema");
 
 
 
+// const getWalletHistory = async (req, res) => {
+//     try {
+
+//         const userId = req.session.user;
+        
+//         const userData = await User.findById(userId);
+//         if (!userData) {
+//             return res.status(404).json({
+//                 status: false,
+//                 message: "User not found"
+//             });
+//         };
+
+//         const page = parseInt(req.query.page);
+//         const limit = 7;
+//         const skip = (page - 1) * limit;
+        
+
+//         // Find wallet and populate transactions
+//         const wallet = await Wallet.findOne({userId: userData._id})
+//         // .populate('transactions')
+//         // .sort({'transactions.createdAt': -1})
+//         // .skip(skip)
+//         // .limit(limit)
+//         // .exec();
+
+//         // const transactionCount = wallet ? wallet.transactions.length : 0;
+//         // const totalPage = Math.ceil(transactionCount / limit);
+        
+//         if (!wallet) {
+//             return res.status(404).json({
+//                 status: false,
+//                 message: "Wallet not found"
+//             });
+//         };
+
+//         // Sort transactions by date (newest first)
+//         const sortedTransactions = wallet.transactions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        
+//         // Paginate the transactions
+//         const paginatedTransactions = sortedTransactions.slice(skip, skip + limit);
+        
+//         // Calculate total pages
+//         const totalTransactions = sortedTransactions.length;
+//         const totalPages = Math.ceil(totalTransactions / limit);
+
+
+//         // console.log("Wallet.transactions", wallet.transactions)
+//         return res.status(200).json({
+//             status: true,
+//             transactions: wallet.transactions || [],
+//             totalPages,
+//             currentPage: page || 1,
+//         });
+        
+//     } catch (error) {
+
+//         console.error("Error fetching wallet history", error);
+//         return res.status(500).json({
+//             status: false,
+//             message: "Internal server error"
+//         });
+
+//     }
+// };
+
 const getWalletHistory = async (req, res) => {
     try {
         const userId = req.session.user;
@@ -17,10 +83,13 @@ const getWalletHistory = async (req, res) => {
             });
         }
 
-        // Find wallet and populate transactions
-        const wallet = await Wallet.findOne({userId: userData._id})
-        .populate('transactions')
-        .sort({'transactions.createdAt': -1});
+        // Get page from query or default to 1
+        const page = parseInt(req.query.page) || 1;
+        const limit = 7;
+        const skip = (page - 1) * limit;
+        
+        // Find wallet
+        const wallet = await Wallet.findOne({userId: userData._id});
         
         if (!wallet) {
             return res.status(404).json({
@@ -29,20 +98,31 @@ const getWalletHistory = async (req, res) => {
             });
         }
 
-        // console.log("Wallet.transactions", wallet.transactions)
+        // Sort transactions by date (newest first)
+        const sortedTransactions = wallet.transactions.sort((a, b) => 
+            new Date(b.createdAt) - new Date(a.createdAt)
+        );
+        
+        // Calculate total pages
+        const totalTransactions = sortedTransactions.length;
+        const totalPages = Math.ceil(totalTransactions / limit);
+        
+        // Paginate the transactions
+        const paginatedTransactions = sortedTransactions.slice(skip, skip + limit);
+
         return res.status(200).json({
             status: true,
-            transactions: wallet.transactions || []
+            transactions: paginatedTransactions,
+            totalPages: totalPages,
+            currentPage: page
         });
         
     } catch (error) {
-
         console.error("Error fetching wallet history", error);
         return res.status(500).json({
             status: false,
             message: "Internal server error"
         });
-
     }
 };
 

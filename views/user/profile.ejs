@@ -627,61 +627,6 @@ function addMoney() {
 
 
   // Load wallet history when the tab is clicked
-// document.getElementById('track-wallet-history-tab').addEventListener('click', function(e) {
-//   if (e.target.getAttribute('href') === '#wallet-history') {
-//     loadWalletHistory();
-//     console.log("Call loadWalletHistory()")
-//   }
-// });
-
-// // document.getElementById('track-wallet-history-tab').addEventListener('click', function(e) {
-// //   const targetTab = document.querySelector('#wallet-history');
-// //   if (targetTab && targetTab.classList.contains('active')) {
-// //     loadWalletHistory();
-// //     console.log("Call loadWalletHistory()")
-// //   }
-// // });
-
-// function loadWalletHistory() {
-//   console.log("Load wallet history")
-//   fetch('/wallet/history')
-//     .then(response => response.json())
-//     .then(data => {
-//       const historyTableBody = document.getElementById('walletHistoryBody');
-//       // Clear loading message
-//       historyTableBody.innerHTML = '';
-      
-//       if (data.status && data.transactions && data.transactions.length > 0) {
-//         data.transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
-        
-//         // Add transaction rows
-//         data.transactions.forEach(transaction => {
-//           const date = new Date(transaction.createdAt).toLocaleDateString();
-//           const type = transaction.type;
-//           // const amount = transaction.type === 'credit' ? `+₹${transaction.amount.toFixed(2)}` : `-₹${transaction.amount.toFixed(2)}`;
-//           const amount = transaction.amount;
-//           const amountClass = transaction.type === 'credit' ? 'text-success' : 'text-danger';
-          
-//           historyTableBody.innerHTML += `
-//             <tr>
-//               <td>${date}</td>
-//               <td>${transaction.description}</td>
-//               <td class="${amountClass}">${amount}</td>
-//               <td>₹${transaction.balance.toFixed(2)}</td>
-//             </tr>
-//           `;
-//         });
-//       } else {
-//         historyTableBody.innerHTML = '<tr><td colspan="4" class="text-center">No transaction history found</td></tr>';
-//       }
-//     })
-//     .catch(error => {
-//       console.error('Error loading wallet history:', error);
-//       document.getElementById('walletHistoryBody').innerHTML = 
-//         '<tr><td colspan="4" class="text-center text-danger">Failed to load transaction history</td></tr>';
-//     });
-// }
-
 document.getElementById('track-wallet-history-tab').addEventListener('click', function(e) {
   // Load the wallet history when this tab is clicked
   loadWalletHistory();

@@ -260,12 +260,12 @@ const getUserProfilePage = async (req, res) => {
         // Fetch Wallet details
         const wallet = await Wallet.findOne({userId: userData._id});
         // console.log("Wallet:", wallet)
-        // if (!wallet) {
-        //     return res.status(404).json({
-        //         status: false,
-        //         message: "Not found Wallet details"
-        //     })
-        // }
+        if (!wallet) {
+            return res.status(404).json({
+                status: false,
+                message: "Not found Wallet details"
+            })
+        };
 
         res.render("profile", {
             user: userData,
