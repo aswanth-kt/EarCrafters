@@ -173,6 +173,8 @@ router.post("/cancel-product", userAuth, orderController.cancelOrder);
 
 router.get("/track-orders", userAuth, orderController.loadTrackOrders);
 
+router.post("/return-product", userAuth, orderController.returnProduct);
+
 
 // Coupon Management
 router.get("/checkout/coupon", userAuth, couponController.getAvailableCoupons);
@@ -184,6 +186,8 @@ router.post("/checkout/remove-coupon", userAuth, couponController.removeCoupon);
 
 // Wallet Management
 router.post("/wallet/add-money", userAuth, walletController.addMoneyToWallet);
+
+router.get("/wallet/add-money/failed", userAuth, walletController.addMoneyFailed);
 
 router.get("/wallet/history", userAuth, walletController.getWalletHistory);
 

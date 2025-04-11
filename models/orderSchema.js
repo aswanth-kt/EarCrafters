@@ -45,7 +45,7 @@ const orderSchema = new Schema ({
 
         returnStatus: {
             type: String,
-            enum: ["Not Requested", "Requested", "Returned"],
+            enum: ["Not Requested", "Requested", "Returned", "Return Declined"],
             default: "Not Requested",
         },
         returnReason: {

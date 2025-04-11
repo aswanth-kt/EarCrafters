@@ -10,7 +10,7 @@
             font-family: 'Arial', sans-serif;
             background-color: #f4f4f4;
             margin: 0;
-            /* padding: 20px; */
+            /* padding-top: 20px; */
             line-height: 1.6;
         }
         .order-container {
@@ -34,6 +34,7 @@
             cursor: pointer;
             font-weight: bold;
             transition: all 0.3s ease;
+            margin-top: 25px;
         }
         .btn-processing {
             background-color: #FFA500;
@@ -97,129 +98,157 @@
 <body>
     <br>
     <div class="order-container">
-        <div class="order-actions">
-            
-            <% if (order.status === "Order Placed") { %>
-            <button class="action-btn btn-processing" data-id="<%= order._id %>" data-status="Processing">Processing</button>
-            <% } else if (order.status === "Processing") { %>
-            <button class="action-btn btn-shipped" data-id="<%= order._id %>" data-status="Shipped">Shipped</button>
-            <% } else if (order.status === "Shipped") { %>
-            <button class="action-btn btn-delivered" data-id="<%= order._id %>" data-status="Delivered">Delivered</button>
-            <% } else if (order.status === "Delivered") { %>
-            <button class="action-btn btn-return" data-id="<%= order._id %>" data-status="Return Request">Return Request</button>
-            <% } %>
 
-            <% if (order.status === "Cancelled") { %>
-                <% if (order.paymentMethod === "wallet" || order.paymentMethod === "upi") { %>
-                <div style="text-align: center;">
-                    <p
-                    style="color: red;">
-                    Order cancelled</p> 
-                    <p
-                    style="color: green;">
-                    Money has sent to customer wallet
-                    </p>
-                </div>
-                <% } else if (order.paymentMethod === "cod") { %>
+        
+
+            <div class="order-actions">
+                
+                <% if (order.status === "Order Placed") { %>
+                    <button class="action-btn btn-processing" data-id="<%= order._id %>" data-status="Processing">Processing</button>
+                <% } else if (order.status === "Processing") { %>
+                    <button class="action-btn btn-shipped" data-id="<%= order._id %>" data-status="Shipped">Shipped</button>
+                <% } else if (order.status === "Shipped") { %>
+                    <button class="action-btn btn-delivered" data-id="<%= order._id %>" data-status="Delivered">Delivered</button>
+                <% } else if (order.status === "Delivered") { %>
+                    <p style="color:green; text-align: center;">Product Delivered</p>
+                <% } else if (order.status === "Return Request") { %>
+                    <p class="text-center">Reason for return: <%= returnReason %></p>
+                    <button class="action-btn btn-return" data-id="<%= order._id %>" data-productid="<%= productId %>" data-status="Returned">Process Return Request</button>
+                <% } %>
+
+                <% if (order.status === "Cancelled") { %>
+                    <% if (order.paymentMethod === "wallet" || order.paymentMethod === "upi") { %>
+                    <div style="text-align: center;">
+                        <p
+                        style="color: red;">
+                        Order cancelled</p> 
+                        <p
+                        style="color: green;">
+                        Money has sent to customer wallet
+                        </p>
+                    </div>
+                    <% } else if (order.paymentMethod === "cod") { %>
+                        <div>
+                            <p style="color: red; text-align: center;">Order cancelled</p>
+                            <p style="color: #2196F3; text-align: center;">No payment is required</p>
+                        </div>
+                    <% } %>
+                <% } else if(order.status === "Returned") { %>
+                    <% if (order.paymentMethod === "wallet" || order.paymentMethod === "upi") { %>
+                        <div style="text-align: center;">
+                            <p
+                            style="color: red;">
+                            Order Returned</p> 
+                            <p
+                            style="color: green;">
+                            Money has sent to customer wallet
+                            </p>
+                        </div>
+                        <% } else if (order.paymentMethod === "cod") { %>
+                            <div>
+                                <p style="color: red; text-align: center;">Order Returned</p>
+                                <p style="color: #2196F3; text-align: center;">No payment is required</p>
+                            </div>
+                        <% } %>
+                <% } else if (order.status === "Return Declined") { %>
                     <div>
-                        <p style="color: red; text-align: center;">Order cancelled</p>
-                        <p style="color: #2196F3; text-align: center;">No payment is required</p>
+                        <p style="color: red; text-align: center;">Order returned request declined</p>
                     </div>
                 <% } %>
-            <% } %>
 
-            <% if (order.status !== 'Cancelled' && order.status !== 'Returned') { %>
-                <button class="action-btn btn btn-danger status-btn" data-id="<%= order._id %>" data-status="Cancelled">Cancel</button>
-                <% } %>
-        </div>
+                <% if (order.status !== 'Cancelled' && order.status !== 'Returned' && order.status !== "Delivered" && order.status !== "Return Declined" && order.status !== "Return Request") { %>
+                    <button class="action-btn btn btn-danger status-btn" data-id="<%= order._id %>" data-status="Cancelled">Cancel</button>
+                    <% } %>
+            </div>
 
-        <h2 class="section-title">Order Information</h2>
-        <div class="info-grid">
-            <div class="info-item">
-                <strong>Order ID:</strong>
-                <span><%= order.orderId %></span>
+            <h2 class="section-title">Order Information</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <strong>Order ID:</strong>
+                    <span><%= order.orderId %></span>
+                </div>
+                <div class="info-item">
+                    <strong>Payment Method:</strong>
+                    <span><%= order.paymentMethod.toUpperCase() %></span>
+                </div>
+                <div class="info-item">
+                    <strong>User Name:</strong>
+                    <span><%= defaultAddress.name %></span>
+                </div>
+                <!-- <div class="info-item">
+                    <strong>Total Price:</strong>
+                    <span>₹1311</span>
+                </div> -->
+                <div class="info-item">
+                    <strong>Discount:</strong>
+                    <span>₹<%= order.discount %></span>
+                </div>
+                <div class="info-item">
+                    <strong>Final Amount:</strong>
+                    <span>₹<%= order.finalAmount %></span>
+                </div>
+                <div class="info-item">
+                    <strong>Status:</strong>
+                    <span><%= order.status %></span>
+                </div>
+                <div class="info-item">
+                    <strong>Coupon Applied:</strong>
+                    <span><%= order.couponApplied%></span>
+                </div>
+                <div class="info-item">
+                    <strong>Order Date:</strong>
+                    <span><%= new Date(order.createdOn).toLocaleDateString() %></span>
+                </div>
             </div>
-            <div class="info-item">
-                <strong>Payment Method:</strong>
-                <span><%= order.paymentMethod.toUpperCase() %></span>
-            </div>
-            <div class="info-item">
-                <strong>User Name:</strong>
-                <span><%= defaultAddress.name %></span>
-            </div>
-            <!-- <div class="info-item">
-                <strong>Total Price:</strong>
-                <span>₹1311</span>
-            </div> -->
-            <div class="info-item">
-                <strong>Discount:</strong>
-                <span>₹<%= order.discount %></span>
-            </div>
-            <div class="info-item">
-                <strong>Final Amount:</strong>
-                <span>₹<%= order.finalAmount %></span>
-            </div>
-            <div class="info-item">
-                <strong>Status:</strong>
-                <span><%= order.status %></span>
-            </div>
-            <div class="info-item">
-                <strong>Coupon Applied:</strong>
-                <span><%= order.couponApplied%></span>
-            </div>
-            <div class="info-item">
-                <strong>Order Date:</strong>
-                <span><%= new Date(order.createdOn).toLocaleDateString() %></span>
-            </div>
-        </div>
 
-        <h2 class="section-title">Shipping Address</h2>
-        <div class="info-grid">
-            <div class="info-item">
-                <strong>Name:</strong>
-                <span><%= defaultAddress.name %></span>
+            <h2 class="section-title">Shipping Address</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <strong>Name:</strong>
+                    <span><%= defaultAddress.name %></span>
+                </div>
+                <div class="info-item">
+                    <strong>City:</strong>
+                    <span><%= defaultAddress.city %></span>
+                </div>
+                <div class="info-item">
+                    <strong>Landmark:</strong>
+                    <span><%= defaultAddress.landMark %></span>
+                </div>
+                <div class="info-item">
+                    <strong>State:</strong>
+                    <span><%= defaultAddress.state %></span>
+                </div>
+                <div class="info-item">
+                    <strong>Pincode:</strong>
+                    <span><%= defaultAddress.pincode %></span>
+                </div>
             </div>
-            <div class="info-item">
-                <strong>City:</strong>
-                <span><%= defaultAddress.city %></span>
-            </div>
-            <div class="info-item">
-                <strong>Landmark:</strong>
-                <span><%= defaultAddress.landMark %></span>
-            </div>
-            <div class="info-item">
-                <strong>State:</strong>
-                <span><%= defaultAddress.state %></span>
-            </div>
-            <div class="info-item">
-                <strong>Pincode:</strong>
-                <span><%= defaultAddress.pincode %></span>
-            </div>
-        </div>
 
-        <h2 class="section-title">Ordered Items</h2>
-        <table class="product-table">
-            <thead>
-                <tr>
-                    <th>Product Image</th>
-                    <th>Product Name</th>
-                    <th>Price</th>
-                    <th>Quantity</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% order.orderItems.forEach((item) => { %> 
-                <tr>
-                    <td>
-                        <img src="/uploads/re-images/<%= item.product.productImage[0] %>" alt="<%= item.product.productName %>" class="product-image">
-                    </td>
-                    <td><%= item.product.productName %></td>
-                    <td><%= item.price %></td>
-                    <td><%= item.quantity %></td>
-                </tr>
-                <% }) %>
-            </tbody>
-        </table>
+            <h2 class="section-title">Ordered Items</h2>
+            <table class="product-table">
+                <thead>
+                    <tr>
+                        <th>Product Image</th>
+                        <th>Product Name</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% order.orderItems.forEach((item) => { %>
+                    <tr>
+                        <td>
+                            <img src="/uploads/re-images/<%= item.product.productImage[0] %>" alt="<%= item.product.productName %>" class="product-image">
+                        </td>
+                        <td><%= item.product.productName %></td>
+                        <td><%= item.price %></td>
+                        <td><%= item.quantity %></td>
+                    </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+            
     </div>
 </body>
 </html>
@@ -229,7 +258,8 @@
     $(document).on("click", ".action-btn", function() {
         var orderId = $(this).data("id");
         var status = $(this).data("status");
-        // console.log("id:", orderId, "status:", status);
+        var productId = $(this).data("productid");
+        console.log("id:", orderId, "status:", status, "productId:", productId);
 
         Swal.fire({
             title: `Are you sure you want to mark this order as ${status}?`,
@@ -243,8 +273,9 @@
                 $.ajax({
                     type: "PUT",
                     url: "/admin/order/details/updateOrderStatus",
-                    data: {orderId, status},
+                    data: {orderId, status, productId},
                     success: (responce) => {
+                        console.log("Responce:", responce)
                         if (responce.status) {
                             Swal.fire({
                                 icon: "success",
@@ -271,11 +302,59 @@
                     },
                 })
             } else {
-                Swal.fire(
-                    "Cancelled", 
-                    "Order status change was cancelled.", 
-                    "info"
-                );
+                if (status === "Returned") {
+                    $.ajax({
+                        method: "PUT",
+                        url: "/admin/order/details/updateOrderStatus",
+                        data: {
+                            orderId, 
+                            status, 
+                            productId,
+                            declinedStatus: "Return Declined",
+                        },
+                        success: (responce) => {
+                            console.log("Responce:", responce)
+                            if (responce.status) {
+                                Swal.fire({
+                                    icon: "success",
+                                    title: responce.message,
+                                    showCancelButton: false,
+                                    timer: 1500,
+                                }).then(() => {
+                                    location.reload();
+                                }).then(() => {
+                                    Swal.fire({
+                                        toast: true,
+                                        position: 'top-end',
+                                        icon: 'success',
+                                        title: 'Order return request declined!',
+                                        showConfirmButton: false,
+                                        timer: 3000
+                                    });
+                                })
+                            } else {
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Error",
+                                    text: "An error occurred while updating the order status. Please try again.",
+                                });
+                            }
+                        },
+                        error: ((error) => {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Request Failed",
+                                text: "There was an issue connecting to the server. Please try again.",
+                            });
+                        }),
+                    });
+                } else {
+                    Swal.fire(
+                        "Cancelled", 
+                        "Order status change was cancelled.", 
+                        "info"
+                    );
+                };
             }
         });
     });

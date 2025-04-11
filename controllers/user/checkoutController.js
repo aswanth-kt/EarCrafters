@@ -817,7 +817,7 @@ const razorpayOrderSuccess = async (req,res) => {
       payment_capture: 1,
     };
 
-    console.log("Razorpay instance:", razorpay);
+    // console.log("Razorpay instance:", razorpay);
     console.log("Creating order with options:", options);
 
     if (!razorpay) {

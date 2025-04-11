@@ -9,7 +9,7 @@ const walletTransactionSchema = new mongoose.Schema({
 //   },
   type: {
     type: String,
-    enum: ['credit', 'debit'],
+    enum: ['credit', 'debit', 'failed'],
     required: true
   },
   description: {

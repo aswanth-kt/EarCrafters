@@ -211,8 +211,8 @@
                    </a>
                  </li>
                  <li class="nav-item">
-                   <a class="nav-link" id="track-wallet-tab" data-bs-toggle="tab" href="#track-orders" role="tab" aria-controls="track-orders" aria-selected="false">
-                     <i class="fi-rs-shopping-cart-check mr-10"></i>Wallet Status
+                   <a class="nav-link" id="track-wallet-tab" data-bs-toggle="tab" href="#wallet" role="tab" aria-controls="track-orders" aria-selected="false">
+                     <i class="fi-rs-shopping-cart-check mr-10"></i>Wallet
                    </a>
                  </li>
                  <li class="nav-item">
@@ -430,7 +430,7 @@
 
 
               <!-- Wallet -->
-               <div class="tab-pane fade" id="track-orders" role="tabpanel" aria-labelledby="track-orders-tab">
+               <div class="tab-pane fade" id="wallet" role="tabpanel" aria-labelledby="track-orders-tab">
                  <div class="card">
                    <div class="card-header">
                      <h5 class="mb-0">Wallet</h5>
@@ -541,6 +541,7 @@
  </section>
 </main>
 
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 <script>
 
@@ -587,6 +588,83 @@ function addMoney() {
       submitButton.innerHTML = originalText;
 
       if (data.status) {
+
+        // Money add with Razorpay
+        if (typeof Razorpay === "undefined") {
+          console.error("Razorpay is not loaded!");
+          Swal.fire({
+              icon: 'error',
+              title: 'Payment Error',
+              text: 'Payment gateway not available. Please try again later.'
+          });
+          return;
+        };
+        
+        var options = {
+          key: data.razorpayKey,
+          amount: data.amount,
+          currency: data.currency,
+          name: "EarCrafters",
+          description: "Add money to wallet",
+          order_id: data.razorpayOrderId,
+          handler: function(response) {
+              console.log("Payment successful, response:", response);
+              Swal.fire({
+                  toast: true,
+                  position: 'top-end',
+                  icon: 'success',
+                  title: 'Your payment has been successfully completed.',
+                  showConfirmButton: false,
+                  timer: 3000
+              })
+              .then(() => {
+                  window.location.reload();
+              })
+          },
+          // Adding a failure handler to the razorpay options
+          "prefill": {
+              name: data.userData.name,
+              email: data.userData.email,
+          },
+          "theme": {
+              "color": "#F37254"
+          },
+          "modal": {
+              "ondismiss": function() {
+              console.log('Payment window was closed before completing.');
+              }
+          },
+        };
+
+        console.log("Razorpay options:", options);
+                      
+        var rzp1 = new Razorpay(options);
+        try {
+
+            console.log("Razorpay open");
+            rzp1.open();
+            
+        } catch (error) {
+          console.error("Error opening Razorpay window:", error);
+          window.location.reload();     // Redirect to the failure page
+        }
+
+        // Handle Razorpay payment failure
+        rzp1.on('payment.failed', function(response) {
+          console.log("Payment failed:", response);
+          Swal.fire({
+              toast: true,
+              position: 'top-end',
+              icon: 'error',
+              title: 'Payment failed. Please try again later',
+              showConfirmButton: false,
+              timer: 3000
+          })
+          .then(() => {
+              window.location.href = `/wallet/add-money/failed?amount=${amount}`;  //Redirect to wallet page
+          })
+        })
+
         // Display success alert with the wallet balance
         Swal.fire({
           title: "Success!",

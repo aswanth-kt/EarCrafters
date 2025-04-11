@@ -105,7 +105,6 @@ const cancelOrder = async (req, res) => {
                 $set: {
                     "orderItems.$[elem].cancellationReason": otherReason || reason || "No reason provided",
                     "orderItems.$[elem].cancellationStatus": "Cancelled",
-                    // "orderItems.$[elem].quantity": Math.max(0, orderItem.quantity - quantityToAdd)
                 }
             },
             {
@@ -176,17 +175,165 @@ const loadTrackOrders = async (req, res) => {
             message: "Internal server error",
         })
     }
-}
+};
 
 
 
+// After delivered Cancel a product
+// const returnProduct = async (req, res) => {
+//     try {
+
+//         const {productId, reason, otherReason, orderId ,returneddAt} = req.body;
+//         console.log("Body :", req.body);
+
+//         const userId = req.session.user;
+//         const userData = await User.findById(userId);
+
+//         if (!userData) {
+//             return res.status(400).json({
+//                 status: false,
+//                 message: "User not found"
+//             })
+//         };
+
+//         const order = await Order.findOne({userId: userData._id});
+
+//         if (!order) {
+//             return res.status(400).json({
+//                 status: false,
+//                 message: "Order not found"
+//             })
+//         };
+
+//         const orderItem = order.orderItems.find(item => item.product._id.toString() === productId.toString());
+//         console.log("orderItem:", orderItem);
+
+//         if (!orderItem) {
+//             return res.status(404).json({
+//                 message: "Product not found in order"
+//             });
+//         };
+
+//         const updatedOrder = await Order.findByIdAndUpdate(
+//             order._id,
+//             {
+//                 $set:{'orderItems.$[elem].returnStatus': "Requested",
+//                     'orderItems.$[elem].returnReason': reason || otherReason,
+//                 }
+//             },
+//             {new: true},
+//         );
+
+//         if (!updatedOrder) {
+//             return res.status(400).json({
+//               status: false,
+//               message: "Failed to update order"
+//             });
+//         }
+
+//         res.status(200).json({
+//             status: true,
+//             message: "Return request submitted and awaiting admin approval",
+//             order: updatedOrder,
+//         })
+        
+//     } catch (error) {
+        
+//         console.error("Error in return product", error);
+//         return res.status(500).json({
+//             status: false,
+//             message: "Internal server error",
+//         })
+        
+//     }
+// }
 
 
+const returnProduct = async (req, res) => {
+    try {
+      const { productId, reason, otherReason, orderId, returnedAt } = req.body;
+      console.log("Return Request Body:", req.body);
+  
+      const userId = req.session.user;
+      const userData = await User.findById(userId);
+  
+      if (!userData) {
+        return res.status(404).json({
+          status: false,
+          message: "User not found"
+        });
+      }
+  
+      // Find the specific order
+      const order = await Order.findOne({ 
+        userId: userData._id, 
+        orderId: orderId 
+      });
+  
+      if (!order) {
+        return res.status(404).json({
+          status: false,
+          message: "Order not found"
+        });
+      }
+  
+      // Find the index of the specific product in orderItems array
+      const itemIndex = order.orderItems.findIndex(
+        item => item.product._id.toString() === productId.toString()
+      );
+  
+      if (itemIndex === -1) {
+        return res.status(404).json({
+          status: false,
+          message: "Product not found in order"
+        });
+      }
+  
+      // Use dot notation to update a specific item in the array
+      const updateQuery = {};
+      updateQuery[`orderItems.${itemIndex}.returnStatus`] = "Requested";
+      updateQuery[`orderItems.${itemIndex}.returnReason`] = reason === 'other' ? otherReason : reason;
+      updateQuery[`orderItems.${itemIndex}.returnedAt`] = returnedAt || new Date().toISOString();
+  
+      const updatedOrder = await Order.findByIdAndUpdate(
+        order._id,
+        { $set: updateQuery },
+        { new: true }
+      );
 
+      if (updatedOrder.orderItems[itemIndex].returnStatus === "Requested") {
+        updatedOrder.status = "Return Request";
+        await updatedOrder.save();
+      }
+  
+      if (!updatedOrder) {
+        return res.status(400).json({
+          status: false,
+          message: "Failed to update order"
+        });
+      };
+
+      console.log("Updated order:", updatedOrder);
+  
+      res.status(200).json({
+        status: true,
+        message: "Return request submitted and awaiting admin approval",
+        order: updatedOrder
+      });
+        
+    } catch (error) {
+      console.error("Error in return product:", error);
+      return res.status(500).json({
+        status: false,
+        message: "Internal server error"
+      });
+    }
+  };
 
 
 module.exports = {
     getOrderDetails,
     cancelOrder,
     loadTrackOrders,
+    returnProduct,
 }
