@@ -91,7 +91,6 @@ const addMoneyToWallet = async (req, res) => {
         };
 
         let wallet = await Wallet.findOne({userId: userData._id});
-
         // Create wallet if it doesn't exist
         if (!wallet) {
             console.log("Creating new wallet for user");

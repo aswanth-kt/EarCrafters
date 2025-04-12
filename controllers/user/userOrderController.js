@@ -3,6 +3,7 @@ const Order = require("../../models/orderSchema");
 const Address = require("../../models/addressSchema");
 const Product = require("../../models/productSchema");
 const mongoose = require("mongoose");
+const Wallet = require("../../models/walletSchema");
 
 
 
@@ -55,7 +56,17 @@ const getOrderDetails = async (req, res) => {
 
 const cancelOrder = async (req, res) => {
     try {
-        const {productId, reason, otherReason, cancelQuantity, orderId ,cancelledAt} = req.body;
+
+        const userId = req.session.user;
+        const userData = await User.findById(userId);
+        if (!userData) {
+            return res.status(400).json({
+                status: false,
+                message: "User not found"
+            })
+        };
+
+        const {productId, reason, otherReason, cancelQuantity, orderId ,cancelledAt, finalAmount} = req.body;
         console.log("Body :", req.body);
 
         if (!req.body) {
@@ -124,8 +135,30 @@ const cancelOrder = async (req, res) => {
                 {$set: {status : "Cancelled"} },  // If all cancelled set to status cancelled
                 {new: true}
             )
-        }
-        
+        };
+
+        const wallet = await Wallet.findOne({userId: userData._id});
+        if (!wallet) {
+            return res.status(400).json({
+                status: false,
+                message: "Wallet not found"
+            })
+        };
+
+        // After product cancellation money back to add wallet
+        wallet.balance += Number(finalAmount);
+
+        // Save transaction history
+        wallet.transactions.push({
+            type: 'credit',
+            amount: finalAmount,
+            description: 'Cancelled product amount added to wallet',
+            balance: wallet.balance,
+            createdAt: cancelledAt,
+        });
+
+        await wallet.save();
+
 
         return res.status(200).json({
             success: true,
