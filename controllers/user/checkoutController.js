@@ -568,17 +568,7 @@ const walletPlaceOrder = async (req, res) => {
       paymentMethod,
     } = req.body;
 
-
-    console.log(
-      `orderData for cod:  
-      orderItems: ${orderItems}, 
-      addressId ${addressId},
-      totalPrice: ${totalPrice},
-      discount: ${discount},
-      finamAmount: ${finalAmount},
-      status: ${status},
-      paymentMethod: ${paymentMethod}`
-    );
+    console.log("Body: ", req.body);
 
     const userId = req.session.user;
     const userData = await User.findById(userId);
@@ -620,8 +610,15 @@ const walletPlaceOrder = async (req, res) => {
     };
 
     // Deduct the amount from wallet
-    wallet.balance -= finalAmount;
-    await wallet.save();
+    if (wallet.balance >= finalAmount) {
+      wallet.balance -= finalAmount;
+      await wallet.save();
+    } else {
+      return res.status(400).json({
+        status: false,
+        message: "Sorry! Insufficient wallet balance"
+      })
+    }
 
     // Create a transaction history
     const transaction = new Transaction({
