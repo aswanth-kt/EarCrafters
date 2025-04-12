@@ -514,89 +514,7 @@
                     </div>
                 </div>
 
-                <!-- Coupon Section -->
-                <!-- <div class="checkout-section">
-                    <div class="section-title">Apply Coupon</div>
-
-                    <div class="coupon-section">
-                        <input type="text" class="coupon-input" id="coupon-input" placeholder="Enter coupon code">
-                        <button class="coupon-button" id="apply-coupon">Apply</button>
-                    </div>
-
-                    <div class="coupon-list" id="coupon-list">
-                        <% if (coupons && coupons.length > 0) { %>
-                            <% coupons.forEach((coupon) => { %> 
-                                <div class="coupon-item">
-                                    <li>
-                                    <div>
-                                        <div class="coupon-code"><%= coupon.name %></div>
-                                        <span class="coupon-details">Off: <%= coupon.offerPrice %></span>
-                                        <span class="coupon-validity">Valid till: <%= coupon.expireOn.toLocaleDateString() %></span>
-                                    </div>
-                                    </li>
-                                    <div>
-                                        <button class="coupon-button">Apply</button>
-                                    </div>
-                                </div>
-                            <% }) %>
-                        <% } %>
-
-                        <div class="coupon-item">
-                            <div>
-                                <div class="coupon-code">SPRING25</div>
-                                <div class="coupon-details">25% off on spring collection</div>
-                                <div class="coupon-validity">Valid till: March 31, 2025</div>
-                            </div>
-                            <div>
-                                <button class="coupon-button">Apply</button>
-                            </div>
-                        </div>
-
-                        <div class="coupon-item">
-                            <div>
-                                <div class="coupon-code">FLAT10</div>
-                                <div class="coupon-details">Flat $10 off on orders above $100</div>
-                                <div class="coupon-validity expired">Expired on: February 28, 2025</div>
-                            </div>
-                            <div>
-                                <button class="coupon-button" disabled style="background-color: #ce1111;">Expired</button>
-                            </div>
-                        </div>
-                    </div>
-                </div> -->
-
-                <!-- <div class="coupons mt-4 bg-white p-4 rounded">
-                    <hr />
-                    <div class="row">
-                      <div class="col-md-8">
-                        <label for="couponInput">Enter Coupon Code:</label>
-                        <input type="text" id="couponInput" class="form-control" placeholder="Enter coupon code" />
-                        <div id="couponList" class="dropdown-menu" style="display: none;"></div>
-                      </div>
-                      <div class="col-md-4">
-                        <button id="applyCouponBtn" class="btn btn-info" style="margin-top: 32px;">Apply</button>
-                      </div>
-                    </div>
-                    <div id="discountMessage" class="mt-2"></div>
-                    <% if (coupons && coupons.length > 0) { %>
-                      <div class="row">
-                          <div class="col-md-12">
-                              <h6 class="text-muted pb-2">Available Coupons</h6>
-                              <% coupons.forEach(function(couponItem) { %>
-                                <p>
-                                  <%= couponItem.name %> |
-                                  Expire on: <%= new Date(couponItem.expireOn).toLocaleDateString() %>
-                              </p>
-                              <% }); %>
-                          </div>
-                      </div>
-                  <% } else { %>
-                      <p>No coupons available at the moment.</p>
-                  <% } %>
-                    
-                </div> -->
-
-                <!-- new -->
+                <!-- Coupons -->
                 <div class="checkout-section">
                     <div class="section-title">Apply Coupon</div>
                     
@@ -669,13 +587,13 @@
 
                     <div class="payment-methods">
                         <div class="payment-method selected">
-                            <input type="radio" id="upi" class="payment-radio" name="paymentMethod">
+                            <input type="radio" id="upi" class="payment-radio" name="paymentMethod" checked>
                             <label for="upi" class="payment-name">UPI</label>
                             <img src="/img/PaymentLogo/upi.png" alt="UPI" class="payment-logo">
                         </div>
 
                         <div class="payment-method">
-                            <input type="radio" id="cod" class="payment-radio" name="paymentMethod" checked>
+                            <input type="radio" id="cod" class="payment-radio" name="paymentMethod">
                             <label for="cod" class="payment-name">Cash On Delivery</label>
                             <img src="/img/PaymentLogo/cod.jpeg" alt="COD" class="payment-logo">
                         </div>
@@ -1026,9 +944,9 @@
                 });
                 this.disabled = false;
             });
-        }
-         else if (paymentMethod === "wallet") {
-            // Handle wallet payment logic
+
+            // Wallet payment
+        }else if (paymentMethod === "wallet") {
             fetch('/payment/wallet', {
                 method: 'POST',
                 headers: {

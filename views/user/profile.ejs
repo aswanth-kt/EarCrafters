@@ -497,24 +497,19 @@
                            <tr>
                              <th>Date</th>
                              <th>Transaction</th>
+                             <th>Type</th>
                              <th>Amount</th>
                              <th>Balance</th>
                            </tr>
                          </thead>
                          <tbody id="walletHistoryBody">
-                          <!-- <% if (wallet.transactions && wallet.transactions.length > 0) { 
-                             wallet.transactions.sort((a, b) => new Date(b.date) - new Date(a.date)) 
-                             wallet.transactions.forEach((transaction) => { 
-                          %> -->
-                              <tr>
-                                <!-- <td colspan="4" class="text-center">Loading transaction history...</td> -->
-                                <td id="createdAt"></td>
-                                <td id="description"></td>
-                                <td id="amount" class=""></td>
-                                <td id="balance"></td>
-                              </tr>
-                            <!-- <% }) %>
-                           <% } %> -->
+                            <tr>
+                              <td id="createdAt"></td>
+                              <td id="description"></td>
+                              <td id="type" class=""></td>
+                              <td id="amount" class=""></td>
+                              <td id="balance"></td>
+                            </tr>
                          </tbody>
                        </table>
                      </div>
@@ -727,13 +722,15 @@ function loadWalletHistory() {
         data.transactions.forEach(transaction => {
           const date = new Date(transaction.createdAt).toLocaleDateString();
           const type = transaction.type;
-          const amount = transaction.amount;
           const amountClass = transaction.type === 'credit' ? 'text-success' : 'text-danger';
+          const amount = transaction.amount;
+          const typeClass = transaction.type === 'credit' ? 'text-success' : 'text-danger';
           
           historyTableBody.innerHTML += `
             <tr>
               <td>${date}</td>
               <td>${transaction.description}</td>
+              <td class="${typeClass}">${type}</td>
               <td class="${amountClass}">${amount}</td>
               <td>₹${transaction.balance.toFixed(2)}</td>
             </tr>

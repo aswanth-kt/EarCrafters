@@ -184,7 +184,7 @@ const getCheckoutPage = async (req, res) => {
         const userId = req.session.user || req.query.userId;
         if (!userId) {
           return res.redirect("/login"); 
-      }
+        }
 
         const user = await User.findById(userId);
         if (!user) {
@@ -239,19 +239,19 @@ const getCheckoutPage = async (req, res) => {
             status: false,
             message: "Coupon not found"
           })
-        }
+        };
 
         res.render("checkout",{
-            user,
-            cartItems,
-            addresses : userAddress ? userAddress.address : [],
-            defaultAddress: defaultAddress || {} ,
-            userAddress,
-            notDefaultAddress,
-            cartData,
-            grandTotal,
-            coupons: validCoupons,
-        })
+          user,
+          cartItems,
+          addresses : userAddress ? userAddress.address : [],
+          defaultAddress: defaultAddress || {} ,
+          userAddress,
+          notDefaultAddress,
+          cartData,
+          grandTotal,
+          coupons: validCoupons,
+        });
 
     } catch (error) {
 
@@ -523,8 +523,11 @@ const getOrderSuccess = async (req, res) => {
 
     const cartItems = cart ? cart.items : [];
 
-    const order = await Order.findById(orderId).populate("orderItems.product").exec();
-    console.log("Order:", order)
+    const order = await Order.findById(orderId)
+    .populate("orderItems.product")
+    .exec();
+
+    console.log("Order in order success page:", order)
 
     if (!order) {
       return res.status(404).json({
@@ -621,16 +624,18 @@ const walletPlaceOrder = async (req, res) => {
     }
 
     // Create a transaction history
-    const transaction = new Transaction({
-      userId: userData._id,
-      type: "Purchased using wallet - Debit",
+    const transaction = wallet.transactions.push({
+      description: "Purchased using wallet",
+      type: "debit",
       amount: finalAmount,
       balance: wallet.balance,
     });
-    await transaction.save();
+    await wallet.save();
 
     // Create order
     const orderId = await generateOrderId();  // Generate unique order id
+
+    // Create new order
     const newOrder = new Order({
       orderId,
       userId: userData._id,
@@ -693,7 +698,7 @@ const walletPlaceOrder = async (req, res) => {
     };
 
     return res.status(200).json({
-      redirectUrl: "/order-success",
+      redirectUrl: `/order-success?orderId=${saveOrder._id}`,
       status: true,
       message: "Order placed successfully!",
       orderId: saveOrder._id,
