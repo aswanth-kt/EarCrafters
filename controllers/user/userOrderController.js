@@ -66,7 +66,7 @@ const cancelOrder = async (req, res) => {
             })
         };
 
-        const {productId, reason, otherReason, cancelQuantity, orderId ,cancelledAt, finalAmount} = req.body;
+        const {productId, reason, otherReason, cancelQuantity, orderId ,cancelledAt, finalAmount, price, totalPrice} = req.body;
         console.log("Body :", req.body);
 
         if (!req.body) {
@@ -146,12 +146,16 @@ const cancelOrder = async (req, res) => {
         };
 
         // After product cancellation money back to add wallet
-        wallet.balance += Number(finalAmount);
+        const couponDidcount = Number(order.discount);
+        const cancelProductPrice = Number((price / totalPrice) * couponDidcount);   // Find one without coupon product price
+        const priceWithoutOffer = Number(price - cancelProductPrice);
+        const roundedPrice = Math.round(priceWithoutOffer);
+        wallet.balance += roundedPrice;
 
         // Save transaction history
         wallet.transactions.push({
             type: 'credit',
-            amount: finalAmount,
+            amount: roundedPrice,
             description: 'Cancelled product amount added to wallet',
             balance: wallet.balance,
             createdAt: cancelledAt,
@@ -212,79 +216,10 @@ const loadTrackOrders = async (req, res) => {
 
 
 
-// After delivered Cancel a product
-// const returnProduct = async (req, res) => {
-//     try {
-
-//         const {productId, reason, otherReason, orderId ,returneddAt} = req.body;
-//         console.log("Body :", req.body);
-
-//         const userId = req.session.user;
-//         const userData = await User.findById(userId);
-
-//         if (!userData) {
-//             return res.status(400).json({
-//                 status: false,
-//                 message: "User not found"
-//             })
-//         };
-
-//         const order = await Order.findOne({userId: userData._id});
-
-//         if (!order) {
-//             return res.status(400).json({
-//                 status: false,
-//                 message: "Order not found"
-//             })
-//         };
-
-//         const orderItem = order.orderItems.find(item => item.product._id.toString() === productId.toString());
-//         console.log("orderItem:", orderItem);
-
-//         if (!orderItem) {
-//             return res.status(404).json({
-//                 message: "Product not found in order"
-//             });
-//         };
-
-//         const updatedOrder = await Order.findByIdAndUpdate(
-//             order._id,
-//             {
-//                 $set:{'orderItems.$[elem].returnStatus': "Requested",
-//                     'orderItems.$[elem].returnReason': reason || otherReason,
-//                 }
-//             },
-//             {new: true},
-//         );
-
-//         if (!updatedOrder) {
-//             return res.status(400).json({
-//               status: false,
-//               message: "Failed to update order"
-//             });
-//         }
-
-//         res.status(200).json({
-//             status: true,
-//             message: "Return request submitted and awaiting admin approval",
-//             order: updatedOrder,
-//         })
-        
-//     } catch (error) {
-        
-//         console.error("Error in return product", error);
-//         return res.status(500).json({
-//             status: false,
-//             message: "Internal server error",
-//         })
-        
-//     }
-// }
-
 
 const returnProduct = async (req, res) => {
     try {
-      const { productId, reason, otherReason, orderId, returnedAt } = req.body;
+      const { productId, reason, otherReason, orderId, returnedAt, finalAmount, price, totalPrice } = req.body;
       console.log("Return Request Body:", req.body);
   
       const userId = req.session.user;
@@ -345,8 +280,37 @@ const returnProduct = async (req, res) => {
           message: "Failed to update order"
         });
       };
-
       console.log("Updated order:", updatedOrder);
+
+      const wallet = await Wallet.findOne({userId: userData._id});
+        if (!wallet) {
+            return res.status(400).json({
+                status: false,
+                message: "Wallet not found"
+            })
+        };
+
+        // After product Returned money back to add wallet
+        if (order.status === "Returned") {
+            const couponDidcount = Number(updatedOrder.discount);
+            const cancelProductPrice = Number((price / totalPrice) * couponDidcount);   // Find one without coupon product price
+            const priceWithoutOffer = Number(price - cancelProductPrice);
+            const roundedPrice = Math.round(priceWithoutOffer);
+
+            wallet.balance += roundedPrice;
+
+            // Save transaction history
+            wallet.transactions.push({
+                type: 'credit',
+                amount: roundedPrice,
+                description: 'Returned product amount added to wallet',
+                balance: wallet.balance,
+                createdAt: returnedAt,
+            });
+
+            await wallet.save();
+        };
+
   
       res.status(200).json({
         status: true,

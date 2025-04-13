@@ -259,7 +259,7 @@
               && item.returnStatus === "Not Requested" 
               && item.cancellationStatus === "Not Cancelled") { %>
                 <button class="btn btn-outline-info"
-                  onclick="returnConfirmation('<%= item.product._id %>', '<%= index %>', '<%= order.orderId %>')">
+                  onclick="returnConfirmation('<%= item.product._id %>', '<%= index %>', '<%= order.orderId %>', '<%= order.finalAmount %>', '<%= item.price %>', '<%= order.totalPrice %>')">
                   Return
                 </button>
             
@@ -279,7 +279,7 @@
                            order.status !== "Delivered" &&
                            order.status !== "Returned") { %>
                 <button class="cancel-btn"
-                  onclick="showCancelConfirmation('<%= item.product._id %>', '<%= index %>', '<%= order.orderId %>', '<%= order.finalAmount %>')">
+                  onclick="showCancelConfirmation('<%= item.product._id %>', '<%= index %>', '<%= order.orderId %>', '<%= order.finalAmount %>', '<%= item.price %>', '<%= order.totalPrice %>')">
                   Cancel Order
                 </button>
               <% } %>
@@ -298,7 +298,7 @@
 
   <script>
     
-    function showCancelConfirmation(productId, rowIndex, orderId, finalAmount) {
+    function showCancelConfirmation(productId, rowIndex, orderId, finalAmount, price, totalPrice) {
       Swal.fire({
         title: 'Cancel Order',
         html: `
@@ -353,13 +353,13 @@
       }).then((result) => {
         if (result.isConfirmed) {
           // Save cancellation data to the database
-          saveCancellationToDB(productId, result.value.reason, result.value.otherReason, result.value.cancelQuantity, orderId, finalAmount);
+          saveCancellationToDB(productId, result.value.reason, result.value.otherReason, result.value.cancelQuantity, orderId, finalAmount, price, totalPrice);
         }
       });
     };
 
     // Function to save cancellation data to database
-    function saveCancellationToDB(productId, reason, otherReason, cancelQuantity, orderId, finalAmount) {
+    function saveCancellationToDB(productId, reason, otherReason, cancelQuantity, orderId, finalAmount, price, totalPrice) {
       // Show loading indicator
       Swal.fire({
         title: 'Processing...',
@@ -378,7 +378,9 @@
         cancelQuantity: cancelQuantity,
         cancelledAt: new Date().toISOString(),
         orderId: orderId,
-        finalAmount
+        finalAmount,
+        price, 
+        totalPrice,
       };
       
       // Send data to server using fetch API
@@ -418,7 +420,7 @@
 
 
     // Return function
-    function returnConfirmation(productId, rowIndex, orderId) {
+    function returnConfirmation(productId, rowIndex, orderId, finalAmount, price, totalPrice) {
       Swal.fire({
         title: 'Return Order',
         html: `
@@ -474,13 +476,13 @@
       }).then((result) => {
         if (result.isConfirmed) {
           // Save return data to the database
-          saveReturnToDB(productId, result.value.reason, result.value.otherReason, result.value.returnQuantity, orderId);
+          saveReturnToDB(productId, result.value.reason, result.value.otherReason, result.value.returnQuantity, orderId, finalAmount, price, totalPrice);
         }
       });
     };
 
 // Function to save return data to database
-function saveReturnToDB(productId, reason, otherReason, returnQuantity, orderId) {
+function saveReturnToDB(productId, reason, otherReason, returnQuantity, orderId, finalAmount, price, totalPrice) {
   // Show loading indicator
   Swal.fire({
     title: 'Processing...',
@@ -499,6 +501,9 @@ function saveReturnToDB(productId, reason, otherReason, returnQuantity, orderId)
     returnQuantity: returnQuantity,
     returnedAt: new Date().toISOString(),
     orderId: orderId,
+    finalAmount,
+    price,
+    totalPrice
   };
   
   // Send data to server using fetch API

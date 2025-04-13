@@ -583,18 +583,20 @@ const walletPlaceOrder = async (req, res) => {
       });
     };
 
-    // Find defalt user address
-    const userAddress = await Address.findOne(
-      { userId: userData._id, "address.isDefault": true }, 
-      { "address.$": 1, _id: addressId } 
-    );
-  
-    if (!userAddress) {
-      return res.status(404).json({
+    const userAddress = await Address.find({userId: userData._id});
+    if (!userAddress || userAddress.length === 0) {
+      return res.status(400).json({
         status: false,
-        message: "Address not found"
+        message: "No address found"
       });
-    };
+    }
+
+    const defaultAddress = userAddress
+    .flatMap((addr) => addr.address)
+    .find((addr) => addr.isDefault === true);
+    // console.log("defaultAddress :", defaultAddress);
+
+    console.log("Wallet place order - defaultAddress:", defaultAddress)
 
     const wallet = await Wallet.findOne({userId: userData._id});
 
@@ -687,7 +689,7 @@ const walletPlaceOrder = async (req, res) => {
     const emailSent = await sendOrderConfirmationEmail(
       userEmail,
       saveOrder,
-      userAddress
+      defaultAddress
     );
 
     if (!emailSent) {
@@ -751,7 +753,8 @@ const razorpayOrderSuccess = async (req,res) => {
 
     const defaultAddress = userAddresses
       .flatMap((addr) => addr.address)
-      .find((addr) => addr.isDefault === true);
+      .find((addr) => addr.isDefault === true
+    );
 
     if(!defaultAddress) {
       return res.status(400).json({
