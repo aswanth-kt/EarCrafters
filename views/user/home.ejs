@@ -244,7 +244,7 @@
   });
 
 
-// Add to Wishlist function
+// Add to cart function
 function addToCart(productId, quantity) {
       fetch("/addToCart", {
           method: "POST",
@@ -264,7 +264,7 @@ function addToCart(productId, quantity) {
               });
           } else {
               Swal.fire({
-                  title: "Product already in cart",
+                  title: data.message,
                   text: data.message || "Check your cart",
                   icon: "info",
                   timer: 3000
@@ -283,38 +283,78 @@ function addToCart(productId, quantity) {
 
 
 // Add to cart function
-function addToCart(productId) {
-    $.ajax({
-        url: "/addToCart",
-        method: "POST",
-        data: {productId: productId},
-        success: (response) => {
-            if (response.status === true) {
-                Swal.fire({
-                    title: response.message || "Product Added",
-                    text: "Product has been added to your cart",
-                    icon: "success",
-                    timer: 3000
-                })
-            } else {
-                Swal.fire({
-                    title: "Error",
-                    text:  response.message|| "Check your cart",
-                    icon: "info",
-                    timer: 3000
-                })
-            }
-        },
-        error: (error) => {
-            Swal.fire({
-            title: "Error",
-            text: error.message || "There was an error in adding the product to wishlis",
-            icon: "error",
-            timer: 3000
-            })
-        }
-    })
-};
+// function addToCart(productId) {
+//     $.ajax({
+//         url: "/addToCart",
+//         method: "POST",
+//         data: {productId: productId},
+//         success: (response) => {
+//             if (response.status === true) {
+//                 Swal.fire({
+//                     title: response.message || "Product Added",
+//                     text: "Product has been added to your cart",
+//                     icon: "success",
+//                     timer: 3000
+//                 })
+//             } else {
+//                 Swal.fire({
+//                     title: "Error",
+//                     text:  response.message|| "Check your cart",
+//                     icon: "info",
+//                     timer: 3000
+//                 })
+//             }
+//         },
+//         error: (error) => {
+//             Swal.fire({
+//             title: "Error",
+//             text: error.message || "There was an error in adding the product to wishlis",
+//             icon: "error",
+//             timer: 3000
+//             })
+//         }
+//     })
+// };
+
+
+function addToWishlist(productId){
+ 
+ $.ajax({
+
+     url: "/addToWishlist",
+     method: "POST",
+     data: {productId: productId},
+     success: (response) => {
+         if (response.status === true) {
+
+         Swal.fire({
+             title: response.message || "Added",
+             text: "Product has been added to your wishlist",
+             icon: "success",
+             // timer: 2000
+         });
+
+         } else {
+         Swal.fire({
+             title: "Already in wishlist",
+             text: response.message,
+             icon: "info",
+             // timer: 2000
+         });
+         };
+     },
+     error: (error) => {
+         Swal.fire({
+         title: "Error",
+         text: error.message || "There was an error in adding the product to wishlis",
+         icon: "error",
+         // timer: 2000
+         })
+     }
+
+ })
+
+}
 
 </script>
 

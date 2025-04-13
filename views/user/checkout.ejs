@@ -1098,7 +1098,52 @@
                 });
             });
         };
-    // next invoice here.........
+
+    // invoice 
+    // function downloadInvoice(orderId) {
+    //     document.getElementById('loadingOverlay').classList.remove('d-none');
+    //     document.getElementById('usePaymentMethodBtn').disabled = true;
+
+    //     fetch(`/checkout/generate-invoice/${orderId}`)
+    //     .then(response => {
+    //         console.log('Response status:', response.status);
+    //         if (!response.ok) {
+    //             throw new Error(`HTTP error! Status: ${response.status}`);
+    //         }
+    //         return response.blob();
+    //     })
+    //     .then(blob => {
+    //         console.log('Blob received:', blob);
+    //         const url = URL.createObjectURL(blob);
+    //         const a = document.createElement("a");
+    //         console.log("url:", url, "a:", a);  //Debuging
+    //         a.href = url;
+    //         a.download = `invoice-${orderId}.pdf`;
+    //         document.body.appendChild(a);
+    //         a.click();
+    //         document.body.removeChild(a);
+    //         URL.revokeObjectURL(url); // Clean up the object URL
+
+    //         // Wait for download to initiate, then proceed to success page
+    //         setTimeout(() => {
+    //             window.location.href = `/order-success?orderId=${orderId}`;
+    //         }, 1000);
+    //     })
+    //     .catch(error => {
+    //         console.error('Error downloading invoice:', error);
+
+    //         // Handle error, re-enable button and hide the overlay
+    //         Swal.fire({
+    //             title: 'Error!',
+    //             text: 'Failed to download the invoice. Please try again later.',
+    //             icon: 'error',
+    //             confirmButtonText: 'OK'
+    //         }).then(() => {
+    //             document.getElementById('loadingOverlay').classList.add('d-none');
+    //             document.getElementById('usePaymentMethodBtn').disabled = false;
+    //         });
+    //     })
+    // };
 
     });
 

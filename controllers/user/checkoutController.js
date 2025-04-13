@@ -241,6 +241,15 @@ const getCheckoutPage = async (req, res) => {
           })
         };
 
+        const order = await Order.findOne({userId: user._id});
+        if (!order) {
+          return res.status(404).join({
+            status: false,
+            message: "Order not found"
+          })
+        };
+
+
         res.render("checkout",{
           user,
           cartItems,
@@ -251,6 +260,7 @@ const getCheckoutPage = async (req, res) => {
           cartData,
           grandTotal,
           coupons: validCoupons,
+          order
         });
 
     } catch (error) {

@@ -14,7 +14,7 @@
       box-sizing: border-box;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
-    
+
     h1 {
       font-size: 24px;
       margin-bottom: 20px;
@@ -132,6 +132,22 @@
         display: none;
       }
     }
+
+    .invoice-container{
+      position: relative;
+      padding: 20px;
+    }
+
+    .invoiceBtn{
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: #296fb9;
+    }
+
+    .invoiceBtn:hover {
+      background-color: #0056b3;
+    }
   </style>
 </head>
 <body>
@@ -151,6 +167,12 @@
     <h1>Order Details</h1>
 
     <% if (order && address) { %>
+
+    <% if (order.status === "Delivered") { %>
+    <div class="invoice-container" style="margin-bottom: 20px;">
+      <button class="btn btn-dark invoiceBtn" onclick="downloadInvoice('<%= order._id %>', '<%=order.orderId%>')">Download Invoice</button>
+    </div>
+    <% } %>
     
     <div class="order-summary">
       <div>
@@ -187,6 +209,9 @@
           </p>
         </div>
       </div>
+      <div>
+        
+      </div>
     </div>
     
     <div class="address-box">
@@ -196,6 +221,12 @@
         <%= address.landMark %><br>
         <%= address.state %><br>
       Phone: <%= address.phone %></p>
+    </div>
+
+    <div id="loadingOverlay" style="display: none;">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
     </div>
     
     <table class="product-list">
@@ -234,7 +265,7 @@
               item.returnStatus === "Returned" ||
               item.returnStatus === "Return Declined"
             ) { %>
-              <td class="return-status" data-retirnstatus="<%= item.returnStatus %>"><%= item.returnStatus %></td>
+              <td class="return-status" data-returnstatus="<%= item.returnStatus %>"><%= item.returnStatus %></td>
             <% } %>
 
 
@@ -541,6 +572,45 @@ function saveReturnToDB(productId, reason, otherReason, returnQuantity, orderId,
     console.error('Error:', error);
   });
 };
+
+
+
+  function downloadInvoice(orderId) {
+    document.getElementById('loadingOverlay').style.display = 'flex';
+    // console.log("Order Id:", orderId)
+
+    fetch(`/checkout/generate-invoice/${orderId}`)
+    .then(response => {
+      console.log('Response status:', response.status);
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      return response.blob();
+    })
+    .then(blob => {
+      console.log('Blob received:', blob);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      console.log("url:", url, "a:", a);  //Debuging
+      a.href = url;
+      a.download = `invoice-${orderId}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      document.getElementById('loadingOverlay').style.display = 'none';
+    })
+    .catch(error => {
+      console.error('Error downloading invoice:', error);
+      Swal.fire({
+        title: 'Error!',
+        text: 'Failed to download the invoice. Please try again later.',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
+      document.getElementById('loadingOverlay').style.display = 'none';
+    });
+  };
 
 
   </script>

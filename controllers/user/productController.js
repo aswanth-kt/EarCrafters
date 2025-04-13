@@ -1,7 +1,7 @@
 const Product = require("../../models/productSchema");
 const Cart = require("../../models/cartSchema");
 const User = require("../../models/userSchema");
-
+const { generateInvoicePDF } = require("../../helpers/generateInvoicePDF");
 
 
 
@@ -56,6 +56,40 @@ const productDetails = async (req, res) => {
 };
 
 
+const generateInvoice = async (req, res) => {
+    try {
+
+        const {orderId} = req.params;
+        console.log("Order id:", orderId, typeof orderId);
+
+        if (!orderId) {
+            return res.status(400).json({
+                status: false,
+                message: "Order ID is required",
+            });
+        };        
+
+        const pdfBuffer = await generateInvoicePDF(orderId); // Call the helper function to generate the PDF
+
+        // Send the PDF as a response
+        res.setHeader("Content-Type", "application/pdf");
+        res.setHeader(
+            "Content-Disposition", `attachment; filename=invoice-${orderId}.pdf`
+        );
+
+        res.send(pdfBuffer);
+        
+    } catch (error) {
+        
+        console.error("Error in generate invoice", error);
+        return res.status(500).json({
+            status: false,
+            message: "Internal server error"
+        })
+        
+    }
+};
+
 
 
 
@@ -65,4 +99,5 @@ const productDetails = async (req, res) => {
 
 module.exports = {
     productDetails,
+    generateInvoice,
 }

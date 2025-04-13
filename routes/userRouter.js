@@ -121,6 +121,8 @@ router.get("/deleteAddress", userAuth, profileController.deleteAddress);
 // Product Management
 router.get("/productDetails", userAuth, productController.productDetails);
 
+router.get("/checkout/generate-invoice/:orderId", userAuth, productController.generateInvoice);
+
 
 
 // Wishlist Management
