@@ -444,11 +444,18 @@
      <main class="product-grid">
         <% for(let i = 0; i < products.length; i++) { %>
          <div class="product-card">
-           <span class="wishlist-btn" onclick="addToWishlist('<%= products[i]._id %>')"><i class="fas fa-heart"></i></span>
+
+          <span class="wishlist-btn" onclick="addToWishlist('<%= products[i]._id %>')">
+            <% if (userData && userData.wishlist && userData.wishlist.find(item => item._id.toString() === products[i]._id.toString())) { %>
+              <i class="fas fa-heart"></i> <!-- Filled heart if product is in wishlist -->
+            <% } else { %>
+              <i class="far fa-heart"></i> <!-- Empty heart if not in wishlist -->
+            <% } %>
+          </span>
+
            <a href="/productDetails?id=<%= products[i]._id %>">
              <img src="/uploads/re-images/<%= products[i].productImage[0] %>" alt="<%= products[i].productName %>" />
              <h4><%= products[i].productName %></h4>
-             <!-- <p></p>     Brand -->
              <p> <%= products[i].salePrice.toLocaleString('en-IN', { style: 'currency', currency: 'INR' }) %> <span class="text-muted"><strike> <%= products[i].regularPrice.toLocaleString('en-IN',{ style: 'currency', currency: 'INR' }) %> </strike></span></p>
            </a>
        
@@ -513,8 +520,10 @@
             title: response.message || "Added",
             text: "Product has been added to your wishlist",
             icon: "success",
-            // timer: 2000
-          });
+          })
+          .then(() => {
+            window.location.reload();
+          })
 
         } else {
           Swal.fire({

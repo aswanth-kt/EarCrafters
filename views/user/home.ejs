@@ -203,11 +203,15 @@
                                   <img class="default-img" src="/uploads/re-images/<%= products[i].productImage[0] %>" alt="<%= products[i].productName %>">
                               </a>
                           </div>
-                          <div>
-                          <a href="javascript:void(0)" onclick="addToWishlist('<%= products[i]._id %>')" class="wishlist-btn">
-                              <i class="fas fa-heart"></i>
-                          </a>
-                          </div>
+
+                          <span onclick="addToWishlist('<%= products[i]._id %>')" class="wishlist-btn">
+                            <% if (user && user.wishlist && user.wishlist.find(item => item._id.toString() === products[i]._id.toString())) { %>
+                              <i class="fas fa-heart"></i> <!-- Filled heart if product is in wishlist -->
+                            <% } else { %>
+                              <i class="far fa-heart"></i> <!-- Empty heart if not in wishlist -->
+                            <% } %>
+                          </span>
+                          
                       </div>
                       <div class="product-content-wrap">
                           <h6><%= products[i].productName %></h6>
@@ -246,75 +250,42 @@
 
 // Add to cart function
 function addToCart(productId, quantity) {
-      fetch("/addToCart", {
-          method: "POST",
-          headers: {
-              "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ productId, quantity })
-      })
-      .then(response => response.json())
-      .then(data => {
-          if (data.status === true) {
-              Swal.fire({
-                  title: data.message || "Product Added",
-                  text: "Product has been added to your cart",
-                  icon: "success",
-                  timer: 3000
-              });
-          } else {
-              Swal.fire({
-                  title: data.message,
-                  text: data.message || "Check your cart",
-                  icon: "info",
-                  timer: 3000
-              });
-          }
-      })
-      .catch(error => {
-          Swal.fire({
-              title: "Error",
-              text: error.message || "There was an error in adding the product to cart",
-              icon: "error",
-              timer: 3000
-          });
-      });
-    }
+    fetch("/addToCart", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ productId, quantity })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === true) {
+            Swal.fire({
+                title: data.message || "Product Added",
+                text: "Product has been added to your cart",
+                icon: "success",
+                timer: 3000
+            });
+        } else {
+            Swal.fire({
+                title: data.message,
+                text: data.message || "Check your cart",
+                icon: "info",
+                timer: 3000
+            });
+        }
+    })
+    .catch(error => {
+        Swal.fire({
+            title: "Error",
+            text: error.message || "There was an error in adding the product to cart",
+            icon: "error",
+            timer: 3000
+        });
+    });
+}
 
 
-// Add to cart function
-// function addToCart(productId) {
-//     $.ajax({
-//         url: "/addToCart",
-//         method: "POST",
-//         data: {productId: productId},
-//         success: (response) => {
-//             if (response.status === true) {
-//                 Swal.fire({
-//                     title: response.message || "Product Added",
-//                     text: "Product has been added to your cart",
-//                     icon: "success",
-//                     timer: 3000
-//                 })
-//             } else {
-//                 Swal.fire({
-//                     title: "Error",
-//                     text:  response.message|| "Check your cart",
-//                     icon: "info",
-//                     timer: 3000
-//                 })
-//             }
-//         },
-//         error: (error) => {
-//             Swal.fire({
-//             title: "Error",
-//             text: error.message || "There was an error in adding the product to wishlis",
-//             icon: "error",
-//             timer: 3000
-//             })
-//         }
-//     })
-// };
 
 
 function addToWishlist(productId){
@@ -328,11 +299,13 @@ function addToWishlist(productId){
          if (response.status === true) {
 
          Swal.fire({
-             title: response.message || "Added",
-             text: "Product has been added to your wishlist",
-             icon: "success",
-             // timer: 2000
-         });
+            title: response.message || "Added",
+            text: "Product has been added to your wishlist",
+            icon: "success",
+         })
+         .then(() => {
+            window.location.reload();
+         })
 
          } else {
          Swal.fire({

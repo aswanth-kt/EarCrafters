@@ -63,7 +63,7 @@ const loadHomepage = async (req, res) => {
 
         if (user) {
             
-            const userData = await User.findOne({_id : user});
+            const userData = await User.findOne({_id : user}).populate('wishlist');
 
             // For disply how may cart item at cat logo
             const cart = await Cart.findOne({userId: userData._id});
@@ -80,6 +80,7 @@ const loadHomepage = async (req, res) => {
 
             return res.render("home", {
                 user : null,
+                userData,
                 products: ProductData,
                 banner: findBanner || [],
             });
@@ -384,7 +385,7 @@ const loadShopPage = async (req, res) => {
         let cartData = [];
 
         if (req.session.user) {
-            userData = await User.findOne({ _id: req.session.user });
+            userData = await User.findOne({ _id: req.session.user }).populate('wishlist');
 
             if (userData && userData.cart && userData.cart.length > 0) {
                 const cart = await Cart.findOne({ _id: { $in: userData.cart } }).populate('items.productId');
