@@ -881,7 +881,6 @@
         const orderItems = JSON.parse(cartItemsDataJson); //to convert that string back into a JavaScript object
         // console.log("cartItemsDataJson :", cartItemsDataJson)
         const addressId = '<%= defaultAddress._id %>';
-        // const totalPrice = parseInt('<%= cartData.totalPrice %>');
         const totalPrice = parseInt('<%= grandTotal %>') || 0;
         const discount = parseInt(document.getElementById('discountAmount').textContent.replace('₹', '').trim());
         // console.log("Discount:",discount, typeof discount)
@@ -901,6 +900,7 @@
             status: status,
             customerName,
             customerEmail,
+            couponApplied
         };
 
         const paymentMethod = document.querySelector("input[name='paymentMethod']:checked").id;

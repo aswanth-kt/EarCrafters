@@ -446,7 +446,7 @@
          <div class="product-card">
 
           <span class="wishlist-btn" onclick="addToWishlist('<%= products[i]._id %>')">
-            <% if (userData && userData.wishlist && userData.wishlist.find(item => item._id.toString() === products[i]._id.toString())) { %>
+            <% if (user && user.wishlist && user.wishlist.find(item => item._id.toString() === products[i]._id.toString())) { %>
               <i class="fas fa-heart"></i> <!-- Filled heart if product is in wishlist -->
             <% } else { %>
               <i class="far fa-heart"></i> <!-- Empty heart if not in wishlist -->
@@ -561,6 +561,9 @@
                 text: "Product has been added to your cart",
                 icon: "success",
                 timer: 3000
+              })
+              .then(() => {
+                window.location.reload();
               })
           } else {
               Swal.fire({

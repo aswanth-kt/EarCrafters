@@ -4,6 +4,7 @@ const Address = require("../../models/addressSchema");
 const Product = require("../../models/productSchema");
 const mongoose = require("mongoose");
 const Wallet = require("../../models/walletSchema");
+const Cart = require("../../models/cartSchema");
 
 
 
@@ -33,16 +34,28 @@ const getOrderDetails = async (req, res) => {
         // const isAllItemCancelled = order.orderItems.filter(item => item.cancellationStatus).length === order.orderItems.length;
         // console.log("All item cancelled :", isAllItemCancelled)
 
-        const userAddress = await Address.findOne({userId: userData._id})
+        const userAddress = await Address.findOne({userId: userData._id});
 
         const address = userAddress 
         ? userAddress.address.find((addr) => addr.isDefault) : null;
+
+        const cart = await Cart.findOne({userId: userData._id}).populate("items.productId");
+        
+        if (!cart) {
+            return res.status(400).json({
+              status: false,
+              message: "Cart not found"
+            })
+          };
+
+        const cartItems = cart ? cart.items : [];
 
         res.render("order-details", {
             user: userData,
             address,
             order,
-            // isAllItemCancelled
+            orderItems: cartItems,
+            cartItems
         })
     } catch (error) {
         
@@ -291,12 +304,12 @@ const returnProduct = async (req, res) => {
         };
 
         // After product Returned money back to add wallet
-        if (order.status === "Returned") {
+        if (updatedOrder.status === "Returned") {
             const couponDidcount = Number(updatedOrder.discount);
             const cancelProductPrice = Number((price / totalPrice) * couponDidcount);   // Find one without coupon product price
             const priceWithoutOffer = Number(price - cancelProductPrice);
             const roundedPrice = Math.round(priceWithoutOffer);
-
+            console.log("couponDiscount:", couponDidcount, "cancelProductPrice:", cancelProductPrice, "roundedPrice:", roundedPrice);   //Debuging
             wallet.balance += roundedPrice;
 
             // Save transaction history
@@ -314,7 +327,7 @@ const returnProduct = async (req, res) => {
   
       res.status(200).json({
         status: true,
-        message: "Return request submitted and awaiting admin approval",
+        message: "Return request submitted and waiting admin approval",
         order: updatedOrder
       });
         

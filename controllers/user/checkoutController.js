@@ -773,7 +773,7 @@ const razorpayOrderSuccess = async (req,res) => {
       })
     };
 
-    const orderId = await generateOrderId()
+    const orderId = await generateOrderId();
 
     const newOrder = new Order({
       orderId,
@@ -786,26 +786,32 @@ const razorpayOrderSuccess = async (req,res) => {
       createdOn: new Date(),
       couponApplied,
       discount,
-      paymentMethod: paymentMethod || "Prepaid"
+      paymentMethod: paymentMethod || "upi"
     });
 
     const savedOrder = await newOrder.save();
+    if(!savedOrder) {
+      return res.status(400).json({
+        status: false,
+        message: "Something error in saved order",
+      })
+    };
 
     // Handle inventory update and cart removal
     for (const item of orderItems) {
       const productId = item.product;
-      const ordereQuantity = item.quantity;
+      const orderedQuantity = item.quantity;
 
       const product = await Product.findById(productId);
       if (product) {
-        if (product.quantity < ordereQuantity) {
+        if (product.quantity < orderedQuantity) {
           return res.status(400).json({
             status: false,
             message: `Not enough stock for product ${product.productName}`,
           });
         };
 
-        product.quantity -= ordereQuantity;
+        product.quantity -= orderedQuantity;
         await product.save();
       }
     };

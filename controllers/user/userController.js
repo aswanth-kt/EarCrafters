@@ -80,7 +80,6 @@ const loadHomepage = async (req, res) => {
 
             return res.render("home", {
                 user : null,
-                userData,
                 products: ProductData,
                 banner: findBanner || [],
             });
