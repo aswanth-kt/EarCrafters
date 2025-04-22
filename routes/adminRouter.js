@@ -7,6 +7,7 @@ const productController = require("../controllers/admin/productController");
 const bannerController = require("../controllers/admin/bannerController");
 const orderController = require("../controllers/admin/orderController");
 const couponController = require("../controllers/admin/couponController");
+const salesReportController = require("../controllers/admin/salesReportController");
 const {userAuth, adminAuth} = require("../middlewares/auth");
 const multer = require('multer');
 const storage = require("../helpers/multer");
@@ -123,6 +124,11 @@ router.put("/coupon/listed", adminAuth, couponController.couponListed);
 router.put("/coupon/unListed", adminAuth, couponController.couponUnlisted);
 
 router.delete("/coupon/delete-coupon", adminAuth, couponController.deleteCoupon);
+
+
+
+// Sales Report Management
+router.get("/salesReport", adminAuth, salesReportController.loadSalesReport);
 
 
 

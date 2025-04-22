@@ -1,4 +1,4 @@
-<%- include("../../views/partials/user/header") %>
+<%- include("../../views/partials/admin/header") %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -258,7 +258,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Sales Report Dashboard</h1>
+            <h1>Sales Report</h1>
         </div>
         
         <div class="card">
@@ -320,11 +320,11 @@
         <div class="summary-cards">
             <div class="metric-card">
                 <h3>Overall Sales Count</h3>
-                <div class="amount">1,258</div>
+                <div class="amount"><%= overallSalesCount %></div>
             </div>
             <div class="metric-card">
                 <h3>Overall Order Amount</h3>
-                <div class="amount">$45,782.50</div>
+                <div class="amount">₹<%= overallOrderAmount %></div>
             </div>
             <div class="metric-card">
                 <h3>Total Discounts</h3>
@@ -559,4 +559,4 @@
 </body>
 </html>
 
-<%- include("../../views/partials/user/footer") %>
+<%- include("../../views/partials/admin/footer") %>
