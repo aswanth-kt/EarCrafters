@@ -5,6 +5,12 @@ const Product = require("../../models/productSchema");
 const mongoose = require("mongoose");
 const Wallet = require("../../models/walletSchema");
 const Cart = require("../../models/cartSchema");
+const Razorpay = require('razorpay');
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET,
+});
+
 
 
 
@@ -38,6 +44,13 @@ const getOrderDetails = async (req, res) => {
 
         const address = userAddress 
         ? userAddress.address.find((addr) => addr.isDefault) : null;
+
+        if (!address) {
+            return res.status(400).json({
+              status: false,
+              message: "Address not found!!"
+            })
+          };
 
         const cart = await Cart.findOne({userId: userData._id}).populate("items.productId");
         
@@ -79,7 +92,17 @@ const cancelOrder = async (req, res) => {
             })
         };
 
-        const {productId, reason, otherReason, cancelQuantity, orderId ,cancelledAt, finalAmount, price, totalPrice} = req.body;
+        const {
+            productId, 
+            reason, 
+            otherReason, 
+            cancelQuantity, 
+            orderId ,
+            cancelledAt, 
+            finalAmount, 
+            price, 
+            totalPrice
+        } = req.body;
         console.log("Body :", req.body);
 
         if (!req.body) {
@@ -171,7 +194,7 @@ const cancelOrder = async (req, res) => {
             amount: roundedPrice,
             description: 'Cancelled product amount added to wallet',
             balance: wallet.balance,
-            createdAt: cancelledAt,
+            createdAt: new Date(),
         });
 
         await wallet.save();
@@ -341,9 +364,108 @@ const returnProduct = async (req, res) => {
   };
 
 
+//   Razorpay retry payment
+const retryPayment = async (req, res) => {
+    try {
+        const {
+            orderItems,
+            addressId,
+            finalAmount,
+            status,
+            paymentMethod,
+            orderId,
+        } = req.body;
+        console.log("req.body:", req.body);
+
+        const userId = req.session.user;
+
+        const userData = await User.findById(userId);
+        if (!userData) {
+            return res.status(400).json({
+                status: false,
+                message: "User not found!"
+            });
+        }
+
+        const userAddress = await Address.findOne({'address._id': addressId});
+        const defaultAddress = userAddress.address.flat().filter(add => 
+            add.isDefault === true
+        );
+        console.log("User address:", defaultAddress);
+        
+        if (!defaultAddress) {
+            return res.status(400).json({
+                status: false,
+                message: "User Address not found!"
+            });
+        }
+
+        const amountInPaise = Math.round(finalAmount * 100);
+
+        // Create a NEW Razorpay order
+        const options = {
+            amount: amountInPaise,
+            currency: "INR",
+            receipt: `receipt_${new Date().getTime()}`,
+            payment_capture: 1,
+        };
+
+        if (!razorpay) {
+            console.error("Razorpay instance not initialized");
+            return res.status(500).json({
+                status: false,
+                message: "Payment gateway not properly configured"
+            });
+        }
+
+        // Create a new Razorpay order
+        const razorpayOrder = await razorpay.orders.create(options);
+
+        // Update the order with the new Razorpay order ID
+        const order = await Order.findByIdAndUpdate(
+            orderId,
+            {
+                $set: {
+                    status: status, 
+                    razorpayOrderId: razorpayOrder.id 
+                }
+            },
+            { new: true } 
+        );
+
+        if (!order) {
+            return res.status(404).json({
+                status: false,
+                message: "Order not found"
+            });
+        }
+
+        // Return the NEW Razorpay order details to frontend
+        res.status(200).json({
+            status: true,
+            message: "Success",
+            orderId: orderId,
+            razorpayOrderId: razorpayOrder.id, // Send the new ID
+            amount: amountInPaise,
+            currency: "INR",
+            razorpayKey: process.env.RAZORPAY_KEY_ID,
+            paymentMethod: paymentMethod || "upi"
+        });
+        
+    } catch (error) {
+        console.error("Error in retry payment:", error);
+        return res.status(500).json({
+            message: "Internal server error",
+            status: false
+        });
+    }
+}
+
+
 module.exports = {
     getOrderDetails,
     cancelOrder,
     loadTrackOrders,
     returnProduct,
+    retryPayment,
 }

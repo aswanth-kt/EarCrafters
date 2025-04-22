@@ -235,8 +235,8 @@ const getUserProfilePage = async (req, res) => {
 
         if (!userId) {
             console.log("UserId is not found!!");
-            res.redirect("/login");
-        }
+        };
+
         const userData = await User.findById(userId);
         const addressData = await Address.findOne({userId: userId});
 

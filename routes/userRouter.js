@@ -177,6 +177,8 @@ router.get("/track-orders", userAuth, orderController.loadTrackOrders);
 
 router.post("/return-product", userAuth, orderController.returnProduct);
 
+router.post("/payment/razorpay-retry-payment", userAuth, orderController.retryPayment);
+
 
 // Coupon Management
 router.get("/checkout/coupon", userAuth, couponController.getAvailableCoupons);

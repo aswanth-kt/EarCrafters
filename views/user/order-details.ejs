@@ -329,8 +329,8 @@
       const order = JSON.parse(orderJsonData);
       const addressId = JSON.parse(addressIdJsonData);
       const finalAmount = parseInt(order.finalAmount);
-      const orderItemsJsonData = '<%- JSON.stringify(orderItems) %>';
       const orderItems = order.orderItems;
+      const orderId = order._id
       const totalPrice = parseInt(order.totalPrice);
       const discount = order.discount;
       const status = "Order Placed";
@@ -348,6 +348,7 @@
         "couponApplied:", couponApplied,
         "customerName:", customerName,
         "customerEmail:", customerEmail,
+        "orderId:", orderId,
       );
   
       const orderData = {
@@ -360,12 +361,13 @@
         customerName,
         customerEmail,
         couponApplied,
-        paymentMethod: "upi"
+        paymentMethod: "upi",
+        orderId,
       };
   
       console.log("OrderData:", orderData);
   
-      fetch("/payment/razorpay-order-success", {
+      fetch("/payment/razorpay-retry-payment", {
         method: "POST",
         headers: {"Content-Type" : "application/json"},
         body: JSON.stringify(orderData),

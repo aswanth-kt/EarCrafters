@@ -876,7 +876,7 @@ const razorpayOrderSuccess = async (req,res) => {
       amount: amountInPaise,
       currency: "INR",
       razorpayKey: process.env.RAZORPAY_KEY_ID,
-      paymentMethod: paymentMethod || "razorpay"
+      paymentMethod: paymentMethod || "upi"
     })
 
   } catch (error) {

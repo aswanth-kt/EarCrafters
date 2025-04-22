@@ -47,7 +47,7 @@ const login = async (req, res) => {
             if (passwordMatch) {
                 
                 req.session.admin = true;
-                return res.redirect("/admin"); //admin-dashboard
+                return res.redirect("/admin/dashboard"); //admin-dashboard
 
             } else {
 
