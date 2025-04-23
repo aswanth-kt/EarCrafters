@@ -579,6 +579,7 @@ const walletPlaceOrder = async (req, res) => {
       finalAmount,
       status,
       paymentMethod,
+      couponApplied,
     } = req.body;
 
     console.log("Body: ", req.body);
@@ -659,6 +660,7 @@ const walletPlaceOrder = async (req, res) => {
       createdOn: new  Date(),
       discount,
       paymentMethod: paymentMethod,
+      couponApplied,
     });
     const saveOrder = await newOrder.save();
 

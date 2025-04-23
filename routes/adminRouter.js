@@ -130,6 +130,8 @@ router.delete("/coupon/delete-coupon", adminAuth, couponController.deleteCoupon)
 // Sales Report Management
 router.get("/salesReport", adminAuth, salesReportController.loadSalesReport);
 
+router.post("/salesReport/generateReport", adminAuth, salesReportController.exportSalesReport);
+
 
 
 

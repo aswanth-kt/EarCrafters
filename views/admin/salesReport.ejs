@@ -102,6 +102,7 @@
             flex-wrap: wrap;
             gap: 15px;
             margin-bottom: 20px;
+            align-items: end;
         }
         
         .filter-group {
@@ -253,6 +254,55 @@
                 flex-direction: column;
             }
         }
+
+        /* Pagination */
+        .pagination {
+        margin: 2rem 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .pagination ul {
+        display: flex;
+        gap: 0.5rem;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        justify-content: center;
+        }
+
+        .pagination li a {
+        display: block;
+        padding: 0.5rem 1rem;
+        text-decoration: none;
+        color: #333;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+        }
+
+        .pagination li a:hover {
+        background-color: #f0f0f0;
+        border-color: #ccc;
+        }
+
+        .pagination li a.active {
+        background-color: #ff3547;
+        color: white;
+        border-color: #f50014;
+        cursor: default;
+        }
+
+        .pagination li.ellipsis span {
+        display: block;
+        padding: 0.5rem 1rem;
+        color: #666;
+        cursor: default;
+        }
+
+        .pagination li a.arrow {
+        font-weight: bold;
+        background-color: #f8f9fa;
+        }
     </style>
 </head>
 <body>
@@ -309,6 +359,17 @@
                     <label for="end-date">End Date</label>
                     <input type="date" id="end-date">
                 </div>
+
+                <div class="radio-group">
+                    <div class="radio-item">
+                        <input type="radio" id="pdf-format" name="download-format" value="pdf" checked>
+                        <label for="pdf-format">PDF</label>
+                    </div>
+                    <div class="radio-item">
+                        <input type="radio" id="excel-format" name="download-format" value="excel">
+                        <label for="excel-format">Excel</label>
+                    </div>
+                </div>
                 
                 <div class="filter-group">
                     <label>&nbsp;</label>
@@ -328,12 +389,12 @@
             </div>
             <div class="metric-card">
                 <h3>Total Discounts</h3>
-                <div class="amount">$0.00</div>
-                <div class="percentage">0% of revenue</div>
+                <div class="amount">₹<%= totalDiscounts %></div>
+                <div class="percentage"><%= discountPercentage.toFixed() %>% of revenue</div>
             </div>
             <div class="metric-card">
                 <h3>Net Revenue</h3>
-                <div class="amount">$45,782.50</div>
+                <div class="amount">₹<%= netRevenue %></div>
             </div>
         </div>
         
@@ -357,104 +418,74 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>#ORD-2025041</td>
-                            <td>Apr 22, 2025</td>
-                            <td>John Smith</td>
-                            <td>$154.99</td>
-                            <td>$0.00</td>
-                            <td>-</td>
-                            <td>$154.99</td>
-                        </tr>
-                        <tr>
-                            <td>#ORD-2025040</td>
-                            <td>Apr 22, 2025</td>
-                            <td>Lisa Johnson</td>
-                            <td>$89.50</td>
-                            <td>$0.00</td>
-                            <td>-</td>
-                            <td>$89.50</td>
-                        </tr>
-                        <tr>
-                            <td>#ORD-2025039</td>
-                            <td>Apr 21, 2025</td>
-                            <td>Michael Davis</td>
-                            <td>$210.75</td>
-                            <td>$0.00</td>
-                            <td>-</td>
-                            <td>$210.75</td>
-                        </tr>
-                        <tr>
-                            <td>#ORD-2025038</td>
-                            <td>Apr 21, 2025</td>
-                            <td>Emily Wilson</td>
-                            <td>$78.25</td>
-                            <td>$0.00</td>
-                            <td>-</td>
-                            <td>$78.25</td>
-                        </tr>
-                        <tr>
-                            <td>#ORD-2025037</td>
-                            <td>Apr 20, 2025</td>
-                            <td>Robert Taylor</td>
-                            <td>$325.00</td>
-                            <td>$0.00</td>
-                            <td>-</td>
-                            <td>$325.00</td>
-                        </tr>
-                        <tr>
-                            <td>#ORD-2025036</td>
-                            <td>Apr 20, 2025</td>
-                            <td>Sarah Brown</td>
-                            <td>$115.30</td>
-                            <td>$0.00</td>
-                            <td>-</td>
-                            <td>$115.30</td>
-                        </tr>
-                        <tr>
-                            <td>#ORD-2025035</td>
-                            <td>Apr 19, 2025</td>
-                            <td>David Miller</td>
-                            <td>$243.75</td>
-                            <td>$0.00</td>
-                            <td>-</td>
-                            <td>$243.75</td>
-                        </tr>
-                        <tr>
-                            <td>#ORD-2025034</td>
-                            <td>Apr 19, 2025</td>
-                            <td>Jennifer Martinez</td>
-                            <td>$56.99</td>
-                            <td>$0.00</td>
-                            <td>-</td>
-                            <td>$56.99</td>
-                        </tr>
+                        <% if (orders) { %>
+                            <% orders.forEach((order) => {%>
+                                <tr>
+                                    <td><%= order.orderId %></td>
+                                    <td><%= order.createdOn.toLocaleString() %></td>
+                                    <td><%= order.userId.name %></td>
+                                    <td>₹<%= order.totalPrice %></td>
+                                    <td>₹<%= order.discount %></td>
+                                    <td><%= order.couponApplied %></td>
+                                    <td>₹<%= order.finalAmount %></td>
+                                </tr>
+                            <% }) %>
+                        <% } %>
                     </tbody>
                 </table>
             </div>
-            
+
             <div class="pagination">
-                <button>&laquo;</button>
-                <button class="active">1</button>
-                <button>2</button>
-                <button>3</button>
-                <button>4</button>
-                <button>&raquo;</button>
+                <ul>
+                  <% if (currentPage > 1) { %>
+                    <li><a href="?page=<%= currentPage - 1 %>" class="arrow">&laquo;</a></li>
+                  <% } %>
+              
+                  <% 
+                    let startPage = Math.max(1, currentPage - 2);
+                    let endPage = Math.min(totalPages, currentPage + 2);
+              
+                    if (startPage > 1) { 
+                  %>
+                    <li><a href="?page=1">1</a></li>
+                    <% if (startPage > 2) { %>
+                      <li class="ellipsis"><span>...</span></li>
+                    <% } %>
+                  <% } %>
+              
+                  <% for (let i = startPage; i <= endPage; i++) { %>
+                    <li><a href="?page=<%= i %>" class="<%= i === currentPage ? 'active' : '' %>"><%= i %></a></li>
+                  <% } %>
+              
+                  <% if (endPage < totalPages) { %>
+                    <% if (endPage < totalPages - 1) { %>
+                      <li class="ellipsis"><span>...</span></li>
+                    <% } %>
+                    <li><a href="?page=<%= totalPages %>"><%= totalPages %></a></li>
+                  <% } %>
+              
+                  <% if (currentPage < totalPages) { %>
+                    <li><a href="?page=<%= currentPage + 1 %>" class="arrow">&raquo;</a></li>
+                  <% } %>
+                </ul>
+              </div>
+
             </div>
             
-            <div class="download-section">
+            <!-- <div class="download-section">
                 <button class="btn btn-outline" id="download-pdf">
                     Download PDF
                 </button>
                 <button class="btn btn-primary" id="download-excel">
                     Download Excel
                 </button>
-            </div>
+            </div> -->
         </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script>
+
         // Show/hide date filters based on report type selection
         document.getElementById('report-type').addEventListener('change', function() {
             // Hide all date filters first
@@ -466,6 +497,7 @@
             document.getElementById('end-date-filter').style.display = 'none';
             
             // Show relevant filters based on selection
+            let filterType = [];
             switch(this.value) {
                 case 'daily':
                     document.getElementById('date-filter').style.display = 'block';
@@ -483,7 +515,9 @@
                     document.getElementById('start-date-filter').style.display = 'block';
                     document.getElementById('end-date-filter').style.display = 'block';
                     break;
-            }
+            };
+
+            
         });
         
         // Set default to daily and trigger change event
@@ -496,18 +530,209 @@
         document.getElementById('start-date').value = today;
         document.getElementById('end-date').value = today;
         
-        // Demo functionality for generate report button
+        // Generate report button click function
+        // document.getElementById('generate-report').addEventListener('click', function() {
+
+        //     console.log("Generate report clicked");
+
+        //     const filterType = document.getElementById('report-type').value;
+
+        //     const specificDate = document.getElementById('date').value;
+        //     const week = document.getElementById('week').value;
+        //     const month = document.getElementById('month').value;
+        //     const year = document.getElementById('year').value;
+        //     const startDate = document.getElementById('start-date').value;
+        //     const endDate = document.getElementById('end-date').value;
+
+        //     const format = document.querySelector('input[name="download-format"]:checked').value;
+
+        //     console.log("specificDate:", specificDate, "week:", week, "month:", month, "year:", year, "S date:", startDate, "EDate:", endDate, "filterType:", filterType, "formate:", format);
+
+        //     const filterData = {
+        //         specificDate,
+        //         week,
+        //         month,
+        //         year,
+        //         startDate,
+        //         endDate,
+        //         format,
+        //         filterType,
+        //     }
+
+        //     fetch("/admin/salesReport/generateReport", {
+        //         method: "POST",
+        //         headers: {"Content-Type": "application/json"},
+        //         body: JSON.stringify({filterData})
+        //     })
+        //     .then(response => {
+        //         if (!response.ok) {
+        //             return response.json().then(err => {
+        //                 throw new Error(err.message || "Something went wrong");
+        //             });
+        //         }
+        //         return response.json();
+        //     })
+        //     .then(data => {
+        //         console.log("Data recived from backend:", data);
+        //         if (filterType === 'custom') {
+        //             // Check both dates are filled
+        //             if (!startDate || !endDate) {
+        //                 Swal.fire({
+        //                     toast: true,
+        //                     position: 'top-end',
+        //                     icon: 'warning',
+        //                     title: 'Please select both dates!',
+        //                     showConfirmButton: false,
+        //                     timer: 3000
+        //                 });
+        //                 return;
+        //             };
+        //             const today = new Date().toISOString().split('T')[0];
+        //             if (startDate > today || endDate > today) {
+        //                 Swal.fire({
+        //                     toast: true,
+        //                     position: 'top-end',
+        //                     icon: 'warning',
+        //                     title: 'The selected dates cannot be in the future!',
+        //                     showConfirmButton: false,
+        //                     timer: 3000
+        //                 });
+        //                 return;
+        //             };
+        //             if (new Date(startDate) > new Date(endDate)) {
+        //                 Swal.fire({
+        //                     toast: true,
+        //                     position: 'top-end',
+        //                     icon: 'warning',
+        //                     title: 'End date cannot be before the start date!',
+        //                     showConfirmButton: false,
+        //                     timer: 3000
+        //                 });
+        //                 return;
+        //             };
+        //         } else if (filterType === 'daily') {
+        //             if (!specificDate) {
+        //                 Swal.fire({
+        //                     toast: true,
+        //                     position: 'top-end',
+        //                     icon: 'warning',
+        //                     title: 'Please select a date for the daily report!',
+        //                     showConfirmButton: false,
+        //                     timer: 3000
+        //                 });
+        //                 return;
+        //             }
+        //         }
+        //     })
+        //     .catch(error => {
+        //         console.error("Error:", error);
+        //         Swal.fire({
+        //             toast: true,
+        //             position: 'top-end',
+        //             icon: 'error',
+        //             title: error.message,
+        //             showConfirmButton: false,
+        //             timer: 3000
+        //         });
+        //     })
+        // });
+      
+
+        // Change your fetch request handling in the frontend JavaScript:
         document.getElementById('generate-report').addEventListener('click', function() {
-            alert('Report generated successfully!');
-        });
-        
-        // Demo functionality for download buttons
-        document.getElementById('download-pdf').addEventListener('click', function() {
-            alert('PDF download starting...');
-        });
-        
-        document.getElementById('download-excel').addEventListener('click', function() {
-            alert('Excel download starting...');
+            console.log("Generate report clicked");
+
+            const filterType = document.getElementById('report-type').value;
+            const specificDate = document.getElementById('date').value;
+            const week = document.getElementById('week').value;
+            const month = document.getElementById('month').value;
+            const year = document.getElementById('year').value;
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+            const format = document.querySelector('input[name="download-format"]:checked').value;
+
+            // Handle validation first
+            if (filterType === 'custom') {
+                // Check both dates are filled
+                if (!startDate || !endDate) {
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'warning',
+                        title: 'Please select both dates!',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
+                    return;
+                }
+                
+                const today = new Date().toISOString().split('T')[0];
+                if (startDate > today || endDate > today) {
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'warning',
+                        title: 'The selected dates cannot be in the future!',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
+                    return;
+                }
+                
+                if (new Date(startDate) > new Date(endDate)) {
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'warning',
+                        title: 'End date cannot be before the start date!',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
+                    return;
+                }
+            } else if (filterType === 'daily') {
+                if (!specificDate) {
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'warning',
+                        title: 'Please select a date for the daily report!',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
+                    return;
+                }
+            }
+
+            // For file downloads, we need to use a different approach
+            const filterData = {
+                specificDate,
+                week,
+                month,
+                year,
+                startDate,
+                endDate,
+                format,
+                filterType,
+            };
+
+            // Create a form dynamically to post and receive the file
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/admin/salesReport/generateReport';
+            form.style.display = 'none';
+
+            // Add the filterData as a hidden input
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'filterData';
+            input.value = JSON.stringify(filterData);
+            form.appendChild(input);
+
+            // Add form to body, submit it, then remove it
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
         });
         
         // Initialize Sales Chart
