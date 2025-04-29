@@ -341,12 +341,11 @@ const returnProduct = async (req, res) => {
                 amount: roundedPrice,
                 description: 'Returned product amount added to wallet',
                 balance: wallet.balance,
-                createdAt: returnedAt,
+                createdAt: new Date(),
             });
 
             await wallet.save();
         };
-
   
       res.status(200).json({
         status: true,

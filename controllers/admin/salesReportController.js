@@ -43,7 +43,7 @@ const loadSalesReport = async (req, res) => {
         const limit = 10;
         const skip = (page - 1) * limit;
 
-        const orders = await Order.find({})
+        const orders = await Order.find({status: "Delivered"})
         .populate("userId")
         .sort({createdOn: -1})
         .skip(skip)

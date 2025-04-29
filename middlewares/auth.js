@@ -73,15 +73,21 @@ const userAuth = (req, res, next) => {
 
 // Admin authentication
 const adminAuth = (req, res, next) => {
+    
     User.findOne({isAdmin : true})
     .then(data => {
-        
-        if (data) {
+        if (req.session.admin) {    //For checking admin is logedin (session admin : true)
 
-            next();
+            if (data) {
+
+                next();
+
+            } else {
+
+                res.redirect("/admin/login");
+            }
 
         } else {
-
             res.redirect("/admin/login");
         }
     })
@@ -92,6 +98,8 @@ const adminAuth = (req, res, next) => {
         
     })
 };
+
+
 
 
 
