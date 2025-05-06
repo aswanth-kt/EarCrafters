@@ -429,6 +429,9 @@
                                     <td><%= order.couponApplied %></td>
                                     <td>₹<%= order.finalAmount %></td>
                                 </tr>
+                                <%
+                                    let date = new Date(order.createdOn).toLocaleDateString();
+                                %>
                             <% }) %>
                         <% } %>
                     </tbody>
@@ -471,15 +474,6 @@
               </div>
 
             </div>
-            
-            <!-- <div class="download-section">
-                <button class="btn btn-outline" id="download-pdf">
-                    Download PDF
-                </button>
-                <button class="btn btn-primary" id="download-excel">
-                    Download Excel
-                </button>
-            </div> -->
         </div>
     </div>
 
@@ -640,7 +634,6 @@
 
         // Change your fetch request handling in the frontend JavaScript:
         document.getElementById('generate-report').addEventListener('click', function() {
-            console.log("Generate report clicked");
 
             const filterType = document.getElementById('report-type').value;
             const specificDate = document.getElementById('date').value;
@@ -739,10 +732,11 @@
         const ctx = document.createElement('canvas');
         document.getElementById('sales-chart').appendChild(ctx);
         
+        
         new Chart(ctx, {
             type: 'line',
             data: {
-                labels: ['Apr 16', 'Apr 17', 'Apr 18', 'Apr 19', 'Apr 20', 'Apr 21', 'Apr 22'],
+                labels: ['<%= orders.createdOn%>'],
                 datasets: [{
                     label: 'Sales Amount',
                     data: [1250, 1580, 1340, 1890, 2240, 1780, 2450],
@@ -763,7 +757,7 @@
                         },
                         ticks: {
                             callback: function(value) {
-                                return '$' + value;
+                                return '₹' + value;
                             }
                         }
                     },
