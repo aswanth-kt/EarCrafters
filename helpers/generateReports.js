@@ -2,9 +2,6 @@ const PdfPrinter = require("pdfmake");
 const ExcelJS = require("exceljs");
 const Order = require("../models/orderSchema");
 
-
-
-
 // Define fonts for pdfmake
 const fonts = {
   Roboto: {
@@ -19,7 +16,7 @@ const printer = new PdfPrinter(fonts);
 
 async function generatePDFReport(
   filterType,
-  specificDate, 
+  specificDate,
   startDate,
   endDate,
   includeDiscounts,
