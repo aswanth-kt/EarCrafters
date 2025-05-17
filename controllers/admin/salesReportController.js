@@ -4,12 +4,20 @@ const {
   generateExcelReport,
 } = require("../../helpers/generateReports");
 
+const {
+  OK,
+  Created,
+  BadRequest,
+  NotFound,
+  InternalServerError,
+} = require("../../helpers/httpStatusCodes");
+
 const loadSalesReport = async (req, res) => {
   try {
     const allOrders = await Order.find({});
 
     if (!allOrders) {
-      return res.status(400).json({
+      return res.status(BadRequest).json({
         status: false,
         message: "There is no orders available",
       });
@@ -65,7 +73,7 @@ const loadSalesReport = async (req, res) => {
     });
   } catch (error) {
     console.error("Error in load sales report:", error);
-    return res.status(500).json({
+    return res.status(InternalServerError).json({
       status: false,
       message: "Internal server error",
     });
@@ -139,14 +147,14 @@ const exportSalesReport = async (req, res) => {
 
       res.send(excelBuffer);
     } else {
-      res.status(400).json({
+      res.status(BadRequest).json({
         status: false,
         message: "Invalid format",
       });
     }
   } catch (error) {
     console.error("Error in export sales report:", error);
-    return res.status(500).json({
+    return res.status(InternalServerError).json({
       status: false,
       message: "Internal server error",
     });

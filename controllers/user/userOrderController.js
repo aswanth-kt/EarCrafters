@@ -10,6 +10,13 @@ const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
   key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
+const {
+  OK,
+  Created,
+  BadRequest,
+  NotFound,
+  InternalServerError,
+} = require("../../helpers/httpStatusCodes");
 
 const getOrderDetails = async (req, res) => {
   try {
@@ -23,7 +30,7 @@ const getOrderDetails = async (req, res) => {
       .exec();
 
     if (!order) {
-      return res.status(404).json({ message: "Order not found" });
+      return res.status(NotFound).json({ message: "Order not found" });
     }
 
     // const isAllItemCancelled = order.orderItems.filter(item => item.cancellationStatus).length === order.orderItems.length;
@@ -36,7 +43,7 @@ const getOrderDetails = async (req, res) => {
       : null;
 
     if (!address) {
-      return res.status(400).json({
+      return res.status(BadRequest).json({
         status: false,
         message: "Address not found!!",
       });
@@ -47,7 +54,7 @@ const getOrderDetails = async (req, res) => {
     );
 
     if (!cart) {
-      return res.status(400).json({
+      return res.status(BadRequest).json({
         status: false,
         message: "Cart not found",
       });
@@ -73,7 +80,7 @@ const cancelOrder = async (req, res) => {
     const userId = req.session.user;
     const userData = await User.findById(userId);
     if (!userData) {
-      return res.status(400).json({
+      return res.status(BadRequest).json({
         status: false,
         message: "User not found",
       });
@@ -93,7 +100,7 @@ const cancelOrder = async (req, res) => {
     console.log("Body :", req.body);
 
     if (!req.body) {
-      return res.status(404).json({
+      return res.status(NotFound).json({
         message: "No data in body",
       });
     }
@@ -107,7 +114,7 @@ const cancelOrder = async (req, res) => {
     // console.log("Order with orderId:", order)
 
     if (!order) {
-      return res.status(404).json({
+      return res.status(NotFound).json({
         message: "Order not found",
       });
     }
@@ -117,7 +124,7 @@ const cancelOrder = async (req, res) => {
     );
 
     if (!orderItem) {
-      return res.status(404).json({
+      return res.status(NotFound).json({
         message: "Product not found in order",
       });
     }
@@ -130,7 +137,7 @@ const cancelOrder = async (req, res) => {
     );
 
     if (!updateProduct) {
-      return res.status(404).json({
+      return res.status(NotFound).json({
         message: "Product update failed, order not cancelled",
       });
     }
@@ -170,7 +177,7 @@ const cancelOrder = async (req, res) => {
 
     const wallet = await Wallet.findOne({ userId: userData._id });
     if (!wallet) {
-      return res.status(400).json({
+      return res.status(BadRequest).json({
         status: false,
         message: "Wallet not found",
       });
@@ -194,14 +201,14 @@ const cancelOrder = async (req, res) => {
 
     await wallet.save();
 
-    return res.status(200).json({
+    return res.status(OK).json({
       success: true,
       message: "Order cancelled successfully",
       updatedOrder,
     });
   } catch (error) {
     console.error("Error in cancel order", error);
-    res.status(500).json({
+    res.status(InternalServerError).json({
       message: "Internal server error",
     });
   }
@@ -216,7 +223,7 @@ const loadTrackOrders = async (req, res) => {
     const order = await Order.findById(orderId);
     console.log("order in track:", order);
     if (!order) {
-      return res.status(404).json({
+      return res.status(NotFound).json({
         status: false,
         message: "Order not found",
       });
@@ -228,7 +235,7 @@ const loadTrackOrders = async (req, res) => {
     });
   } catch (error) {
     console.error("Error in load order track", error);
-    return res.status(500).json({
+    return res.status(InternalServerError).json({
       status: false,
       message: "Internal server error",
     });
@@ -253,7 +260,7 @@ const returnProduct = async (req, res) => {
     const userData = await User.findById(userId);
 
     if (!userData) {
-      return res.status(404).json({
+      return res.status(NotFound).json({
         status: false,
         message: "User not found",
       });
@@ -266,7 +273,7 @@ const returnProduct = async (req, res) => {
     });
 
     if (!order) {
-      return res.status(404).json({
+      return res.status(NotFound).json({
         status: false,
         message: "Order not found",
       });
@@ -278,7 +285,7 @@ const returnProduct = async (req, res) => {
     );
 
     if (itemIndex === -1) {
-      return res.status(404).json({
+      return res.status(NotFound).json({
         status: false,
         message: "Product not found in order",
       });
@@ -304,7 +311,7 @@ const returnProduct = async (req, res) => {
     }
 
     if (!updatedOrder) {
-      return res.status(400).json({
+      return res.status(BadRequest).json({
         status: false,
         message: "Failed to update order",
       });
@@ -313,7 +320,7 @@ const returnProduct = async (req, res) => {
 
     const wallet = await Wallet.findOne({ userId: userData._id });
     if (!wallet) {
-      return res.status(400).json({
+      return res.status(BadRequest).json({
         status: false,
         message: "Wallet not found",
       });
@@ -347,14 +354,14 @@ const returnProduct = async (req, res) => {
       await wallet.save();
     }
 
-    res.status(200).json({
+    res.status(OK).json({
       status: true,
       message: "Return request submitted and waiting admin approval",
       order: updatedOrder,
     });
   } catch (error) {
     console.error("Error in return product:", error);
-    return res.status(500).json({
+    return res.status(InternalServerError).json({
       status: false,
       message: "Internal server error",
     });
@@ -378,7 +385,7 @@ const retryPayment = async (req, res) => {
 
     const userData = await User.findById(userId);
     if (!userData) {
-      return res.status(400).json({
+      return res.status(BadRequest).json({
         status: false,
         message: "User not found!",
       });
@@ -391,7 +398,7 @@ const retryPayment = async (req, res) => {
     console.log("User address:", defaultAddress);
 
     if (!defaultAddress) {
-      return res.status(400).json({
+      return res.status(BadRequest).json({
         status: false,
         message: "User Address not found!",
       });
@@ -409,7 +416,7 @@ const retryPayment = async (req, res) => {
 
     if (!razorpay) {
       console.error("Razorpay instance not initialized");
-      return res.status(500).json({
+      return res.status(InternalServerError).json({
         status: false,
         message: "Payment gateway not properly configured",
       });
@@ -431,14 +438,14 @@ const retryPayment = async (req, res) => {
     );
 
     if (!order) {
-      return res.status(404).json({
+      return res.status(NotFound).json({
         status: false,
         message: "Order not found",
       });
     }
 
     // Return the NEW Razorpay order details to frontend
-    res.status(200).json({
+    res.status(OK).json({
       status: true,
       message: "Success",
       orderId: orderId,
@@ -450,7 +457,7 @@ const retryPayment = async (req, res) => {
     });
   } catch (error) {
     console.error("Error in retry payment:", error);
-    return res.status(500).json({
+    return res.status(InternalServerError).json({
       message: "Internal server error",
       status: false,
     });
