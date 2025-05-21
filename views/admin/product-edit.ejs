@@ -50,20 +50,6 @@
                                 <div id="productName-error" class="error-message"></div>
                             </div>
 
-                            <!-- <div class="col-lg-4 mb-4">
-                                <label class="form-label">Brand</label>
-                                <select class="form-select border" name="brand">
-
-                                    <option value="">
-
-                                    </option>
-
-                                </select>
-                                <div id="brand-error" class="error-message"></div>
-
-
-                            </div> -->
-
                             <div class="mb-4">
                                 <label class="form-label">Full description</label>
                                 <input name="descriptionData" value="<%= product.description %>" class="form-control border" rows="4">
@@ -414,23 +400,34 @@
                     alert("Missing image or product information");
                     return;
                 };
-
-                $.ajax({
-                    url: "/admin/deleteImage",
-                    method: "post",
-                    data: {
-                        imageNameToServer: imageId,
-                        productIdToServer: productId
-                    },
-                    success: ((response) => {
-                        if (response.status === true) {
-                            window.location.reload();
-                        } else {
-                            alert("Failed to delete image: " + (response.message || "Unknown error"));
-                        }
-                    })
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "You can't undo this!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Yes, remove it!"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "/admin/deleteImage",
+                            method: "post",
+                            data: {
+                                imageNameToServer: imageId,
+                                productIdToServer: productId
+                            },
+                            success: ((response) => {
+                                if (response.status === true) {
+                                    window.location.reload();
+                                } else {
+                                    alert("Failed to delete image: " + (response.message || "Unknown error"));
+                                }
+                            })
+                        })
+                    }
                 })
-               }
+            }
 
                
            </script>
