@@ -237,6 +237,8 @@ const getUserProfilePage = async (req, res) => {
       totalPages,
       currentPage: page,
       wallet: wallet || null,
+      currentPageOfWalletHistory: null,
+      totalPagesOfWalletHistory: null,
     });
   } catch (error) {
     console.error("Error in get user profile page", error);

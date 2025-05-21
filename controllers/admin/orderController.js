@@ -142,21 +142,17 @@ const updateOrderStatus = async (req, res) => {
       console.log(`Item ${index} product ID:`, item.product._id.toString());
     });
 
-    // Change this from array to null initialization
     let orderItem = null;
 
     if (productId) {
-      // Ensure both are strings when comparing
       orderItem = order.orderItems.find(
         (item) => item.product._id.toString() === productId.toString()
       );
       console.log("Found order item:", orderItem ? "Yes" : "No");
     }
 
-    // If we need to process a return but don't have an item, check all items
+
     if ((status === "Returned" || declinedStatus) && !orderItem) {
-      // Either handle all items or return error based on your business logic
-      // Option 1: Handle all items with requested return status
       const returnableItems = order.orderItems.filter(
         (item) => item.returnStatus === "Requested"
       );
@@ -168,6 +164,7 @@ const updateOrderStatus = async (req, res) => {
             item.returnStatus = "Return Declined";
           } else {
             item.returnStatus = "Returned";
+
           }
         });
 
@@ -187,7 +184,6 @@ const updateOrderStatus = async (req, res) => {
       }
     }
 
-    // Continue with your existing logic for the found orderItem...
     if (orderItem) {
       if (orderItem.returnStatus === "Requested" && !declinedStatus) {
         orderItem.returnStatus = "Returned";
@@ -203,6 +199,13 @@ const updateOrderStatus = async (req, res) => {
       }
 
       await order.save();
+
+      // Update product Qty..
+      // if (order.status === "Returned") {
+      //   const updatedProduct = Product.findByIdAndUpdate(productId,
+      //     {$inc: {quantity: ?}}
+      //   )
+      // }
 
       return res.status(OK).json({
         status: true,
@@ -223,7 +226,6 @@ const updateOrderStatus = async (req, res) => {
       });
     }
 
-    // If we get here, something is wrong
     return res.status(BadRequest).json({
       status: false,
       message: "Could not process order status update",

@@ -57,6 +57,7 @@ const getWalletHistory = async (req, res) => {
       transactions: paginatedTransactions,
       totalPages: totalPages,
       currentPage: page,
+      totalTransactions,
     });
   } catch (error) {
     console.error("Error fetching wallet history", error);

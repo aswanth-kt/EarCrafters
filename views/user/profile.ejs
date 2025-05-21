@@ -485,7 +485,7 @@
 
 
                <!-- Wallet History -->
-               <div class="tab-pane fade" id="wallet-history" role="tabpanel" aria-labelledby="history-tab">
+               <!-- <div class="tab-pane fade" id="wallet-history" role="tabpanel" aria-labelledby="history-tab">
                  <div class="card">
                    <div class="card-header">
                      <h5 class="mb-0">Wallet History</h5>
@@ -516,6 +516,60 @@
                    </div>
                  </div>
                </div>
+                -->
+               <!-- Wallet transaction pagination -->
+                <!-- <div class="pagination">
+                  <ul>
+                    <% if (currentPage > 1) { %>
+                        <li><a href="?page=<%= currentPage - 1%>"> « </a></li>
+                    <% } %>
+        
+                    <% for (let i = 1; i <= totalPages; i++) { %>
+                        <li><a href="#orders?page=<%= i %>" class="<%= i === currentPage ? 'active' : '' %>"><%= i %></a></li>
+                    <% } %>
+        
+                    <% if (currentPage < totalPages) { %>
+                        <li><a href="?page=<%= totalPages + 1 %>"> » </a></li>
+                    <% } %>
+                  </ul>
+                </div> -->
+
+                <!-- Updated Wallet History Tab Section -->
+                <div class="tab-pane fade" id="wallet-history" role="tabpanel" aria-labelledby="history-tab">
+                  <div class="card">
+                    <div class="card-header">
+                      <h5 class="mb-0">Wallet History</h5>      
+                    </div>
+                    <div class="card-body">
+                      <div class="table-responsive">
+                        <table class="table">
+                          <thead>
+                            <tr>
+                              <th>Date</th>
+                              <th>Transaction</th>
+                              <th>Type</th>
+                              <th>Amount</th>
+                              <th>Balance</th>
+                            </tr>
+                          </thead>
+                          <tbody id="walletHistoryBody">
+                            <tr>
+                              <td colspan="5" class="text-center">Loading transaction history...</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      
+                      <!-- Wallet History Pagination -->
+                      <div class="pagination" id="wallet-history-pagination">
+                        <ul>
+                          <!-- Pagination will be populated by JavaScript -->
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
 
 
                <div class="tab-pane fade" id="referal" role="tabpanel" aria-labelledby="track-orders-tab">
@@ -699,53 +753,216 @@ function addMoney() {
   });
 
 
-  // Load wallet history when the tab is clicked
-document.getElementById('track-wallet-history-tab').addEventListener('click', function(e) {
-  // Load the wallet history when this tab is clicked
-  loadWalletHistory();
-  console.log("Call loadWalletHistory()");
-});
+//   // Load wallet history when the tab is clicked
+// document.getElementById('track-wallet-history-tab').addEventListener('click', function(e) {
+//   // Load the wallet history when this tab is clicked
+//   loadWalletHistory();
+//   console.log("Call loadWalletHistory()");
+// });
 
-function loadWalletHistory() {
-  console.log("Load wallet history");
-  fetch('/wallet/history')
-    .then(response => response.json())
-    .then(data => {
-      const historyTableBody = document.getElementById('walletHistoryBody');
-      // Clear loading message
-      historyTableBody.innerHTML = '';
+// function loadWalletHistory(page = 1) {
+//   console.log("Load wallet history");
+//   fetch(`/wallet/history?page=${page}`)
+//     .then(response => response.json())
+//     .then(data => {
+//       const historyTableBody = document.getElementById('walletHistoryBody');
+//       // Clear loading message
+//       historyTableBody.innerHTML = '';
       
-      if (data.status && data.transactions && data.transactions.length > 0) {
-        data.transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+//       if (data.status && data.transactions && data.transactions.length > 0) {
+//         data.transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
         
-        // Add transaction rows
-        data.transactions.forEach(transaction => {
-          const date = new Date(transaction.createdAt).toLocaleDateString();
-          const type = transaction.type;
-          const amountClass = transaction.type === 'credit' ? 'text-success' : 'text-danger';
-          const amount = transaction.amount;
-          const typeClass = transaction.type === 'credit' ? 'text-success' : 'text-danger';
+//         // Add transaction rows
+//         data.transactions.forEach(transaction => {
+//           const date = new Date(transaction.createdAt).toLocaleDateString();
+//           const type = transaction.type;
+//           const amountClass = transaction.type === 'credit' ? 'text-success' : 'text-danger';
+//           const amount = transaction.amount;
+//           const typeClass = transaction.type === 'credit' ? 'text-success' : 'text-danger';
           
-          historyTableBody.innerHTML += `
-            <tr>
-              <td>${date}</td>
-              <td>${transaction.description}</td>
-              <td class="${typeClass}">${type}</td>
-              <td class="${amountClass}">${amount}</td>
-              <td>₹${transaction.balance.toFixed(2)}</td>
-            </tr>
-          `;
-        });
-      } else {
-        historyTableBody.innerHTML = '<tr><td colspan="4" class="text-center">No transaction history found</td></tr>';
+//           historyTableBody.innerHTML += `
+//             <tr>
+//               <td>${date}</td>
+//               <td>${transaction.description}</td>
+//               <td class="${typeClass}">${type}</td>
+//               <td class="${amountClass}">${amount}</td>
+//               <td>₹${transaction.balance.toFixed(2)}</td>
+//             </tr>
+//           `;
+//         });
+//       } else {
+//         historyTableBody.innerHTML = '<tr><td colspan="4" class="text-center">No transaction history found</td></tr>';
+//       }
+//     })
+//     .catch(error => {
+//       console.error('Error loading wallet history:', error);
+//       document.getElementById('walletHistoryBody').innerHTML = 
+//         '<tr><td colspan="4" class="text-center text-danger">Failed to load transaction history</td></tr>';
+//     });
+// }
+
+
+
+  // Global variable to track wallet history state
+  let walletHistoryState = {
+    currentPage: 1,
+    totalPages: 1
+  };
+
+  // Load wallet history when the tab is clicked
+  document.getElementById('track-wallet-history-tab').addEventListener('click', function(e) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const page = urlParams.get('wallet-page') || 1;
+    loadWalletHistory(page);
+  });
+
+  function loadWalletHistory(page = 1) {
+    document.getElementById('walletHistoryBody').innerHTML = '<tr><td colspan="5" class="text-center">Loading transaction history...</td></tr>';
+    
+    fetch(`/wallet/history?page=${page}`)
+      .then(response => response.json())
+      .then(data => {
+        const historyTableBody = document.getElementById('walletHistoryBody');
+        // Clear loading message
+        historyTableBody.innerHTML = '';
+        
+        // Update pagination state
+        walletHistoryState.currentPage = data.currentPage;
+        walletHistoryState.totalPages = data.totalPages;
+        
+        if (data.status && data.transactions && data.transactions.length > 0) {
+          // Add transaction rows
+          data.transactions.forEach(transaction => {
+            const date = new Date(transaction.createdAt).toLocaleDateString();
+            const type = transaction.type;
+            const amountClass = transaction.type === 'credit' ? 'text-success' : 'text-danger';
+            const amount = transaction.amount;
+            const typeClass = transaction.type === 'credit' ? 'text-success' : 'text-danger';
+            
+            historyTableBody.innerHTML += `
+              <tr>
+                <td>${date}</td>
+                <td>${transaction.description}</td>
+                <td class="${typeClass}">${type}</td>
+                <td class="${amountClass}">₹${amount.toFixed(2)}</td>
+                <td>₹${transaction.balance.toFixed(2)}</td>
+              </tr>
+            `;
+          });
+          
+          // Update the pagination UI
+          updateWalletHistoryPagination(data.currentPage, data.totalPages);
+        } else {
+          historyTableBody.innerHTML = '<tr><td colspan="5" class="text-center">No transaction history found</td></tr>';
+          document.getElementById('wallet-history-pagination').style.display = 'none';
+        }
+      })
+      .catch(error => {
+        console.error('Error loading wallet history:', error);
+        document.getElementById('walletHistoryBody').innerHTML = 
+          '<tr><td colspan="5" class="text-center text-danger">Failed to load transaction history</td></tr>';
+      });
+  }
+
+  // Function to update wallet history pagination UI
+  function updateWalletHistoryPagination(currentPage, totalPages) {
+    const paginationElement = document.getElementById('wallet-history-pagination');
+    
+    if (totalPages <= 1) {
+      paginationElement.style.display = 'none';
+      return;
+    }
+    
+    paginationElement.style.display = 'block';
+    const paginationList = paginationElement.querySelector('ul');
+    paginationList.innerHTML = '';
+    
+    // Previous page button
+    if (currentPage > 1) {
+      const prevLi = document.createElement('li');
+      prevLi.innerHTML = `<a href="?wallet-page=${currentPage - 1}#wallet-history" class="arrow">&laquo;</a>`;
+      paginationList.appendChild(prevLi);
+    }
+    
+    // Calculate page range to display
+    let startPage = Math.max(1, currentPage - 2);
+    let endPage = Math.min(totalPages, currentPage + 2);
+    
+    // Always show first page
+    if (startPage > 1) {
+      paginationList.appendChild(createPageItem(1, currentPage, '#wallet-history'));
+      
+      // Show ellipsis if needed
+      if (startPage > 2) {
+        const ellipsisLi = document.createElement('li');
+        ellipsisLi.className = 'ellipsis';
+        ellipsisLi.innerHTML = '<span>...</span>';
+        paginationList.appendChild(ellipsisLi);
       }
-    })
-    .catch(error => {
-      console.error('Error loading wallet history:', error);
-      document.getElementById('walletHistoryBody').innerHTML = 
-        '<tr><td colspan="4" class="text-center text-danger">Failed to load transaction history</td></tr>';
-    });
-}
+    }
+    
+    // Show page numbers
+    for (let i = startPage; i <= endPage; i++) {
+      paginationList.appendChild(createPageItem(i, currentPage, '#wallet-history'));
+    }
+    
+    // Always show last page
+    if (endPage < totalPages) {
+      // Show ellipsis if needed
+      if (endPage < totalPages - 1) {
+        const ellipsisLi = document.createElement('li');
+        ellipsisLi.className = 'ellipsis';
+        ellipsisLi.innerHTML = '<span>...</span>';
+        paginationList.appendChild(ellipsisLi);
+      }
+      
+      paginationList.appendChild(createPageItem(totalPages, currentPage, '#wallet-history'));
+    }
+    
+    // Next page button
+    if (currentPage < totalPages) {
+      const nextLi = document.createElement('li');
+      nextLi.innerHTML = `<a href="?wallet-page=${currentPage + 1}#wallet-history" class="arrow">&raquo;</a>`;
+      paginationList.appendChild(nextLi);
+    }
+  }
+
+  // Helper function to create page item
+  function createPageItem(pageNumber, currentPage, hashTag) {
+    const li = document.createElement('li');
+    const isActive = pageNumber === currentPage;
+    li.innerHTML = `<a href="?wallet-page=${pageNumber}${hashTag}" class="${isActive ? 'active' : ''}">${pageNumber}</a>`;
+    return li;
+  }
+
+  // Check if URL has wallet-history hash and load the tab
+  document.addEventListener('DOMContentLoaded', function() {
+    if (window.location.hash === '#wallet-history') {
+      document.getElementById('track-wallet-history-tab').click();
+      
+      // Get page from URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const page = urlParams.get('wallet-page') || 1;
+      loadWalletHistory(page);
+    }
+  });
+
+  // Add event delegation for pagination links
+  document.getElementById('wallet-history-pagination').addEventListener('click', function(event) {
+    if (event.target.tagName === 'A') {
+      event.preventDefault();
+      const href = event.target.getAttribute('href');
+      const urlParams = new URLSearchParams(href.split('?')[1]);
+      const page = urlParams.get('wallet-page') || 1;
+      
+      // Update URL without reloading the page
+      const newUrl = `${window.location.pathname}?wallet-page=${page}#wallet-history`;
+      window.history.pushState({}, '', newUrl);
+      
+      // Load wallet history for the new page
+      loadWalletHistory(page);
+    }
+  });
 
 
   // Check if there's a hash in the URL
@@ -765,8 +982,3 @@ function loadWalletHistory() {
 </script>
 
 <%- include("../../views/partials/user/footer") %>
-
-
-
-
-

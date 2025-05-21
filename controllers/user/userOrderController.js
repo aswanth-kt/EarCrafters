@@ -291,7 +291,6 @@ const returnProduct = async (req, res) => {
       });
     }
 
-    // Use dot notation to update a specific item in the array
     const updateQuery = {};
     updateQuery[`orderItems.${itemIndex}.returnStatus`] = "Requested";
     updateQuery[`orderItems.${itemIndex}.returnReason`] =
@@ -327,7 +326,7 @@ const returnProduct = async (req, res) => {
     }
 
     // After product Returned money back to add wallet
-    if (updatedOrder.status === "Returned") {
+    // if (updatedOrder.status === "Returned") {
       const couponDidcount = Number(updatedOrder.discount);
       const cancelProductPrice = Number((price / totalPrice) * couponDidcount); // Find one without coupon product price
       const priceWithoutOffer = Number(price - cancelProductPrice);
@@ -352,7 +351,7 @@ const returnProduct = async (req, res) => {
       });
 
       await wallet.save();
-    }
+    // }
 
     res.status(OK).json({
       status: true,
