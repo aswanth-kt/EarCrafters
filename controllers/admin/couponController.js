@@ -82,6 +82,14 @@ const createCoupon = async (req, res) => {
       });
     }
 
+    // Check offer price grater than min price.
+    if (offerPrice > minPurchaseAmount) {
+      return res.status(BadRequest).json({
+        status: false,
+        message: "Minimum purchase amount should be greater than offer price"
+      })
+    };
+
     // const coupon = await Coupon.findOne({userId: userData._id});
     // Create a new coupon
     const newCoupon = new Coupon({
