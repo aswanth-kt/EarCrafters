@@ -91,16 +91,18 @@
 
                             </div>
                             <div class="card mb-4">
-
-
+                                
                                 <div class="card-body">
                                     <div class="row gx-2">
                                         <div class="col-sm-6 mb-3">
                                             <label class="form-label">Category</label>
                                             <select class="form-select border" style="width: 150px;" name="category">
+                                                <option value="">
+                                                    Choose Options...
+                                                </option>
                                                 <% for(let i = 0; i < category.length; i++) { %>
-                                                    <option value="<%= category[i]._id %>">
-                                                        <%= category[i].name %> 
+                                                    <option value="<%= category[i]._id %>" <% if (category[i]._id.toString() === product.category.toString() ) { %> selected <% } %>>
+                                                        <%= category[i].name %>
                                                     </option>
                                                 <% } %>
                                             </select>

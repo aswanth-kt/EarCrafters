@@ -732,48 +732,50 @@
         const ctx = document.createElement('canvas');
         document.getElementById('sales-chart').appendChild(ctx);
         
-        
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['<%= orders.createdOn%>'],
-                datasets: [{
-                    label: 'Sales Amount',
-                    data: [1250, 1580, 1340, 1890, 2240, 1780, 2450],
-                    borderColor: '#ff4757',
-                    backgroundColor: 'rgba(255, 71, 87, 0.1)',
-                    tension: 0.4,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.05)'
+        function updateChart(label, data) {
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    // labels: ["<%= orders.map(order => order.createdOn.toDateString('en-GB'))%>"],
+                    labels: label,
+                    datasets: [{
+                        label: 'Sales Amount',
+                        data: data || [1250, 1580, 1340, 1890, 2240, 1780, 2450],
+                        borderColor: '#ff4757',
+                        backgroundColor: 'rgba(255, 71, 87, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return '₹' + value;
+                                }
+                            }
                         },
-                        ticks: {
-                            callback: function(value) {
-                                return '₹' + value;
+                        x: {
+                            grid: {
+                                display: false
                             }
                         }
                     },
-                    x: {
-                        grid: {
+                    plugins: {
+                        legend: {
                             display: false
                         }
                     }
-                },
-                plugins: {
-                    legend: {
-                        display: false
-                    }
                 }
-            }
-        });
+            });
+        }
     </script>
 </body>
 </html>

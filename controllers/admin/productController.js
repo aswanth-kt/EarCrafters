@@ -238,6 +238,8 @@ const getEditProduct = async (req, res) => {
     const productId = req.query.id;
     const productData = await Product.findOne({ _id: productId });
     const categoryData = await Category.find({}); // store all cate data for show the dropdown menu
+    console.log("pro data..:", productData)
+
     res.render("product-edit", {
       product: productData,
       category: categoryData,

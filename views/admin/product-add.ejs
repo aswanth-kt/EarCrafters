@@ -105,6 +105,9 @@
                                             <label class="form-label">Category</label>
                                             <select class="form-select border" style="width: 150px;" name="category">
                                                 <% if (cateData && cateData.length> 0) { %>
+                                                    <option>
+                                                        Choose Options...
+                                                    </option>
                                                     <% for(let i=0; i < cateData.length; i++) {%>
 
                                                         <option value="<%= cateData[i].name %>">
