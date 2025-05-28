@@ -731,16 +731,22 @@
         // Initialize Sales Chart
         const ctx = document.createElement('canvas');
         document.getElementById('sales-chart').appendChild(ctx);
+
+        let labels = [<%- labels.map(label => `'${label}'`).join(', ') %>];
+        let totalSales = [<%= totalSales.join(', ') %>];
+        console.log("labels:", labels);
+        console.log("totalSales:", totalSales, typeof totalSales)
+
+        updateChart(labels, totalSales);
         
-        function updateChart(label, data) {
+        function updateChart(labels, totalSales) {
             new Chart(ctx, {
-                type: 'line',
+                type: 'bar',
                 data: {
-                    // labels: ["<%= orders.map(order => order.createdOn.toDateString('en-GB'))%>"],
-                    labels: label,
+                    labels: labels,
                     datasets: [{
                         label: 'Sales Amount',
-                        data: data || [1250, 1580, 1340, 1890, 2240, 1780, 2450],
+                        data: totalSales,
                         borderColor: '#ff4757',
                         backgroundColor: 'rgba(255, 71, 87, 0.1)',
                         tension: 0.4,

@@ -61,6 +61,24 @@ const loadSalesReport = async (req, res) => {
     const totalOrderCount = await Order.countDocuments({});
     const totalPages = Math.ceil(totalOrderCount / limit);
 
+    // Date and one day total sales for chart
+    let salesByDate = {};
+
+    orders.forEach(order => {
+      let dateKey = order.createdOn.toISOString().slice(0, 10); // 'YYYY-MM-DD'
+      if (!salesByDate[dateKey]) {
+        salesByDate[dateKey] = 0;
+      }
+      salesByDate[dateKey] += order.finalAmount;
+    });
+
+    // Prepare data for the chart
+    let labels = Object.keys(salesByDate);       
+    let totalSales = Object.values(salesByDate); 
+
+    console.log("dates:", labels);
+    console.log("totalSales:", totalSales);
+
     res.render("salesReport", {
       overallSalesCount,
       overallOrderAmount,
@@ -70,6 +88,8 @@ const loadSalesReport = async (req, res) => {
       orders,
       totalPages,
       currentPage: page,
+      labels,
+      totalSales,
     });
   } catch (error) {
     console.error("Error in load sales report:", error);
