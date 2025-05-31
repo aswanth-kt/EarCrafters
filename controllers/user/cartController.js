@@ -24,6 +24,7 @@ const getCartPage = async (req, res) => {
         quantity: 0,
         data: [],
         grandTotal: 0,
+        shippingFee: 50,
       });
     }
 
@@ -69,6 +70,13 @@ const getCartPage = async (req, res) => {
       grandTotal += item.totalPrice;
     }
 
+    // // If the amount is under 1000 you want to pay shipping fee.
+    // let shippingFee = 0;
+    // if (grandTotal < 1000) {
+    //   shippingFee = 50;
+    //   grandTotal += shippingFee;
+    // } 
+
     req.session.grandTotal = grandTotal;
 
     res.render("cart", {
@@ -82,124 +90,6 @@ const getCartPage = async (req, res) => {
     res.redirect("/pageNotFound");
   }
 };
-
-// const addToCart = async (req, res) => {
-//   try {
-//     const productId = req.body.productId;
-//     const count = req.body.count;
-//     // console.log("count:", count)
-//     const userId = req.session.user;
-//     if(!userId) {
-//       return res.json({ status: false, message: "Please login" });
-//     }
-
-//     const user = await User.findById(userId).populate("wishlist");
-//     const product = await Product.findById(productId).lean();
-
-//     if (!product) {
-//       return res.json({ status: false, message: "Product not found" });
-//     }
-
-//     if (product.quantity <= 0) {
-//       return res.json({ status: false, message: "Out of stock" });
-//     }
-
-//     // Check if user already has a cart
-//     let userCart;
-
-//     // If user has cart references
-//     if (user.cart && user.cart.length > 0) {
-//       // Get the user's cart document
-//       userCart = await Cart.findOne({ _id: { $in: user.cart } });
-//     }
-
-//     // If no cart exists for the user, create one
-//     if (!userCart) {
-//       userCart = new Cart({
-//         userId: userId,
-//         items: [
-//           {
-//             productId: product._id,
-//             quantity: 1,
-//             price: product.salePrice,
-//             totalPrice: product.salePrice
-//           },
-//         ]
-//       });
-
-//       // Save the new cart
-//       const savedCart = await userCart.save();
-
-//       // Add cart reference to user
-//       await User.findByIdAndUpdate(userId, {
-//         $push: { cart: savedCart._id }
-//       });
-
-//       // If add to cart remove the product from wishlist
-//       // const productObjectId = new mongoose.Types.ObjectId(productId);
-//       // const index = user.wishlist.indexOf(productObjectId);   // find index that product in wishlist array
-//       // console.log("Index of product in wishlist:", index);
-//       // if (index > -1) {
-//       //   user.wishlist.splice(index, 1)  // Remove the product from wishlist array
-//       //   await user.save();
-//       // } else console.log("index is -1..!")
-
-//       // if (user.wishlist.includes(productId)) {
-//       //   user.wishlist.pull(productId);  // removes it if it exists
-//       //   await user.save();
-//       // }
-
-//       const index = user.wishlist.findIndex((item) => item._id && item._id.equals(productId));
-//       console.log("index od product in wishlist:", index);
-//       if (index > -1) {
-//         user.wishlist.splice(index, 1);
-//         await user.save();
-//       }
-
-//       return res.json({
-//         status: true,
-//         cartLength: 1,
-//         user: userId
-//       });
-//     } else {
-//       // Cart exists, check if product already in items array
-//       const itemIndex = userCart.items.findIndex(item =>
-//         item.productId.toString() === productId.toString()
-//       );
-
-//       if (itemIndex === -1) {
-//         // Product not in cart, add it
-//         userCart.items.push({
-//           productId: productId,
-//           quantity: 1,
-//           price: product.salePrice,
-//           totalPrice: product.salePrice
-//         });
-//       } else {
-//         // Product already in cart, update quantity if stock allows
-//         if (userCart.items[itemIndex].quantity < product.quantity) {
-//           userCart.items[itemIndex].quantity += 1;
-//           userCart.items[itemIndex].totalPrice =
-//             userCart.items[itemIndex].price * userCart.items[itemIndex].quantity;
-//         } else {
-//           return res.json({ status: false, message: "Out of stock" });
-//         }
-//       }
-
-//       // Save the updated cart
-//       await userCart.save();
-
-//       return res.json({
-//         status: true,
-//         cartLength: userCart.items.length,
-//         user: userId,
-//       });
-//     }
-//   } catch (error) {
-//     console.error(error);
-//     return res.redirect("/pageNotFound");
-//   }
-// };
 
 const addToCart = async (req, res) => {
   try {

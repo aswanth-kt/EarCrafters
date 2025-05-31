@@ -1,10 +1,561 @@
 <%- include("../../views/partials/admin/header") %>
-<section class="content-main">
-    <div class="content-header">
-        <div>
-            <h2 class="content-title card-title">Dashboard </h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: #2d3748;
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .main-container {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .filter-container {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 25px;
+            background: #e2e8f0;
+            color: #4a5568;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .filter-btn:hover {
+            background: #cbd5e0;
+            transform: translateY(-2px);
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .stat-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .products-icon { background: linear-gradient(135deg, #ff6b6b, #ee5a52); }
+        .categories-icon { background: linear-gradient(135deg, #4ecdc4, #44a08d); }
+        .brands-icon { background: linear-gradient(135deg, #45b7d1, #96c93d); }
+
+        .top-list {
+            list-style: none;
+        }
+
+        .top-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e2e8f0;
+            transition: background 0.2s ease;
+        }
+
+        .top-item:hover {
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 8px;
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
+
+        .top-item:last-child {
+            border-bottom: none;
+        }
+
+        .item-rank {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .item-name {
+            flex: 1;
+            margin-left: 1rem;
+            font-weight: 500;
+        }
+
+        .item-value {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .ledger-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .ledger-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .ledger-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .ledger-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .control-label {
+            font-weight: 500;
+            color: #4a5568;
+            margin-bottom: 0.5rem;
+        }
+
+        .control-input {
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .control-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .generate-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        }
+
+        .chart-canvas {
+            max-height: 400px;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .main-container {
+                padding: 1rem;
+            }
+            
+            .header {
+                padding: 1rem;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>📊 Admin Dashboard</h1>
+    </header>
+
+    <div class="main-container">
+        <div class="dashboard-grid">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h2 class="chart-title">Sales Analytics</h2>
+                    <div class="filter-container">
+                        <button class="filter-btn active" onclick="changeFilter('yearly')">Yearly</button>
+                        <button class="filter-btn" onclick="changeFilter('monthly')">Monthly</button>
+                        <button class="filter-btn" onclick="changeFilter('weekly')">Weekly</button>
+                        <button class="filter-btn" onclick="changeFilter('daily')">Daily</button>
+                    </div>
+                </div>
+                <canvas id="salesChart" class="chart-canvas"></canvas>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <h3 class="stat-title">Top 10 Products</h3>
+                    <div class="stat-icon products-icon">🏆</div>
+                </div>
+                <ul class="top-list" id="topProducts">
+                    <!-- Products will be populated by JavaScript -->
+                </ul>
+            </div>
         </div>
-       
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <h3 class="stat-title">Top 10 Categories</h3>
+                    <div class="stat-icon categories-icon">📂</div>
+                </div>
+                <ul class="top-list" id="topCategories">
+                    <!-- Categories will be populated by JavaScript -->
+                </ul>
+            </div>
+
+            <!-- <div class="stat-card">
+                <div class="stat-header">
+                    <h3 class="stat-title">Top 10 Brands</h3>
+                    <div class="stat-icon brands-icon">🏷️</div>
+                </div>
+                <ul class="top-list" id="topBrands"> -->
+
+                    <!-- Brands will be populated by JavaScript -->
+
+                <!-- </ul>
+            </div> -->
+        </div>
+
+        <div class="ledger-section">
+            <div class="ledger-header">
+                <h2 class="ledger-title">📚 Generate Ledger Book</h2>
+                <p style="color: #718096;">Generate comprehensive financial reports and ledger books</p>
+            </div>
+            
+            <div class="ledger-controls">
+                <div class="control-group">
+                    <label class="control-label">Report Type</label>
+                    <select class="control-input" id="reportType">
+                        <option value="full">Complete Ledger</option>
+                        <option value="sales">Sales Ledger</option>
+                        <option value="purchase">Purchase Ledger</option>
+                        <option value="inventory">Inventory Report</option>
+                        <option value="profit">Profit & Loss</option>
+                    </select>
+                </div>
+                
+                <div class="control-group">
+                    <label class="control-label">Date From</label>
+                    <input type="date" class="control-input" id="dateFrom" value="2024-01-01">
+                </div>
+                
+                <div class="control-group">
+                    <label class="control-label">Date To</label>
+                    <input type="date" class="control-input" id="dateTo" value="2024-12-31">
+                </div>
+                
+                <div class="control-group">
+                    <label class="control-label">Format</label>
+                    <select class="control-input" id="reportFormat">
+                        <option value="pdf">PDF Report</option>
+                        <option value="excel">Excel Spreadsheet</option>
+                        <option value="csv">CSV Export</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button class="generate-btn" onclick="generateLedger()">
+                🚀 Generate Ledger Book
+            </button>
+        </div>
     </div>
-</section>
+
+    <script>
+        // Sample data
+        const sampleData = {
+            yearly: {
+                labels: ['2020', '2021', '2022', '2023', '2024'],
+                data: [45000, 52000, 48000, 61000, 58000]
+            },
+            monthly: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                data: [4200, 3800, 4500, 4100, 4800, 5200, 4900, 5100, 4700, 5300, 4600, 4400]
+            },
+            weekly: {
+                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6', 'Week 7'],
+                data: [1200, 1100, 1350, 1050, 1400, 1250, 1300]
+            },
+            daily: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                data: [180, 165, 220, 195, 240, 280, 190]
+            }
+        };
+
+        // const topProducts = JSON.Stringify(<%- topProducts %>);
+        const topProducts = <%- JSON.stringify(topProducts) %>;
+        console.log("Top products:", topProducts)
+
+        const topCategories = <%- JSON.stringify(topCategories) %>
+        console.log("topCategories:", topCategories)
+
+        const topBrands = [
+            { name: 'TechCorp', sales: '$89,450' },
+            { name: 'InnovateTech', sales: '$76,230' },
+            { name: 'FutureBrand', sales: '$65,780' },
+            { name: 'NextGen Solutions', sales: '$54,920' },
+            { name: 'SmartDevices Co.', sales: '$43,670' },
+            { name: 'DigitalPro', sales: '$38,450' },
+            { name: 'TechGiant', sales: '$32,190' },
+            { name: 'ModernTech', sales: '$27,680' },
+            { name: 'EliteGadgets', sales: '$23,450' },
+            { name: 'ProTech Industries', sales: '$19,870' }
+        ];
+
+        let currentChart;
+
+        function initChart() {
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            currentChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: sampleData.yearly.labels,
+                    datasets: [{
+                        label: 'Sales ($)',
+                        data: sampleData.yearly.data,
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#667eea',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0,0,0,0.1)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(0,0,0,0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function changeFilter(period) {
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Update chart data
+            currentChart.data.labels = sampleData[period].labels;
+            currentChart.data.datasets[0].data = sampleData[period].data;
+            currentChart.update();
+        }
+
+        function populateTopLists() {
+            // Populate top products
+            const productsContainer = document.getElementById('topProducts');
+            topProducts.forEach((product, index) => {
+                const li = document.createElement('li');
+                li.className = 'top-item';
+                li.innerHTML = `
+                    <div class="item-rank">${index + 1}</div>
+                    <div class="item-name">${product.productName}</div>
+                    <div class="item-value">${product.totalSales}<span class="badge badge-secondary">sold</span></div>
+                `;
+                productsContainer.appendChild(li);
+            });
+
+            // Populate top categories
+            const categoriesContainer = document.getElementById('topCategories');
+            topCategories.forEach((category, index) => {
+                const li = document.createElement('li');
+                li.className = 'top-item';
+                li.innerHTML = `
+                    <div class="item-rank">${index + 1}</div>
+                    <div class="item-name">${category.categoryName}</div>
+                    <div class="item-name">${category.totalSalesQty} <span class="badge badge-secondary">sold</span></div>
+                    <div class="item-value">₹ ${category.totalSalesPrice}</div>
+                `;
+                categoriesContainer.appendChild(li);
+            });
+
+            // // Populate top brands
+            // const brandsContainer = document.getElementById('topBrands');
+            // topBrands.forEach((brand, index) => {
+            //     const li = document.createElement('li');
+            //     li.className = 'top-item';
+            //     li.innerHTML = `
+            //         <div class="item-rank">${index + 1}</div>
+            //         <div class="item-name">${brand.name}</div>
+            //         <div class="item-value">${brand.sales}</div>
+            //     `;
+            //     brandsContainer.appendChild(li);
+            // });
+        }
+
+        function generateLedger() {
+            const reportType = document.getElementById('reportType').value;
+            const dateFrom = document.getElementById('dateFrom').value;
+            const dateTo = document.getElementById('dateTo').value;
+            const format = document.getElementById('reportFormat').value;
+
+            // Simulate ledger generation
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            
+            btn.innerHTML = '⏳ Generating...';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                alert(`Ledger Generated Successfully!\n\nReport Type: ${reportType.charAt(0).toUpperCase() + reportType.slice(1)}\nPeriod: ${dateFrom} to ${dateTo}\nFormat: ${format.toUpperCase()}\n\nThe report has been generated and is ready for download.`);
+                
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }, 2000);
+        }
+
+        // Initialize everything when page loads
+        window.addEventListener('load', () => {
+            initChart();
+            populateTopLists();
+        });
+    </script>
+</body>
+</html>
+
 <%- include("../../views/partials/admin/footer") %>

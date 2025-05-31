@@ -407,6 +407,20 @@ const codPlaceOrder = async (req, res) => {
         status: false,
         message: "No default address found",
       });
+    };
+
+    if (finalAmount > 1000) {
+      return res.status(BadRequest).json({
+        status: false,
+        message: "Order above Rs 1000 should not be allowed for COD."
+      })
+    }
+
+    // Final amount less than 1000 thre is 50 rs shippin fee
+    let shippingFee = 0
+    if (finalAmount < 1000) {
+      shippingFee = 50
+      finalAmount += shippingFee;
     }
 
     const orderId = await generateOrderId(); // Generate unique order id
@@ -479,7 +493,9 @@ const codPlaceOrder = async (req, res) => {
       status: true,
       message: "Order placed successfully!",
       orderId: savedOrder._id,
+      shippingFee,
     });
+
   } catch (error) {
     console.error("Error in COD  place order", error);
     res.status(InternalServerError).json({

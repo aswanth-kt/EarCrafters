@@ -150,7 +150,7 @@
 
                                     <tr>
                                         <td class="cart_total_label">Shipping</td>
-                                        <td class="cart_total_amount"> <i class="ti-gift mr-5"></i> Free Shipping
+                                        <td class="cart_total_amount"> <i class="ti-gift mr-5"><span id="shippingFee">Free Shipping</span></i> 
                                         </td>
                                     </tr>
                                     <tr>
@@ -180,6 +180,7 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+
     function changeQuantity(productId, cartQuantity, count, productPrice, i, productQuantity) {
         console.log("productId:",productId, "cart qty :",cartQuantity, "count :", count, "product price :", productPrice, "i :", i, "product qty :", productQuantity);
 
@@ -189,7 +190,8 @@
         const totalElements = document.getElementById('total').innerHTML;
 
         let currentQuantity = parseInt(cartProductQuantityElement.value)
-        const currentSubTotal = parseInt(subtotalElement.innerHTML);           
+        const currentSubTotal = parseInt(subtotalElement.innerHTML); 
+        
 
         if (currentQuantity + count > 5) {
             Swal.fire({
@@ -222,7 +224,7 @@
 
         const newSubtotal = newQuantity * productPrice
         if (count == 1) {
-            document.getElementById(`subTotal${i}`).innerHTML = parseInt(subtotalElement.innerHTML) + parseInt(productPrice)
+            document.getElementById(`subTotal${i}`).innerHTML = parseInt(subtotalElement.innerHTML) + parseInt(productPrice) 
         } else {
             document.getElementById(`subTotal${i}`).innerHTML = parseInt(subtotalElement.innerHTML) - parseInt(productPrice)
         }
@@ -275,7 +277,11 @@
                 window.location.href = `/deleteItem?id=${productId}`;
             }
         })
-    }
+    };
+
+    
+    
+
 </script>
 <%- include("../../views/partials/user/footer") %>
 

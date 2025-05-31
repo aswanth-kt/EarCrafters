@@ -20,12 +20,6 @@
             line-height: 1.6;
         }
         
-        /* .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        } */
-        
         .checkout-container {
             display: flex;
             flex-wrap: wrap;
@@ -572,7 +566,7 @@
                     
                     <div class="price-row">
                         <span class="price-label">Shipping</span>
-                        <span>₹0</span>
+                        <span id="shippingFee">₹0</span>
                     </div>
                     
                     <div class="price-row total-row">
@@ -882,7 +876,7 @@
         const addressId = '<%= defaultAddress._id %>';
         const totalPrice = parseInt('<%= grandTotal %>') || 0;
         const discount = parseInt(document.getElementById('discountAmount').textContent.replace('₹', '').trim());
-        // console.log("Discount:",discount, typeof discount)
+        // console.log("Discount:",discount, typeof discount);
         const finalAmount = totalPrice - discount;
         const status = "Order Placed";
         const couponApplied = discount > 0;
@@ -899,7 +893,7 @@
             status: status,
             customerName,
             customerEmail,
-            couponApplied
+            couponApplied,
         };
 
         const paymentMethod = document.querySelector("input[name='paymentMethod']:checked").id;
@@ -918,15 +912,15 @@
             })
             .then(response => response.json())
             .then(data => {
-                console.log("Full data :", data)    
+                console.log("Full data :", data);   //Debug
                 document.getElementById("loadingOverlay").classList.add("d-none");
                 if (data.status) {
                     window.location.href = `/order-success?orderId=${data.orderId}`;
                 } else {
                     Swal.fire({
                         icon: "info",
-                        title: data.message,
-                        text:  "Something went wrong",
+                        title: "Info",
+                        text:  data.message,
                         timer: 3000,
                     });
                     this.disabled = false;

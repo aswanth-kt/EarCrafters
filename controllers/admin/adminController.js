@@ -1,4 +1,5 @@
 const User = require("../../models/userSchema");
+const Order = require("../../models/orderSchema");
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const {
@@ -8,6 +9,7 @@ const {
   NotFound,
   InternalServerError,
 } = require("../../helpers/httpStatusCodes");
+// const { default: orders } = require("razorpay/dist/types/orders");
 
 // Admin page error
 const pageError = async (req, res) => {
@@ -18,11 +20,11 @@ const pageError = async (req, res) => {
 const loadLogin = async (req, res) => {
   try {
     if (req.session.admin) {
-      //How to know this admin is in session?
       return res.redirect("/admin/dashboard");
     }
 
     return res.render("admin-login", { message: null });
+
   } catch (error) {
     console.error("Dashboard page not found", error);
     res.status(InternalServerError).send("Server error");
@@ -54,10 +56,73 @@ const login = async (req, res) => {
 const loadDashboard = async (req, res) => {
   if (req.session.admin) {
     try {
-      res.render("dashboard");
+
+      // Find top 10 products
+      let topProducts = await Order.aggregate([
+        { $unwind: '$orderItems' },
+        { $lookup: {
+            from: "products",
+            localField: "orderItems.product",
+            foreignField: "_id",
+            as: "productDetails"
+          } 
+        },
+        {
+          $group: {
+            _id: "$productDetails._id",
+            totalSales: {$sum: "$orderItems.quantity"},
+            productName: {$first: "$productDetails.productName"}
+          }
+        },
+        {$sort: {totalSales: -1}},
+        {$limit: 10}
+      ]);
+      // console.log("top product:", topProducts);
+
+      // Find top 10 categories
+      let topCategories = await Order.aggregate([
+        {$unwind: '$orderItems'},
+        {
+          $lookup: {
+            from: "products",
+            localField: "orderItems.product",
+            foreignField: "_id",
+            as: "productDetails"
+          }
+        },
+        {$unwind: "$productDetails"},
+        {
+          $lookup: {
+            from: "categories",
+            localField: "productDetails.category",
+            foreignField: "_id",
+            as: "categoryDetails"
+          }
+        },
+        {$unwind: "$categoryDetails"},
+        {
+          $group: {
+          _id: "$categoryDetails._id",
+          categoryName: {$first: "$categoryDetails.name"},
+          totalSalesPrice: {$sum:"$finalAmount"},
+          totalSalesQty: {$sum: "$orderItems.quantity"}
+          }
+        }
+      ]);
+      console.log("Top category:", topCategories);
+
+      return res.render("dashboard", {
+        status: true,
+        message: "Dashboard rendering successfull",
+        topProducts,
+        topCategories,
+      });
+
     } catch (error) {
-      console.error("Error at render dashboard");
+
+      console.error("Error at render dashboard", error);
       res.redirect("/admin/pageerror");
+
     }
   }
 };
