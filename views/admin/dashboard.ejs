@@ -39,13 +39,13 @@
 
         .main-container {
             padding: 2rem;
-            max-width: 1400px;
+            max-width: auto;
             margin: 0 auto;
         }
 
         .dashboard-grid {
             display: grid;
-            grid-template-columns: 2fr 1fr;
+            grid-template-columns: 1fr;
             gap: 2rem;
             margin-bottom: 2rem;
         }
@@ -307,7 +307,9 @@
                 </div>
                 <canvas id="salesChart" class="chart-canvas"></canvas>
             </div>
+        </div>
 
+        <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-header">
                     <h3 class="stat-title">Top 10 Products</h3>
@@ -317,9 +319,7 @@
                     <!-- Products will be populated by JavaScript -->
                 </ul>
             </div>
-        </div>
-
-        <div class="stats-grid">
+        
             <div class="stat-card">
                 <div class="stat-header">
                     <h3 class="stat-title">Top 10 Categories</h3>
