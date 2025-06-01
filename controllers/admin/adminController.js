@@ -107,15 +107,91 @@ const loadDashboard = async (req, res) => {
           totalSalesPrice: {$sum:"$finalAmount"},
           totalSalesQty: {$sum: "$orderItems.quantity"}
           }
-        }
+        },
+        {$sort: {totalSalesPrice: -1}},
+        {$limit: 10},
       ]);
-      console.log("Top category:", topCategories);
+      // console.log("Top category:", topCategories);
+
+
+      // Yealy data for graph
+      const yearlyData = await Order.aggregate([
+        {$match:
+          {finalAmount: {$exists: true}}},
+          {$addFields: {"year": {$year: "$createdOn"}}},
+          {
+            $group: {
+              _id: "$year",
+              totalSalesInYearly: {$sum: "$finalAmount"}
+            },
+          },
+          {$sort: {_id: -1}},
+          {$limit: 5},
+      ]);
+      // console.log("Yearly data:", yearlyData);
+
+
+      // Monthly data for graph
+      const monthlyData = await Order.aggregate([
+        {$match:
+          {finalAmount: {$exists: true}}},
+          {$addFields: {"year": {$year: "$createdOn"}}},
+          {$addFields: {"month": {$month: "$createdOn"}}},
+          {
+            $group: {
+              _id: "$month",
+              totalSalesInMonthly: {$sum: "$finalAmount"}
+            },
+          },
+          {$sort: {_id: -1}},
+          {$limit: 5},
+      ]);
+      console.log("Monthly data:", monthlyData);
+
+      const months = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+      const formattedMonthWiseData  = monthlyData.map((data) => {
+        return {
+          month: months[data._id],
+          totalSales: data.totalSalesInMonthly
+        }
+      })
+      console.log("monthsForMonthlyData:", formattedMonthWiseData );
+
+
+      // Daily data for graph
+      const dailyData = await Order.aggregate([
+        {$match:
+          {finalAmount: {$exists: true}}},
+          {
+            $group: {
+              _id: {$dayOfWeek: "$createdOn"},  //Get the week number like 1 = mon, 2 = tue
+              totalSalesInDaily: {$sum: "$finalAmount"},
+            },
+          },
+          {$sort: {_id: -1}},
+          {$limit: 7},
+      ]);
+      console.log("Daily data:", dailyData);
+
+      const days = ['', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+      const formattedDailyhWiseData = dailyData.map((data) => {
+        return {
+          day: days[data._id],
+          totalSales: data.totalSalesInDaily
+        }
+      }).reverse();
+      console.log("formattedDailyhWiseData:", formattedDailyhWiseData)
 
       return res.render("dashboard", {
         status: true,
         message: "Dashboard rendering successfull",
         topProducts,
         topCategories,
+        yearlyData,
+        formattedMonthWiseData,
+        formattedDailyhWiseData,
       });
 
     } catch (error) {

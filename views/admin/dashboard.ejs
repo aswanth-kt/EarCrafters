@@ -299,10 +299,10 @@
                 <div class="chart-header">
                     <h2 class="chart-title">Sales Analytics</h2>
                     <div class="filter-container">
-                        <button class="filter-btn active" onclick="changeFilter('yearly')">Yearly</button>
+                        <button class="filter-btn" onclick="changeFilter('yearly')">Yearly</button>
                         <button class="filter-btn" onclick="changeFilter('monthly')">Monthly</button>
                         <button class="filter-btn" onclick="changeFilter('weekly')">Weekly</button>
-                        <button class="filter-btn" onclick="changeFilter('daily')">Daily</button>
+                        <button class="filter-btn active" onclick="changeFilter('daily')">Daily</button>
                     </div>
                 </div>
                 <canvas id="salesChart" class="chart-canvas"></canvas>
@@ -329,18 +329,6 @@
                     <!-- Categories will be populated by JavaScript -->
                 </ul>
             </div>
-
-            <!-- <div class="stat-card">
-                <div class="stat-header">
-                    <h3 class="stat-title">Top 10 Brands</h3>
-                    <div class="stat-icon brands-icon">🏷️</div>
-                </div>
-                <ul class="top-list" id="topBrands"> -->
-
-                    <!-- Brands will be populated by JavaScript -->
-
-                <!-- </ul>
-            </div> -->
         </div>
 
         <div class="ledger-section">
@@ -388,57 +376,74 @@
     </div>
 
     <script>
-        // Sample data
-        const sampleData = {
+
+        // Yearly Data For Chart
+        const yearlyData = <%- JSON.stringify(yearlyData) %>;
+        let years = [];
+        let totalSaleYearWise = [];
+        yearlyData.forEach((year) => {
+            years.push(year._id);
+            totalSaleYearWise.push(year.totalSalesInYearly);
+        })
+
+
+        // Month wise data for chart
+       const monthlyData = <%- JSON.stringify(formattedMonthWiseData) %>;
+       const months = [];
+       const totalSalesMonthly = [];
+       monthlyData.forEach((data) => {
+        months.push(data.month);
+        totalSalesMonthly.push(data.totalSales)
+       });
+       // console.log("Monthly data", monthlyData)
+
+       // Daily wise data for chart
+       const dailyData = <%- JSON.stringify(formattedDailyhWiseData) %>;
+       const days = [];
+       const totalSalesDaily = [];
+       dailyData.forEach((data) => {
+        days.push(data.day);
+        totalSalesDaily.push(data.totalSales);
+       });
+    //    console.log("Daily data:", dailyData)
+
+        const chartData = {
             yearly: {
-                labels: ['2020', '2021', '2022', '2023', '2024'],
-                data: [45000, 52000, 48000, 61000, 58000]
+                labels: years,
+                data: totalSaleYearWise,
             },
             monthly: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                data: [4200, 3800, 4500, 4100, 4800, 5200, 4900, 5100, 4700, 5300, 4600, 4400]
+                labels: months,
+                data: totalSalesMonthly
             },
             weekly: {
                 labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6', 'Week 7'],
                 data: [1200, 1100, 1350, 1050, 1400, 1250, 1300]
             },
             daily: {
-                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                data: [180, 165, 220, 195, 240, 280, 190]
+                labels: days,
+                data: totalSalesDaily,
             }
         };
 
         // const topProducts = JSON.Stringify(<%- topProducts %>);
         const topProducts = <%- JSON.stringify(topProducts) %>;
-        console.log("Top products:", topProducts)
+        // console.log("Top products:", topProducts)
 
-        const topCategories = <%- JSON.stringify(topCategories) %>
-        console.log("topCategories:", topCategories)
-
-        const topBrands = [
-            { name: 'TechCorp', sales: '$89,450' },
-            { name: 'InnovateTech', sales: '$76,230' },
-            { name: 'FutureBrand', sales: '$65,780' },
-            { name: 'NextGen Solutions', sales: '$54,920' },
-            { name: 'SmartDevices Co.', sales: '$43,670' },
-            { name: 'DigitalPro', sales: '$38,450' },
-            { name: 'TechGiant', sales: '$32,190' },
-            { name: 'ModernTech', sales: '$27,680' },
-            { name: 'EliteGadgets', sales: '$23,450' },
-            { name: 'ProTech Industries', sales: '$19,870' }
-        ];
+        const topCategories = <%- JSON.stringify(topCategories) %>;
+        // console.log("topCategories:", topCategories);
+        
 
         let currentChart;
-
         function initChart() {
             const ctx = document.getElementById('salesChart').getContext('2d');
             currentChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: sampleData.yearly.labels,
+                    labels: chartData.daily.labels,
                     datasets: [{
                         label: 'Sales ($)',
-                        data: sampleData.yearly.data,
+                        data: chartData.daily.data,
                         borderColor: '#667eea',
                         backgroundColor: 'rgba(102, 126, 234, 0.1)',
                         borderWidth: 3,
@@ -481,8 +486,8 @@
             event.target.classList.add('active');
 
             // Update chart data
-            currentChart.data.labels = sampleData[period].labels;
-            currentChart.data.datasets[0].data = sampleData[period].data;
+            currentChart.data.labels = chartData[period].labels;
+            currentChart.data.datasets[0].data = chartData[period].data;
             currentChart.update();
         }
 
@@ -513,19 +518,6 @@
                 `;
                 categoriesContainer.appendChild(li);
             });
-
-            // // Populate top brands
-            // const brandsContainer = document.getElementById('topBrands');
-            // topBrands.forEach((brand, index) => {
-            //     const li = document.createElement('li');
-            //     li.className = 'top-item';
-            //     li.innerHTML = `
-            //         <div class="item-rank">${index + 1}</div>
-            //         <div class="item-name">${brand.name}</div>
-            //         <div class="item-value">${brand.sales}</div>
-            //     `;
-            //     brandsContainer.appendChild(li);
-            // });
         }
 
         function generateLedger() {
