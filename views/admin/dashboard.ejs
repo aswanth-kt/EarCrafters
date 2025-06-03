@@ -301,7 +301,6 @@
                     <div class="filter-container">
                         <button class="filter-btn" onclick="changeFilter('yearly')">Yearly</button>
                         <button class="filter-btn" onclick="changeFilter('monthly')">Monthly</button>
-                        <button class="filter-btn" onclick="changeFilter('weekly')">Weekly</button>
                         <button class="filter-btn active" onclick="changeFilter('daily')">Daily</button>
                     </div>
                 </div>
@@ -331,7 +330,7 @@
             </div>
         </div>
 
-        <div class="ledger-section">
+        <!-- <div class="ledger-section">
             <div class="ledger-header">
                 <h2 class="ledger-title">📚 Generate Ledger Book</h2>
                 <p style="color: #718096;">Generate comprehensive financial reports and ledger books</p>
@@ -372,7 +371,7 @@
             <button class="generate-btn" onclick="generateLedger()">
                 🚀 Generate Ledger Book
             </button>
-        </div>
+        </div> -->
     </div>
 
     <script>
@@ -415,10 +414,6 @@
             monthly: {
                 labels: months,
                 data: totalSalesMonthly
-            },
-            weekly: {
-                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6', 'Week 7'],
-                data: [1200, 1100, 1350, 1050, 1400, 1250, 1300]
             },
             daily: {
                 labels: days,
@@ -478,6 +473,7 @@
                     }
                 }
             });
+            // console.log("current chart:", currentChart);
         }
 
         function changeFilter(period) {
@@ -489,7 +485,8 @@
             currentChart.data.labels = chartData[period].labels;
             currentChart.data.datasets[0].data = chartData[period].data;
             currentChart.update();
-        }
+        };
+        
 
         function populateTopLists() {
             // Populate top products
@@ -520,26 +517,26 @@
             });
         }
 
-        function generateLedger() {
-            const reportType = document.getElementById('reportType').value;
-            const dateFrom = document.getElementById('dateFrom').value;
-            const dateTo = document.getElementById('dateTo').value;
-            const format = document.getElementById('reportFormat').value;
+        // function generateLedger() {
+        //     const reportType = document.getElementById('reportType').value;
+        //     const dateFrom = document.getElementById('dateFrom').value;
+        //     const dateTo = document.getElementById('dateTo').value;
+        //     const format = document.getElementById('reportFormat').value;
 
-            // Simulate ledger generation
-            const btn = event.target;
-            const originalText = btn.innerHTML;
+        //     // ledger generation
+        //     const btn = event.target;
+        //     const originalText = btn.innerHTML;
             
-            btn.innerHTML = '⏳ Generating...';
-            btn.disabled = true;
+        //     btn.innerHTML = '⏳ Generating...';
+        //     btn.disabled = true;
 
-            setTimeout(() => {
-                alert(`Ledger Generated Successfully!\n\nReport Type: ${reportType.charAt(0).toUpperCase() + reportType.slice(1)}\nPeriod: ${dateFrom} to ${dateTo}\nFormat: ${format.toUpperCase()}\n\nThe report has been generated and is ready for download.`);
+        //     setTimeout(() => {
+        //         alert(`Ledger Generated Successfully!\n\nReport Type: ${reportType.charAt(0).toUpperCase() + reportType.slice(1)}\nPeriod: ${dateFrom} to ${dateTo}\nFormat: ${format.toUpperCase()}\n\nThe report has been generated and is ready for download.`);
                 
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }, 2000);
-        }
+        //         btn.innerHTML = originalText;
+        //         btn.disabled = false;
+        //     }, 2000);
+        // }
 
         // Initialize everything when page loads
         window.addEventListener('load', () => {
