@@ -236,7 +236,7 @@ const getCheckoutPage = async (req, res) => {
     });
 
     if (!validCoupons) {
-      return res.status(NotFound).join({
+      return res.status(NotFound).json({
         status: false,
         message: "Coupon not found",
       });
@@ -244,11 +244,24 @@ const getCheckoutPage = async (req, res) => {
 
     const order = await Order.findOne({ userId: user._id });
     if (!order) {
-      return res.status(NotFound).join({
+      return res.status(NotFound).json({
         status: false,
         message: "Order not found",
       });
     }
+
+    // GST Calculation
+    let gst = Math.round(grandTotal * 18 / 100);
+    grandTotal += gst;
+
+    // Update the gst in to DB
+    await Order.updateOne({_id: order._id},
+      {gst: gst},
+      {new: true},
+    );
+    console.log("Order.gst:", order.gst);
+    console.log("gst:", gst);
+    console.log("Order:", order)
 
     res.render("checkout", {
       user,
@@ -261,6 +274,7 @@ const getCheckoutPage = async (req, res) => {
       grandTotal,
       coupons: validCoupons,
       order,
+      gst
     });
   } catch (error) {
     console.error("Error in get checkout page", error);
@@ -381,6 +395,7 @@ const codPlaceOrder = async (req, res) => {
       status,
       paymentMethod,
       couponApplied,
+      gst,
     } = req.body;
 
     // console.log("frondend passing datas: ",req.body);
@@ -414,14 +429,7 @@ const codPlaceOrder = async (req, res) => {
         status: false,
         message: "Order above Rs 1000 should not be allowed for COD."
       })
-    }
-
-    // Final amount less than 1000 thre is 50 rs shippin fee
-    let shippingFee = 0
-    if (finalAmount < 1000) {
-      shippingFee = 50
-      finalAmount += shippingFee;
-    }
+    };
 
     const orderId = await generateOrderId(); // Generate unique order id
 
@@ -437,11 +445,12 @@ const codPlaceOrder = async (req, res) => {
       discount,
       paymentMethod: paymentMethod || "COD",
       couponApplied,
+      gst,
     });
     // console.log("newOrder :", newOrder);
 
     const savedOrder = await newOrder.save();
-    console.log("Full saved order data:", savedOrder);
+    // console.log("Full saved order data:", savedOrder);
 
     for (const item of orderItems) {
       // console.log('orderItems.product:', item.product);
@@ -493,7 +502,6 @@ const codPlaceOrder = async (req, res) => {
       status: true,
       message: "Order placed successfully!",
       orderId: savedOrder._id,
-      shippingFee,
     });
 
   } catch (error) {
@@ -561,6 +569,7 @@ const walletPlaceOrder = async (req, res) => {
       status,
       paymentMethod,
       couponApplied,
+      gst,
     } = req.body;
 
     console.log("Body: ", req.body);
@@ -642,6 +651,7 @@ const walletPlaceOrder = async (req, res) => {
       discount,
       paymentMethod: paymentMethod,
       couponApplied,
+      gst,
     });
     const saveOrder = await newOrder.save();
 
@@ -717,6 +727,7 @@ const razorpayOrderSuccess = async (req, res) => {
       status,
       couponApplied,
       paymentMethod,
+      gst,
     } = req.body;
     console.log("Receiving data from frondend:", req.body);
 
@@ -763,6 +774,7 @@ const razorpayOrderSuccess = async (req, res) => {
       couponApplied,
       discount,
       paymentMethod: paymentMethod || "upi",
+      gst,
     });
 
     const savedOrder = await newOrder.save();

@@ -169,7 +169,8 @@
     <% if (order && address) { %>
 
       <div class="invoice-container" style="margin-bottom: 20px;">
-        <% if (order.status === "Delivered") { %>
+        <% if (["cod", "upi", "wallet"].includes(order.paymentMethod) &&
+         ["Order Placed", "Processing", "Shipped", "Delivered"].includes(order.status)) { %>
           <button class="btn btn-dark invoiceBtn" onclick="downloadInvoice('<%= order._id %>', '<%=order.orderId%>')">Download Invoice</button>
 
         <% } else if (order.status === "Payment Pending") { %>
@@ -321,6 +322,7 @@
 
   const orderJsonData = '<%- JSON.stringify(order) %>';
   const addressIdJsonData = '<%- JSON.stringify (address._id) %>';
+  const gst = '<%= gst %>'
 
   document.addEventListener('DOMContentLoaded', function() {
    
@@ -363,6 +365,7 @@
         couponApplied,
         paymentMethod: "upi",
         orderId,
+        gst
       };
   
       console.log("OrderData:", orderData);

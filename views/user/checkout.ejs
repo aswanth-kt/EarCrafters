@@ -556,12 +556,17 @@
                 <div class="price-details">
                     <div class="price-row">
                         <span class="price-label">Subtotal</span>
-                        <span>₹<%= grandTotal %></span>
+                        <span id="subtotal">₹0</span>
                     </div>
                     
                     <div class="price-row">
                         <span class="price-label">Discount</span>
                         <span id="discountAmount">₹0</span>
+                    </div>
+
+                    <div class="price-row">
+                        <span class="price-label">18% GST</span>
+                        <span id="gstAmount">₹<%= gst %></span>
                     </div>
                     
                     <div class="price-row">
@@ -625,6 +630,7 @@
                                 product: cart._id,
                                 quantity: cart.quantity,
                                 price: cart.salePrice,
+                                subtotal: cart.totalPrice,
                             }) %>
                         <% }) %>
 
@@ -864,9 +870,17 @@
     }
         
 
-    // Proceed to Payment function
     const cartItemsDataJson = '<%- JSON.stringify(cartItemsData) %>';
+    // console.log("cartItemsDataJson:", cartItemsDataJson);
 
+    const parseCartItems = JSON.parse(cartItemsDataJson);   //For access subtotal
+    // console.log("parse cart items:", parseCartItems);
+
+    // update subtotal in UI
+    const subtotalElement = document.getElementById("subtotal");
+    subtotalElement.textContent = `₹${parseCartItems[0].subtotal}`;
+
+    // Proceed to Payment function
     document.getElementById("paymentMethodBtn").addEventListener('click', function() {
         document.getElementById("loadingOverlay").classList.remove("d-none");
         this.disabled = true; // Disable the button to prevent multiple clicks
@@ -882,6 +896,7 @@
         const couponApplied = discount > 0;
         const customerName = '<%= user.name %>';
         const customerEmail = '<%= user.email %>';
+        const gst = '<%= gst %>'
         console.log("Customer name:", customerName, "Customer email:", customerEmail)
 
         const orderData = {
@@ -894,6 +909,7 @@
             customerName,
             customerEmail,
             couponApplied,
+            gst,
         };
 
         const paymentMethod = document.querySelector("input[name='paymentMethod']:checked").id;
@@ -1173,7 +1189,6 @@ document.addEventListener("DOMContentLoaded", function() {
       });
       
       const data = await response.json();
-      
       if (data.status) { // Changed from data.success to data.status to match backend
         // Store the applied coupon
         appliedCouponCode = couponCode;
@@ -1227,7 +1242,8 @@ document.addEventListener("DOMContentLoaded", function() {
           An unexpected error occurred. Please try again.
         </div>
       `;
-    }
+    };
+
   });
 
   // Remove coupon button handler
@@ -1296,6 +1312,7 @@ document.addEventListener("DOMContentLoaded", function() {
       `;
     }
   });
+
 
   // Helper function for showing alerts if SweetAlert is available
   function showAlert(type, message) {

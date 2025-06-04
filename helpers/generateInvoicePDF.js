@@ -138,6 +138,12 @@ async function generateInvoicePDF(orderId) {
           layout: "lightHorizontalLines", // Add light horizontal lines for a clean look
           margin: [0, 0, 0, 20],
         },
+        {
+          text: `GST 18%: ₹${order.gst.toFixed(2)}`,
+          style: "gst",
+          alignment: "right",
+          margin: [0, 10, 0, 20],
+        },
         order.couponApplied && order.discount > 0
           ? {
               text: `Discount Applied: ₹${order.discount.toFixed(2)}`,
@@ -208,6 +214,11 @@ async function generateInvoicePDF(orderId) {
           bold: true,
         },
         finalAmount: {
+          fontSize: 9,
+          bold: true,
+          color: "#333",
+        },
+        gst: {
           fontSize: 12,
           bold: true,
           color: "#333",

@@ -62,12 +62,15 @@ const getOrderDetails = async (req, res) => {
 
     const cartItems = cart ? cart.items : [];
 
+    let gst = order.finalAmount * 18 / 100;
+
     res.render("order-details", {
       user: userData,
       address,
       order,
       orderItems: cartItems,
       cartItems,
+      gst,
     });
   } catch (error) {
     console.error("Error in get orders details", error);
@@ -377,6 +380,7 @@ const retryPayment = async (req, res) => {
       status,
       paymentMethod,
       orderId,
+      gst,
     } = req.body;
     console.log("req.body:", req.body);
 
@@ -431,6 +435,7 @@ const retryPayment = async (req, res) => {
         $set: {
           status: status,
           razorpayOrderId: razorpayOrder.id,
+          gst: gst,
         },
       },
       { new: true }
