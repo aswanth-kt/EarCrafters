@@ -210,16 +210,16 @@ async function generateInvoicePDF(orderId) {
         },
         discount: {
           fontSize: 9,
-          color: "#d32f2f",
+          color: "#333",
           bold: true,
         },
         finalAmount: {
-          fontSize: 9,
+          fontSize: 12,
           bold: true,
           color: "#333",
         },
         gst: {
-          fontSize: 12,
+          fontSize: 9,
           bold: true,
           color: "#333",
         },

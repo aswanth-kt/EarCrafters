@@ -377,12 +377,13 @@
     <script>
 
         // Yearly Data For Chart
-        const yearlyData = <%- JSON.stringify(yearlyData) %>;
+        const yearlyData = <%- JSON.stringify(formattedYearlyWiseData) %>;
+        console.log("Yearly data:", yearlyData);
         let years = [];
         let totalSaleYearWise = [];
-        yearlyData.forEach((year) => {
-            years.push(year._id);
-            totalSaleYearWise.push(year.totalSalesInYearly);
+        yearlyData.forEach((data) => {
+            years.push(data.year);
+            totalSaleYearWise.push(data.totalSales);
         })
 
 

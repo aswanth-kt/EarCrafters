@@ -130,6 +130,18 @@ const loadDashboard = async (req, res) => {
       ]);
       // console.log("Yearly data:", yearlyData);
 
+      //For find 5 years data
+      const [currentYear] = [yearlyData[0]._id];  
+      const yearltDataMap = new Map(yearlyData.map(item => [item._id, item.totalSalesInYearly]));
+      const formattedYearlyWiseData = [];
+
+      for (let year = currentYear; year >= currentYear - 4; year--) {
+        formattedYearlyWiseData.push({
+          year: year,
+          totalSales: yearltDataMap.get(year) || 0
+        });
+      };
+      // console.log('formattedYearlyWiseData:', formattedYearlyWiseData);
 
       // Monthly data for graph
       const monthlyData = await Order.aggregate([
@@ -149,40 +161,21 @@ const loadDashboard = async (req, res) => {
       // console.log("Monthly data:", monthlyData);
 
       const months = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const [currentMonth] = [monthlyData[0]._id]; //Destructure for get current month
 
-      const formattedMonthWiseData  = monthlyData.map((data) => {
-        return {
-          month: months[data._id],
-          totalSales: data.totalSalesInMonthly
-        }
-      })
-      // console.log("monthsForMonthlyData:", formattedMonthWiseData );
+      const monthlyDataMap = new Map(monthlyData.map(item => [item._id, item.totalSalesInMonthly]));
+      // console.log("map", monthlyDataMap)  // Map(4) { 6 => 124600, 5 => 112646, 4 => 416364, 3 => 118343 }
 
+      let formattedMonthWiseData = [];
+      for (let month = currentMonth; month >= 1; month--) {
+        formattedMonthWiseData.push({
+          month: months[month],
+          totalSales: monthlyDataMap.get(month) || 0
+        })
+      };
+      // console.log("formattedMonthWiseData:", formattedMonthWiseData);
 
-      // Daily data for graph
-
-      // const dailyData = await Order.aggregate([
-      //   {$match:
-      //     {finalAmount: {$exists: true}}},
-      //     {
-      //       $group: {
-      //         _id: {$dayOfWeek: "$createdOn"},  //Get the week number like 1 = mon, 2 = tue
-      //         totalSalesInDaily: {$sum: "$finalAmount"},
-      //       },
-      //     },
-      //     {$sort: {_id: -1}},
-      //     {$limit: 7},
-      // ]);
-
-      // const days = ['', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-
-      // const formattedDailyhWiseData = dailyData.map((data) => {
-      //   return {
-      //     day: days[data._id],
-      //     totalSales: data.totalSalesInDaily
-      //   }
-      // }).reverse();
-
+      // Daily data for graph.
       const dailyData = await Order.aggregate([
         {
           $match: {
@@ -201,7 +194,7 @@ const loadDashboard = async (req, res) => {
           }
         },
         {$sort: {_id: -1}},  // sort by Date
-        {$limit: 10},
+        {$limit: 15},   //Set last 15 data
         {
           $project: {
             _id: 0,
@@ -215,7 +208,7 @@ const loadDashboard = async (req, res) => {
           }
         }
       ]);
-      console.log("Daily data:", dailyData);
+      // console.log("Daily data:", dailyData);
 
       const formattedDailyhWiseData = dailyData.map((data) => {
         return {
@@ -229,7 +222,7 @@ const loadDashboard = async (req, res) => {
         status: true,
         topProducts,
         topCategories,
-        yearlyData,
+        formattedYearlyWiseData,
         formattedMonthWiseData,
         formattedDailyhWiseData,
       });
