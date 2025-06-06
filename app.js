@@ -62,7 +62,7 @@ app.use("/admin", adminRouter);
 
 
 
-const port = process.env.PORT || process.env.SECOND_PORT;
+const port = process.env.PORT || 4330;
 app.listen(port, () => {
     console.log(`http://localhost:${port}`);
 });
