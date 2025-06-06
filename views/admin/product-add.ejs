@@ -444,10 +444,10 @@
             }
 
             // Image validation
-            let hasImage = true;
+            let hasImage = false;
             ['input1', 'input2', 'input3'].forEach(inputId => {
                 const input = document.getElementById(inputId);
-                if (input.files && input.files.length > 3) {
+                if (input.files && input.files.length > 0) {
                     hasImage = true;
                 }
             });
