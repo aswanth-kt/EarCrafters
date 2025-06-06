@@ -131,7 +131,8 @@ const loadDashboard = async (req, res) => {
       // console.log("Yearly data:", yearlyData);
 
       //For find 5 years data
-      const [currentYear] = [yearlyData[0]._id];  
+      const currentYear = yearlyData?.[0]?._id || new Date().getFullYear();
+  
       const yearltDataMap = new Map(yearlyData.map(item => [item._id, item.totalSalesInYearly]));
       const formattedYearlyWiseData = [];
 
@@ -161,7 +162,8 @@ const loadDashboard = async (req, res) => {
       // console.log("Monthly data:", monthlyData);
 
       const months = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      const [currentMonth] = [monthlyData[0]._id]; //Destructure for get current month
+      const currentMonth = monthlyData?.[0]?._id || (new Date().getMonth() + 1);
+      // console.log("current month:", currentMonth);
 
       const monthlyDataMap = new Map(monthlyData.map(item => [item._id, item.totalSalesInMonthly]));
       // console.log("map", monthlyDataMap)  // Map(4) { 6 => 124600, 5 => 112646, 4 => 416364, 3 => 118343 }
@@ -212,11 +214,11 @@ const loadDashboard = async (req, res) => {
 
       const formattedDailyhWiseData = dailyData.map((data) => {
         return {
-          day: data.date,
-          totalSales: data.totalSalesInDaily
+          day: data.date || new Date().toLocaleDateString('en-GB').split('/').join('-'),
+          totalSales: data.totalSalesInDaily || 0
         }
       });
-      console.log("formattedDailyhWiseData:", formattedDailyhWiseData)
+      console.log("formattedDailyhWiseData:", formattedDailyhWiseData);
 
       return res.render("dashboard", {
         status: true,

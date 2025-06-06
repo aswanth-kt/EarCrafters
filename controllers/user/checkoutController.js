@@ -243,25 +243,25 @@ const getCheckoutPage = async (req, res) => {
     }
 
     const order = await Order.findOne({ userId: user._id });
-    if (!order) {
-      return res.status(NotFound).json({
-        status: false,
-        message: "Order not found",
-      });
-    }
+    // if (!order) {
+    //   return res.status(NotFound).json({
+    //     status: false,
+    //     message: "Order not found",
+    //   });
+    // }
 
     // GST Calculation
     let gst = Math.round(grandTotal * 18 / 100);
     grandTotal += gst;
 
     // Update the gst in to DB
-    await Order.updateOne({_id: order._id},
-      {gst: gst},
-      {new: true},
-    );
-    console.log("Order.gst:", order.gst);
-    console.log("gst:", gst);
-    console.log("Order:", order)
+    // await Order.updateOne({_id: order._id},
+    //   {gst: gst},
+    //   {new: true},
+    // );
+    // console.log("Order.gst:", order.gst);
+    // console.log("gst:", gst);
+    // console.log("Order:", order)
 
     res.render("checkout", {
       user,

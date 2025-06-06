@@ -378,7 +378,6 @@
 
         // Yearly Data For Chart
         const yearlyData = <%- JSON.stringify(formattedYearlyWiseData) %>;
-        console.log("Yearly data:", yearlyData);
         let years = [];
         let totalSaleYearWise = [];
         yearlyData.forEach((data) => {
@@ -438,7 +437,7 @@
                 data: {
                     labels: chartData.daily.labels,
                     datasets: [{
-                        label: 'Sales ($)',
+                        label: 'Sales (₹)',
                         data: chartData.daily.data,
                         borderColor: '#667eea',
                         backgroundColor: 'rgba(102, 126, 234, 0.1)',
