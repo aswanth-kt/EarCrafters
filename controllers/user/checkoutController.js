@@ -215,12 +215,13 @@ const getCheckoutPage = async (req, res) => {
       ? userAddress.address.filter((addr) => addr.isDefault === false)
       : null;
 
-    // console.log("notDefaultAddress :", notDefaultAddress);
+    console.log("notDefaultAddress :", notDefaultAddress);
 
     // Only default address
     const defaultAddress = userAddress
       ? userAddress.address.find((addr) => addr.isDefault)
-      : null;
+    : null;
+    console.log("DefaultAddress :", defaultAddress);
 
     const cartItems = cart ? cart.items : [];
     // console.log(userAddress.address[0].name)
@@ -729,7 +730,7 @@ const razorpayOrderSuccess = async (req, res) => {
       paymentMethod,
       gst,
     } = req.body;
-    console.log("Receiving data from frondend:", req.body);
+    // console.log("Receiving data from frondend:", req.body);
 
     const userId = req.session.user;
 
@@ -747,7 +748,7 @@ const razorpayOrderSuccess = async (req, res) => {
         status: false,
         message: "No addresses found for the user",
       });
-    }
+    };
 
     const defaultAddress = userAddresses
       .flatMap((addr) => addr.address)

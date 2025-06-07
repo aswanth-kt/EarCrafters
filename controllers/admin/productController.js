@@ -64,13 +64,11 @@ const addProducts = async (req, res) => {
       const newProduct = new Product({
         productName: product.productName,
         description: product.description,
-        // brand: product.brand,
         category: categoryId._id,
         regularPrice: product.regularPrice,
         salePrice: product.salePrice,
         createdAt: new Date(),
         quantity: product.quantity,
-        // size: product.size, //Check it!!!!!
         color: product.color,
         productImage: images,
         status: "Available",

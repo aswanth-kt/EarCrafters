@@ -291,7 +291,7 @@ body {
 
 
             if (sDateObj > eDateObj) {
-                document.getElementById('error-end-date').innerHTML = 'End date should be after the start date';
+                displayErrorMessage("error-end-date", "End date should be after the start date")
                 isValid = false;
             }
             if (productName === "") {

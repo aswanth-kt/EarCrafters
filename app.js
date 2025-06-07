@@ -64,7 +64,9 @@ app.use("/admin", adminRouter);
 
 const port = process.env.PORT || 4330;
 app.listen(port, () => {
-    console.log(`http://localhost:${port}`);
+    console.log(`Localhost:       http://localhost:${port}`);
+    console.log(`Admin Panel:     http://localhost:${port}/admin/login`);
+    console.log(`Live Site:       https://earcrafters.onrender.com`);
 });
 
 

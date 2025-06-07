@@ -391,6 +391,9 @@
                 <div class="checkout-section">
                     <div class="section-title">
                         <span>Shipping Address</span>
+                        <% if (!defaultAddress) { %>
+                            <button>Add Address</button>
+                        <% } %>
                     </div>
                     
                         <% if (!defaultAddress && defaultAddress.name) { %>
@@ -398,69 +401,69 @@
                         <% } %>
 
                         <% if (defaultAddress && defaultAddress.name) { %>
-                        <div class="address-card selected">
-                            <div class="address-default-badge">Default</div>
+                            <div class="address-card selected">
+                                <div class="address-default-badge">Default</div>
 
-                            <strong>
-                                <%=defaultAddress.name%>
-                            </strong>
-                            <div class="badge badge-secondary">
-                                <%= defaultAddress.addressType %>
-                            </div>
-                            <p>
-                                <%=defaultAddress.city%>
-                            </p>
-                            <p>
-                                <%=defaultAddress.landMark%>
-                            </p>
-                            <p>
-                                <%=defaultAddress.state%>
-                            </p>
-                            <p>
-                                <%=defaultAddress.phone%>
-                            </p>
-                            <p>
-                                <%=defaultAddress.altPhone%>
-                            </p>
-
-                            <div class="address-action-buttons">
-                                <a href="/editCheckoutAddress?id=<%= defaultAddress._id %>">
-                                    <button class="address-action-btn" id="editAddressBtn" onclick="editAddress('<%= defaultAddress._id %>')">Edit</button>
-                                </a>
-                                <button class="address-action-btn" id="changeAddressBtn">Change Address</button>
-                            </div>
-                        </div>
-                        <% } else if (addresses) { %>
-                            <% addresses.forEach(function(address) { %>
-                            <div class="address-list-container" id="address-list">
-                                <div class="address-card">
-
-                                    <div class="address-details">
-                                        <strong>
-                                            <%= address.name %>
-                                        </strong>
-                                        <p>
-                                            <%= address.addressType %>
-                                        </p>
-                                        <p>
-                                            <%= address.city %>, <%= address.state %> - <%=
-                                            address.pincode %>
-                                        </p>
-                                        <p>Phone: <%= address.phone %>
-                                        </p>
-                                    </div>
-
-                                    <div class="address-action-buttons">
-                                        <button class="address-action-btn">Edit</button>
-                                        <button class="address-action-btn">Delete</button>
-                                        <button class="address-action-btn">Set as Default</button>
-                                    </div>
+                                <strong>
+                                    <%= defaultAddress.name %>
+                                </strong>
+                                <div class="badge badge-secondary">
+                                    <%= defaultAddress.addressType %>
                                 </div>
+                                <p>
+                                    <%=defaultAddress.city%>
+                                </p>
+                                <p>
+                                    <%=defaultAddress.landMark%>
+                                </p>
+                                <p>
+                                    <%=defaultAddress.state%>
+                                </p>
+                                <p>
+                                    <%=defaultAddress.phone%>
+                                </p>
+                                <p>
+                                    <%=defaultAddress.altPhone%>
+                                </p>
 
-                                <button class="add-new-address">
-                                    + Add New Address
-                                </button>
+                                <div class="address-action-buttons">
+                                    <a href="/editCheckoutAddress?id=<%= defaultAddress._id %>">
+                                        <button class="address-action-btn" id="editAddressBtn" onclick="editAddress('<%= defaultAddress._id %>')">Edit</button>
+                                    </a>
+                                    <button class="address-action-btn" id="changeAddressBtn">Change Address</button>
+                                </div>
                             </div>
+                        <% } else if (notDefaultAddress) { %>
+                            <% Object.entries(notDefaultAddress).forEach(([key, address]) => { %>
+                                <div class="address-list-container" id="address-list">
+                                    <div class="address-card">
+
+                                        <div class="address-details">
+                                            <strong>
+                                                <%= address.name %>
+                                            </strong>
+                                            <p>
+                                                <%= address.addressType %>
+                                            </p>
+                                            <p>
+                                                <%= address.city %>, <%= address.state %> - <%=
+                                                address.pincode %>
+                                            </p>
+                                            <p>Phone: <%= address.phone %>
+                                            </p>
+                                        </div>
+
+                                        <div class="address-action-buttons">
+                                            <button class="address-action-btn">Edit</button>
+                                            <button class="address-action-btn">Delete</button>
+                                            <button class="address-action-btn">Set as Default</button>
+                                        </div>
+                                    </div>
+
+                                    <button class="add-new-address">
+                                        + Add New Address
+                                    </button>
+                                </div>
                             <% }) %>
                         <% } else { %>
                                 <p>No Address Found</p>
@@ -664,7 +667,8 @@
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 <script>
-
+    // const notDefaultAddress = <%- notDefaultAddress %>;
+    // console.log("notDefaultAddress:", notDefaultAddress)
     document.addEventListener("DOMContentLoaded", function() {
         // Initialize Bootstrap components
         if (typeof bootstrap !== 'undefined') {
@@ -1008,7 +1012,7 @@
                 return response.json();
             })
             .then(data => {
-
+                console.log("Data:", data)
                 document.getElementById('loadingOverlay').classList.add('d-none');
                 document.getElementById('paymentMethodBtn').disabled = false;
 
