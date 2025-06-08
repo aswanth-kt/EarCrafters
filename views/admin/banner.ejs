@@ -30,7 +30,7 @@
                             <%= data[i].description %>
                           </td>
                           <td>
-                            <% if (data[i].startDate < Date.now() && data[i].endDate > Date.now()) { %>
+                            <% if (data[i].startDate <= Date.now() && data[i].endDate > Date.now()) { %>
                                 <p class="badge rounded-pill alert-success">Active</p>
                             <% } else { %>
                                 <p class="badge rounded-pill alert-danger">No Active</p>
