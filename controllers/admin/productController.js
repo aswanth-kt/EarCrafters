@@ -14,8 +14,6 @@ const {
   InternalServerError,
 } = require("../../helpers/httpStatusCodes");
 
-const cloudinary = require("../../config/cloudinary");
-
 const getAddProduct = async (req, res) => {
   try {
     const categoryData = await Category.find({ isListed: true });
@@ -63,8 +61,6 @@ const addProducts = async (req, res) => {
         return res.status(BadRequest).json("Invalid category name");
       }
 
-      const imageUrls = req.files ? req.files.map(file => file.path) : [];
-
       const newProduct = new Product({
         productName: product.productName,
         description: product.description,
@@ -74,7 +70,7 @@ const addProducts = async (req, res) => {
         createdAt: new Date(),
         quantity: product.quantity,
         color: product.color,
-        productImage: imageUrls,
+        productImage: images,
         status: "Available",
       });
 

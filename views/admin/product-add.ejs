@@ -255,23 +255,20 @@
                     let croppedCanvas = cropper.getCroppedCanvas();
                     let croppedImage = document.getElementById("croppedImg" + index);
                     croppedImage.src = croppedCanvas.toDataURL("image/jpeg", 1.0);
-                    // let timeStamp = new Date().getTime();
-                    // let fileName = `cropped-img-${timeStamp}-${index}.png`;
+                    let timeStamp = new Date().getTime();
+                    let fileName = `cropped-img-${timeStamp}-${index}.png`;
 
-                    // // Convert cropped img to original img, Save Image
-                    // croppedCanvas.toBlob(blob => {
-                    //     let input = document.getElementById("input" + index);
-                    //     let imgFile = new File([blob], fileName, { type: blob.type });
-                    //     const fileList = new DataTransfer();
-                    //     fileList.items.add(imgFile);
-                    //     input.files = fileList.files;
+                    // Convert cropped img to original img, Save Image
+                    croppedCanvas.toBlob(blob => {
+                        let input = document.getElementById("input" + index);
+                        let imgFile = new File([blob], fileName, { type: blob.type });
+                        const fileList = new DataTransfer();
+                        fileList.items.add(imgFile);
+                        input.files = fileList.files;
                         
-                    //     // Add to thumbnails
-                    //     addThumbnail(croppedImage.src, index);
-                    // }, 'image/png');
-
-                    // Upload to Cloudinary
-                    uploadToCloudinary(croppedCanvas, index);
+                        // Add to thumbnails
+                        addThumbnail(croppedImage.src, index);
+                    }, 'image/png');
 
                     cropperContainer.style.display = "none";
                     cropper.destroy();
@@ -279,108 +276,6 @@
             };
 
             reader.readAsDataURL(input.files[0]);
-        };
-
-        // Function to upload cropped image to Cloudinary
-        async function uploadToCloudinary(canvas, index) {
-            // Your Cloudinary configuration
-            const CLOUDINARY_URL = 'https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/image/upload';
-            const UPLOAD_PRESET = 'earcrafters';
-            
-            try {
-                // Convert canvas to blob
-                canvas.toBlob(async (blob) => {
-                    const formData = new FormData();
-                    formData.append('file', blob);
-                    formData.append('upload_preset', UPLOAD_PRESET);
-                    formData.append('folder', 'products'); // Optional: organize images in folders
-                    
-                    const response = await fetch(CLOUDINARY_URL, {
-                        method: 'POST',
-                        body: formData
-                    });
-                    
-                    const data = await response.json();
-                    
-                    if (data.secure_url) {
-                        console.log('Image uploaded successfully:', data.secure_url);
-                        
-                        // Store the Cloudinary URL for form submission
-                        storeCloudinaryUrl(data.secure_url, index);
-                        
-                        // Add thumbnail
-                        addThumbnail(data.secure_url, index);
-                        
-                        // Show success message
-                        showSuccessMessage(`Image ${index} uploaded successfully!`);
-                    } else {
-                        throw new Error('Upload failed');
-                    }
-                }, 'image/jpeg', 0.9);
-                
-            } catch (error) {
-                console.error('Error uploading to Cloudinary:', error);
-                alert('Failed to upload image. Please try again.');
-            }
-        }
-
-        // Store Cloudinary URLs for form submission
-        const cloudinaryUrls = {};
-
-        function storeCloudinaryUrl(url, index) {
-            cloudinaryUrls[`image${index}`] = url;
-            
-            // Create hidden input to store URL for form submission
-            let hiddenInput = document.getElementById(`cloudinary_url_${index}`);
-            if (!hiddenInput) {
-                hiddenInput = document.createElement('input');
-                hiddenInput.type = 'hidden';
-                hiddenInput.name = `cloudinaryUrls[${index}]`;
-                hiddenInput.id = `cloudinary_url_${index}`;
-                document.querySelector('form').appendChild(hiddenInput);
-            }
-            hiddenInput.value = url;
-        }
-
-        function showSuccessMessage(message) {
-            // Create or update success message element
-            let successElement = document.getElementById('upload-success');
-            if (!successElement) {
-                successElement = document.createElement('div');
-                successElement.id = 'upload-success';
-                successElement.style.color = 'green';
-                successElement.style.marginTop = '10px';
-                document.querySelector('.card-header').appendChild(successElement);
-            }
-            successElement.textContent = message;
-            
-            // Hide after 3 seconds
-            setTimeout(() => {
-                successElement.textContent = '';
-            }, 3000);
-        }
-
-        // Alternative: Using Cloudinary Upload Widget
-        function openCloudinaryWidget(index) {
-            cloudinary.openUploadWidget({
-                cloudName: 'ddkao5ss5',
-                uploadPreset: 'earcrafters',
-                folder: 'products',
-                cropping: true,
-                croppingAspectRatio: 1,
-                multiple: false,
-                resourceType: 'image',
-                clientAllowedFormats: ['jpg', 'jpeg', 'png', 'gif'],
-                maxFileSize: 10000000, // 10MB
-                theme: 'minimal'
-            }, (error, result) => {
-                if (!error && result && result.event === "success") {
-                    console.log('Upload successful:', result.info);
-                    storeCloudinaryUrl(result.info.secure_url, index);
-                    addThumbnail(result.info.secure_url, index);
-                    showSuccessMessage(`Image ${index} uploaded successfully!`);
-                }
-            });
         }
 
         // Add thumbnail to the container
