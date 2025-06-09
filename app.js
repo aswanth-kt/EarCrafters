@@ -33,7 +33,7 @@ app.use(express.urlencoded({extended: true}));    //convert urls string
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
-  saveUninitialized: false,
+  saveUninitialized: true,
   store: MongoStore.create({ mongoUrl: process.env.MONGODB_URI }),
   cookie: {
     secure: process.env.NODE_ENV === 'production',
