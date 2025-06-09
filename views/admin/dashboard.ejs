@@ -299,9 +299,9 @@
                 <div class="chart-header">
                     <h2 class="chart-title">Sales Analytics</h2>
                     <div class="filter-container">
-                        <button class="filter-btn" onclick="changeFilter('yearly')">Yearly</button>
+                        <button class="filter-btn active" onclick="changeFilter('yearly')">Yearly</button>
                         <button class="filter-btn" onclick="changeFilter('monthly')">Monthly</button>
-                        <button class="filter-btn active" onclick="changeFilter('daily')">Daily</button>
+                        <button class="filter-btn" onclick="changeFilter('daily')">Daily</button>
                     </div>
                 </div>
                 <canvas id="salesChart" class="chart-canvas"></canvas>
@@ -435,10 +435,10 @@
             currentChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: chartData.daily.labels,
+                    labels: chartData.yearly.labels,
                     datasets: [{
                         label: 'Sales (₹)',
-                        data: chartData.daily.data,
+                        data: chartData.yearly.data,
                         borderColor: '#667eea',
                         backgroundColor: 'rgba(102, 126, 234, 0.1)',
                         borderWidth: 3,
