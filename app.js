@@ -18,29 +18,29 @@ app.use(express.json());    //for convert form data
 app.use(express.urlencoded({extended: true}));    //convert urls string
 
 // Session setup
-// app.use(session({
-//     secret : process.env.SESSION_SECRET,
-//     resave : false,
-//     saveUninitialized : true,
-//     store: MongoStore.create({mongoUrl: process.env.MONGODB_URI}),
-//     cookie : {
-//         secure : false, //Remind change to true at production time
-//         httpOnly : true,
-//         maxAge : 72*60*60*1000
-//     },
-// }));
-
 app.use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-  store: MongoStore.create({ mongoUrl: process.env.MONGODB_URI }),
-  cookie: {
-    secure: process.env.NODE_ENV === 'production',
-    httpOnly: true,
-    maxAge: 72 * 60 * 60 * 1000
-  }
+    secret : process.env.SESSION_SECRET,
+    resave : false,
+    saveUninitialized : true,
+    store: MongoStore.create({mongoUrl: process.env.MONGODB_URI}),
+    cookie : {
+        secure : false, //Remind change to true at production time
+        httpOnly : true,
+        maxAge : 72*60*60*1000
+    },
 }));
+
+// app.use(session({
+//   secret: process.env.SESSION_SECRET,
+//   resave: false,
+//   saveUninitialized: false,
+//   store: MongoStore.create({ mongoUrl: process.env.MONGODB_URI }),
+//   cookie: {
+//     secure: process.env.NODE_ENV === 'production',
+//     httpOnly: true,
+//     maxAge: 72 * 60 * 60 * 1000
+//   }
+// }));
 
 
 
