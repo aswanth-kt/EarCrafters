@@ -605,7 +605,7 @@ const filterPriceLowToHigh = async (req, res) => {
     }).lean();
 
     // Pagination
-    let itemsPerPage = 6;
+    let itemsPerPage = 9;
     let currentPage = parseInt(req.query.page) || 1;
     const totalProducts = await Product.countDocuments({
       isBlock: false,
@@ -627,6 +627,7 @@ const filterPriceLowToHigh = async (req, res) => {
       currentPage: currentPage,
       count: totalProducts,
       filter: null,
+      user: userData,
     });
   } catch (error) {
     console.error("Error in Filter price low to high", error);
@@ -645,7 +646,7 @@ const filterPriceHighToLow = async (req, res) => {
     }).lean();
 
     // Pagination
-    let itemsPerPage = 6;
+    let itemsPerPage = 9;
     let currentPage = parseInt(req.query.page) || 1;
     const totalProducts = await Product.countDocuments({
       isBlock: false,
@@ -667,6 +668,7 @@ const filterPriceHighToLow = async (req, res) => {
       currentPage: currentPage,
       count: totalProducts,
       filter: null,
+      user: userData,
     });
   } catch (error) {
     console.error("Error in Filter price High to Low", error);
@@ -685,7 +687,7 @@ const filterNameAscendingOrder = async (req, res) => {
     }).lean();
 
     // Pagination
-    let itemsPerPage = 6;
+    let itemsPerPage = 9;
     let currentPage = parseInt(req.query.page) || 1;
     const totalProducts = await Product.countDocuments({
       isBlock: false,
@@ -730,7 +732,7 @@ const filterNameDescendingOrder = async (req, res) => {
     }).lean();
 
     // Pagination
-    let itemsPerPage = 6;
+    let itemsPerPage =9;
     let currentPage = parseInt(req.query.page) || 1;
     const totalProducts = await Product.countDocuments({
       isBlock: false,
