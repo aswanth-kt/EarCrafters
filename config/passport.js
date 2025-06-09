@@ -8,11 +8,12 @@ passport.use(new GoogleStrategy(
     {
         clientID : process.env.GOOGLE_CLIENT_ID,
         clientSecret : process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL : "https://earcrafters.onrender.com/auth/google/callback"
+        callbackURL : "https://earcrafters.onrender.com/auth/google/callback" || "/auth/google/callback"
     },
 
     async (accessToken, refreshToken, profile, done) => {
         try {
+            console.log("Google Profile:", profile);
 
             let user = await User.findOne({googleId : profile.id});
             if (user) {
@@ -50,7 +51,7 @@ passport.deserializeUser((id, done) => {
         done(null, user);
     })
     .catch(error => {
-        done(err, null);
+        done(error, null);
     });
 });
 
