@@ -598,7 +598,7 @@ const walletPlaceOrder = async (req, res) => {
       .find((addr) => addr.isDefault === true);
     // console.log("defaultAddress :", defaultAddress);
 
-    console.log("Wallet place order - defaultAddress:", defaultAddress);
+    // console.log("Wallet place order - defaultAddress:", defaultAddress);
 
     const wallet = await Wallet.findOne({ userId: userData._id });
 

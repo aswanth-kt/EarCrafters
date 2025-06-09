@@ -667,8 +667,7 @@
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 <script>
-    // const notDefaultAddress = <%- notDefaultAddress %>;
-    // console.log("notDefaultAddress:", notDefaultAddress)
+
     document.addEventListener("DOMContentLoaded", function() {
         // Initialize Bootstrap components
         if (typeof bootstrap !== 'undefined') {
@@ -920,8 +919,8 @@
         orderData.paymentMethod = paymentMethod;
 
         if (paymentMethod === "cod") {
-            // this.disabled = false;      // Re-enable the payment button
-            document.getElementById('loadingOverlay').classList.add('d-none');
+            document.getElementById('loadingOverlay').classList.remove("d-none");
+            document.getElementById('paymentMethodBtn').disabled = true;
             // Add this after collecting the order data
             fetch('/checkout/place-order', {
                 method: 'POST',
@@ -960,6 +959,9 @@
 
             // Wallet payment
         }else if (paymentMethod === "wallet") {
+            document.getElementById('loadingOverlay').classList.remove("d-none");
+            document.getElementById('paymentMethodBtn').disabled = true;
+
             fetch('/payment/wallet', {
                 method: 'POST',
                 headers: {
@@ -995,8 +997,6 @@
 
             // Razorpay
         } else if (paymentMethod === 'upi') {
-            console.log("Starting razorpay payment process...");
-
             document.getElementById('loadingOverlay').classList.remove("d-none");
             document.getElementById('paymentMethodBtn').disabled = true;
 

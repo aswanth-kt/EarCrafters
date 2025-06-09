@@ -222,7 +222,7 @@ const getUserProfilePage = async (req, res) => {
 
     // Fetch Wallet details
     const wallet = await Wallet.findOne({ userId: userData._id });
-    console.log("Wallet:", wallet)
+    // console.log("Wallet:", wallet)
     // if (!wallet) {
     //   return res.status(NotFound).json({
     //     status: false,
@@ -523,6 +523,20 @@ const postAddAddress = async (req, res) => {
     } = req.body;
 
     const userAddress = await Address.findOne({ userId: userData._id });
+
+    // // Set default address to true if this is the user's first address
+    // const addressCounts = await Address.aggregate([
+    //   {
+    //     $project: {
+    //       addressCount: {$size: "$address"}
+    //     }
+    //   }
+    // ]);
+    // console.log("AddressCounts:", addressCounts)
+    // let isDefault = false;
+    // if (addressCounts.addressCount === 0) {
+    //   isDefault = true;
+    // }
 
     if (!userAddress) {
       // There is no address create a new address.
