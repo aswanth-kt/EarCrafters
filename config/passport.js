@@ -3,11 +3,13 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const User = require('../models/userSchema');
 const dotenv = require('dotenv').config();
 
+console.log("clientID :", process.env.GOOGLE_CLIENT_ID);
+console.log("clientSecret:", process.env.GOOGLE_CLIENT_SECRET);
 
 passport.use(new GoogleStrategy(
     {
         clientID : process.env.GOOGLE_CLIENT_ID,
-        clientSecret : process.env.GOOGLE_CLIENT_SECRET,
+        clientSecret : process.env.GOOGLE_CLIENT_SECRET || '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',
         callbackURL : "https://earcrafters.onrender.com/auth/google/callback",
     },
 
