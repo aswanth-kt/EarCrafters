@@ -209,7 +209,9 @@ const cancelOrder = async (req, res) => {
       message: "Order cancelled successfully",
       updatedOrder,
     });
+
   } catch (error) {
+    
     console.error("Error in cancel order", error);
     res.status(InternalServerError).json({
       message: "Internal server error",

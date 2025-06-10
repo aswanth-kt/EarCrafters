@@ -214,7 +214,7 @@ const loadDashboard = async (req, res) => {
 
       const formattedDailyhWiseData = dailyData.map((data) => {
         return {
-          day: data.date || new Date().toLocaleDateString('en-GB').split('/').join('-'),
+          day: data.date,
           totalSales: data.totalSalesInDaily || 0
         }
       });

@@ -570,6 +570,7 @@
       return response.json();
     })
     .then(data => {
+      console.log("cancellation data:", data)
       Swal.fire({
         title: 'Cancelled!',
         text: `Your order has been cancelled successfully.`,
