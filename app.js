@@ -21,7 +21,7 @@ app.use(express.urlencoded({extended: true}));    //convert urls string
 app.use(session({
     secret : process.env.SESSION_SECRET,
     resave : false,
-    saveUninitialized : false,
+    saveUninitialized : false, //false at production time
     store: MongoStore.create({mongoUrl: process.env.MONGODB_URI}),
     cookie : {
         secure : false, //Remind change to true at production time

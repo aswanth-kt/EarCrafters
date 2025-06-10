@@ -84,7 +84,11 @@
                                      <ul>
                                          <li class="mb-10"><i class="fi-rs-crown mr-5"></i> 1 Year Warranty</li>
                                          <li class="mb-10"><i class="fi-rs-refresh mr-5"></i> 30 Day Return Policy</li>
-                                         <li><i class="fi-rs-credit-card mr-5"></i> Cash on Delivery available</li>
+                                         <% if (product.salePrice <= 1000) {%>
+                                            <li><i class="fi-rs-credit-card mr-5"></i> Cash on Delivery available</li>
+                                         <% } else {%>
+                                            <li><i class="fi-rs-credit-card mr-5"></i> Only Prepaid available</li>
+                                        <% } %>
                                      </ul>
                                  </div>
                                
