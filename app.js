@@ -24,7 +24,7 @@ app.use(session({
     saveUninitialized : false, //false at production time
     store: MongoStore.create({mongoUrl: process.env.MONGODB_URI}),
     cookie : {
-        secure : true, //Remind change to true at production time
+        secure : false, //Remind change to true at production time
         httpOnly : true,
         maxAge : 72*60*60*1000
     },
