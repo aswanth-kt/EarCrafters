@@ -556,6 +556,8 @@
     };
     
     // Send data to server using fetch API
+    console.log('Request data:', data);
+    console.log('Request body:', JSON.stringify(data));
     fetch('/cancel-product', {
       method: 'POST',
       headers: {
@@ -564,6 +566,7 @@
       body: JSON.stringify(data)
     })
     .then(response => {
+      console.log('Cance product Status:', response.status, response.statusText);
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
