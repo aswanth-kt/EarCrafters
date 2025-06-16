@@ -169,7 +169,7 @@ const cancelOrder = async (req, res) => {
     const isAllItemCancelled = updatedOrder.orderItems.every(
       (item) => item.cancellationStatus === "Cancelled"
     );
-    console.log("is all item cancelled? :", isAllItemCancelled);
+    // console.log("is all item cancelled? :", isAllItemCancelled);
     if (isAllItemCancelled) {
       await Order.findByIdAndUpdate(
         order._id,
@@ -205,7 +205,7 @@ const cancelOrder = async (req, res) => {
     await wallet.save();
 
     return res.status(OK).json({
-      success: true,
+      status: true,
       message: "Order cancelled successfully",
       updatedOrder,
     });
