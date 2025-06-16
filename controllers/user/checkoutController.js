@@ -403,7 +403,10 @@ const codPlaceOrder = async (req, res) => {
 
     const userId = req.session.user;
 
-    const userData = await User.findOne({ _id: userId });
+    const userData = await User.findOne({ _id: userId }, {
+      isBlock: false,
+      isAdmin: false,
+    });
 
     const userAddress = await Address.find({ userId: userData._id });
     if (!userAddress || userAddress.length === 0) {
@@ -458,7 +461,10 @@ const codPlaceOrder = async (req, res) => {
       const productId = item.product;
       const orderedQuantity = item.quantity;
 
-      const product = await Product.findById(productId);
+      const product = await Product.findById(productId, {
+        isBlock: false,
+        isSoftDelete: false
+      });
 
       if (product) {
         if (product.quantity < orderedQuantity) {
@@ -576,7 +582,10 @@ const walletPlaceOrder = async (req, res) => {
     console.log("Body: ", req.body);
 
     const userId = req.session.user;
-    const userData = await User.findById(userId);
+    const userData = await User.findById(userId, {
+      isBlock: false,
+      isAdmin: false,
+    });
 
     if (!userData) {
       return res.status(NotFound).json({
@@ -662,7 +671,10 @@ const walletPlaceOrder = async (req, res) => {
       const productId = item.product;
       const orderedQuantity = item.quantity;
 
-      const product = await Product.findById(productId);
+      const product = await Product.findById(productId, {
+        isBlock: false,
+        isSoftDelete: false
+      });
 
       if (product) {
         if (product.quantity < orderedQuantity) {
@@ -734,7 +746,10 @@ const razorpayOrderSuccess = async (req, res) => {
 
     const userId = req.session.user;
 
-    const userData = await User.findById(userId);
+    const userData = await User.findById(userId, {
+      isBlock: false,
+      isAdmin: false
+    });
     if (!userData) {
       return res.status(NotFound).json({
         status: false,
@@ -791,7 +806,10 @@ const razorpayOrderSuccess = async (req, res) => {
       const productId = item.product;
       const orderedQuantity = item.quantity;
 
-      const product = await Product.findById(productId);
+      const product = await Product.findById(productId, {
+        isBlock: false,
+        isSoftDelete: false
+      });
       if (product) {
         if (product.quantity < orderedQuantity) {
           return res.status(BadRequest).json({
@@ -886,7 +904,11 @@ const getRazorpayOrderFaild = async (req, res) => {
     console.log("OrderId:", orderId);
 
     const userId = req.session.user;
-    const userData = await User.findById(userId).select("name email");
+    const userData = await User.findById(userId, {
+      isBlock: false,
+      isAdmin: false
+    })
+    .select("name email");
 
     if (!userData) {
       return res.status(BadRequest).json({
@@ -898,7 +920,8 @@ const getRazorpayOrderFaild = async (req, res) => {
     const cart = await Cart.findOne({ userId: userData._id });
     const cartItems = cart ? cart.items : [];
 
-    const order = await Order.findById(orderId);
+    const order = await Order.findById(orderId).populate("orderItems.product");
+    // console.log("Order in razorpay failed:", order.orderItems)
 
     if (!order) {
       return res.status(BadRequest).json({
@@ -910,6 +933,15 @@ const getRazorpayOrderFaild = async (req, res) => {
     // Update order status to Payment pending
     order.status = "Payment Pending";
     await order.save();
+
+    // Update product quantity
+    for (const item of order.orderItems) {
+      const product = item.product;
+      if (product) {
+        product.quantity = Math.max(0, (product.quantity += item.quantity));
+      };
+      await product.save();   // Save the updated quantity to the database
+    }
 
     res.render("order-failed", {
       order,
