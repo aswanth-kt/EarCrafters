@@ -3,6 +3,7 @@ const Category = require("../../models/categorySchema");
 const Product = require("../../models/productSchema");
 const Banner = require("../../models/bannerSchema");
 const Cart = require("../../models/cartSchema");
+const Wallet = require("../../models/walletSchema");
 const nodemailer = require("nodemailer");
 const dotenv = require("dotenv").config();
 const bcrypt = require("bcrypt");
@@ -86,8 +87,11 @@ const loadHomepage = async (req, res) => {
 // Load signup page
 const loadSignup = async (req, res) => {
   try {
+
     return res.render("signup", { message: null });
+
   } catch (error) {
+
     console.log("Home page not loading", error);
     res.status(InternalServerError).send("Server error");
   }
@@ -95,7 +99,16 @@ const loadSignup = async (req, res) => {
 
 // To generate OTP
 function generateOtp() {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+  try {
+    
+    return Math.floor(100000 + Math.random() * 900000).toString();
+
+  } catch (error) {
+    
+    console.log("Error in generate OTP", error);
+    res.status(InternalServerError).send("Server error");
+
+  }
 }
 
 // For send a email
@@ -128,10 +141,26 @@ async function sendVerificationEmail(email, otp) {
   }
 }
 
+// Generate a new referral code.
+function generateReferral (userName) {
+  try {
+    
+    const refCode = userName.slice(0,3).toLowerCase() + Math.floor(100 + Math.random() * 900).toString();
+    return refCode;
+
+  } catch (error) {
+
+    console.log("Error in generate referral", error);
+    res.status(InternalServerError).send("Server error");
+    
+  }
+  
+};
+
 // Create a new user
 const signup = async (req, res) => {
   try {
-    const { name, phone, email, password, cPassword } = req.body;
+    const { name, phone, email, password, cPassword, referral } = req.body;
 
     // Check oassword is match
     if (password !== cPassword) {
@@ -140,16 +169,62 @@ const signup = async (req, res) => {
 
     // Check the email is unique
     const findUser = await User.findOne({ email });
+    console.log("findUser:", findUser);
+    
     if (findUser) {
       return res.render("signup", {
         name,
         phone,
         email,
         password,
-        cPassword, // for store the typed data in inputs
+        cPassword, // for store the typed data in inputs,
+        referral,
         message: "User with this email already exists",
       });
     }
+
+    const reffered_user = await User.findOne({referralCode: referral});
+    console.log("reffered_user:", reffered_user);
+
+    // Check the refferal code
+    if (referral) {
+      if (reffered_user.referralCode === referral) {
+
+        let refferedUserWallet = await Wallet.findOne({userId: reffered_user._id});
+        console.log("refferedUserWallet:", refferedUserWallet);
+
+        if (!refferedUserWallet) {
+
+          // Create a new wallet for referred user
+          refferedUserWallet = new Wallet({
+            userId: reffered_user._id,
+            balance: 200, // give ₹200 starting credit
+            transactions: [{
+              type: "credit",
+              amount: 200,
+              description: "You've earned ₹200 referral credit",
+              balance: 200,
+              createdAt: new Date(),
+            }]
+          });
+          refferedUserWallet.save();
+
+        }else {
+
+          // Reffered user get 200 rs.
+          refferedUserWallet.balance += 200;
+          // Save transaction history
+          refferedUserWallet.transactions.push({
+            type: "credit",
+            amount: 200,
+            description: "You've earned ₹200 referral credit",
+            balance: refferedUserWallet.balance,
+            createdAt: new Date(),
+          });
+          await refferedUserWallet.save();
+        }
+      };
+    };
 
     const otp = generateOtp();
 
@@ -191,12 +266,16 @@ const verifyOtp = async (req, res) => {
       const user = req.session.userData;
       const passwordHash = await securePassword(user.password);
 
+      // Calling the function generate referral
+      const referralCode = generateReferral(user.name);
+
       // Create a new user
       const saveUserData = new User({
         name: user.name,
         email: user.email,
         phone: user.phone,
         password: passwordHash,
+        referralCode,
       });
 
       await saveUserData.save(); // Save user data to DB

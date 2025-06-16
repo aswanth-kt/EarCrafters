@@ -221,6 +221,12 @@
                 <div id="error-cPassword" class="error-message"> </div>
             </div>
 
+            <div class="form-group">
+                <label for="confirm-password">Referral Code</label>
+                <input name="referral" type="text" id="referral" required placeholder="Enter your referral-code" value="<%= locals.referral %>">
+                <div id="error-referral" class="error-referral"> </div>
+            </div>
+
             <button type="submit" class="submit-button">Create Account</button>
         </form>
         <% if (message) { %>
@@ -245,13 +251,15 @@
     const emailid = document.getElementById("email");    
     const phoneid = document.getElementById("phone");    
     const passid = document.getElementById("password");    
-    const cpassid = document.getElementById("confirmPassword");    
+    const cpassid = document.getElementById("confirmPassword"); 
+    const referralid = document.getElementById("referral"); 
 
     const error_name = document.getElementById("error-name");
     const error_email = document.getElementById("error-email");
     const error_phone = document.getElementById("error-phone");
     const error_password = document.getElementById("error-password");
     const error_cPassword = document.getElementById("error-cPassword");
+    const error_referral = document.getElementById("referral");
 
     const sign_form = document.getElementById("sign-form");
 
