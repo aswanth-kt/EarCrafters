@@ -887,234 +887,246 @@
     subtotalElement.textContent = `₹${parseCartItems[0].subtotal}`;
 
     // Proceed to Payment function
-    document.getElementById("paymentMethodBtn").addEventListener('click', function() {
-        document.getElementById("loadingOverlay").classList.remove("d-none");
-        this.disabled = true; // Disable the button to prevent multiple clicks
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById("paymentMethodBtn").addEventListener('click', function() {
+            console.log("Clicked payment btn");
+            document.getElementById("loadingOverlay").classList.remove("d-none");
+            this.disabled = true; // Disable the button to prevent multiple clicks
 
-        const orderItems = JSON.parse(cartItemsDataJson); //to convert that string back into a JavaScript object
-        // console.log("cartItemsDataJson :", cartItemsDataJson)
-        const addressId = '<%= defaultAddress._id %>';
-        const totalPrice = parseInt('<%= grandTotal %>') || 0;
-        const discount = parseInt(document.getElementById('discountAmount').textContent.replace('₹', '').trim());
-        // console.log("Discount:",discount, typeof discount);
-        const finalAmount = totalPrice - discount;
-        const status = "Order Placed";
-        const couponApplied = discount > 0;
-        const customerName = '<%= user.name %>';
-        const customerEmail = '<%= user.email %>';
-        const gst = '<%= gst %>'
-        console.log("Customer name:", customerName, "Customer email:", customerEmail)
+            const orderItems = JSON.parse(cartItemsDataJson); //to convert that string back into a JavaScript object
+            // console.log("cartItemsDataJson :", cartItemsDataJson)
+            const addressId = '<%= defaultAddress._id %>';
+            const totalPrice = parseInt('<%= grandTotal %>') || 0;
+            const discount = parseInt(document.getElementById('discountAmount').textContent.replace('₹', '').trim());
+            // console.log("Discount:",discount, typeof discount);
+            const finalAmount = totalPrice - discount;
+            const status = "Order Placed";
+            const couponApplied = discount > 0;
+            const customerName = '<%= user.name %>';
+            const customerEmail = '<%= user.email %>';
+            const gst = '<%= gst %>'
+            console.log("Customer name:", customerName, "Customer email:", customerEmail)
 
-        const orderData = {
-            orderItems: orderItems,
-            addressId: addressId,
-            totalPrice: totalPrice,
-            discount: discount,
-            finalAmount: finalAmount,
-            status: status,
-            customerName,
-            customerEmail,
-            couponApplied,
-            gst,
-        };
+            const orderData = {
+                orderItems: orderItems,
+                addressId: addressId,
+                totalPrice: totalPrice,
+                discount: discount,
+                finalAmount: finalAmount,
+                status: status,
+                customerName,
+                customerEmail,
+                couponApplied,
+                gst,
+            };
 
-        const paymentMethod = document.querySelector("input[name='paymentMethod']:checked").id;
-        orderData.paymentMethod = paymentMethod;
+            const paymentMethod = document.querySelector("input[name='paymentMethod']:checked").id;
+            orderData.paymentMethod = paymentMethod;
 
-        if (paymentMethod === "cod") {
-            document.getElementById('loadingOverlay').classList.remove("d-none");
-            document.getElementById('paymentMethodBtn').disabled = true;
-            // Add this after collecting the order data
-            fetch('/checkout/place-order', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(orderData)
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log("Full data :", data);   //Debug
-                document.getElementById("loadingOverlay").classList.add("d-none");
-                if (data.status) {
-                    window.location.href = `/order-success?orderId=${data.orderId}`;
-                } else {
+            if (paymentMethod === "cod") {
+                document.getElementById('loadingOverlay').classList.remove("d-none");
+                document.getElementById('paymentMethodBtn').disabled = true;
+                // Add this after collecting the order data
+                fetch('/checkout/place-order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(orderData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Full data :", data);   //Debug
+                    document.getElementById("loadingOverlay").classList.add("d-none");
+                    if (data.status) {
+                        window.location.href = `/order-success?orderId=${data.orderId}`;
+                    } else {
+                        Swal.fire({
+                            icon: "info",
+                            title: "Info",
+                            text:  data.message,
+                            timer: 3000,
+                        });
+                        this.disabled = false;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById("loadingOverlay").classList.add("d-none");
                     Swal.fire({
-                        icon: "info",
-                        title: "Info",
-                        text:  data.message,
+                        icon: "error",
+                        title: "Error",
+                        text: data.message || "Something went wrong",
                         timer: 3000,
                     });
                     this.disabled = false;
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                document.getElementById("loadingOverlay").classList.add("d-none");
-                Swal.fire({
-                    icon: "error",
-                    title: "Error",
-                    text: data.message || "Something went wrong",
-                    timer: 3000,
                 });
-                this.disabled = false;
-            });
 
-            // Wallet payment
-        }else if (paymentMethod === "wallet") {
-            document.getElementById('loadingOverlay').classList.remove("d-none");
-            document.getElementById('paymentMethodBtn').disabled = true;
+                // Wallet payment
+            }else if (paymentMethod === "wallet") {
+                document.getElementById('loadingOverlay').classList.remove("d-none");
+                document.getElementById('paymentMethodBtn').disabled = true;
 
-            fetch('/payment/wallet', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(orderData)
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log("Data:", data); //Debug
-                document.getElementById("loadingOverlay").classList.add("d-none");
-                if (data.status) {
-                    window.location.href = data.redirectUrl || '';
-                } else {
-                    Swal.fire({
-                        toast: true,
-                        position: 'top-end',
-                        icon: 'warning',
-                        title: data.message,
-                        showConfirmButton: false,
-                        timer: 3000
-                    });
-                    this.disabled = false;
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                document.getElementById("loadingOverlay").classList.add("d-none");
-                alert('Something went wrong with wallet payment. Please try again.');
-                this.disabled = false;
-                document.getElementById('loadingOverlay').classList.add('d-none')
-            });
-
-            // Razorpay
-        } else if (paymentMethod === 'upi') {
-            document.getElementById('loadingOverlay').classList.remove("d-none");
-            document.getElementById('paymentMethodBtn').disabled = true;
-
-            fetch("/payment/razorpay-order-success", {
-                method: "POST",
-                headers: {"Content-Type" : "application/json"},
-                body:JSON.stringify(orderData),
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Server responded with status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log("Data:", data)
-                document.getElementById('loadingOverlay').classList.add('d-none');
-                document.getElementById('paymentMethodBtn').disabled = false;
-
-                console.log("Data :", data)
-                if (data.status) {
-                    // Check if Razorpay is defined
-                    if (typeof Razorpay === 'undefined') {
-                        console.error("Razorpay is not loaded!");
+                fetch('/payment/wallet', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(orderData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Data:", data); //Debug
+                    document.getElementById("loadingOverlay").classList.add("d-none");
+                    if (data.status) {
+                        window.location.href = data.redirectUrl || '';
+                    } else {
                         Swal.fire({
-                            icon: 'error',
-                            title: 'Payment Error',
-                            text: 'Payment gateway not available. Please try again later.'
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'warning',
+                            title: data.message,
+                            showConfirmButton: false,
+                            timer: 3000
                         });
-                        return;
-                    };
+                        this.disabled = false;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById("loadingOverlay").classList.add("d-none");
+                    alert('Something went wrong with wallet payment. Please try again.');
+                    this.disabled = false;
+                    document.getElementById('loadingOverlay').classList.add('d-none')
+                });
 
-                    var options = {
-                        key: data.razorpayKey,
-                        amount: data.amount,
-                        currency: data.currency,
-                        name: "EarCrafters",
-                        description: "Order Payment",
-                        order_id: data.razorpayOrderId,
-                        handler: function(response) {
-                            console.log("Payment successful, response:", response);
+                // Razorpay
+            } else if (paymentMethod === 'upi') {
+                document.getElementById('loadingOverlay').classList.remove("d-none");
+                document.getElementById('paymentMethodBtn').disabled = true;
+
+                fetch("/payment/razorpay-order-success", {
+                    method: "POST",
+                    headers: {"Content-Type" : "application/json"},
+                    body:JSON.stringify(orderData),
+                })
+                .then(async (response) => {
+                    const data = await response.json()                    
+                    if (!response.ok || data.status === false) {
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'warning',
+                            title: data.message,
+                            showConfirmButton: false,
+                            timer: 3000
+                        });
+                        this.disabled = false;
+                        throw new Error(`Server responded with status: ${response.status}`);
+                    }
+                    return data;
+                })
+                .then((data) => {
+                    console.log("Data:", data)
+                    document.getElementById('loadingOverlay').classList.add('d-none');
+                    document.getElementById('paymentMethodBtn').disabled = false;
+
+                    if (data.status) {
+                        // Check if Razorpay is defined
+                        if (typeof Razorpay === 'undefined') {
+                            console.error("Razorpay is not loaded!");
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Payment Error',
+                                text: 'Payment gateway not available. Please try again later.'
+                            });
+                            return;
+                        };
+
+                        var options = {
+                            key: data.razorpayKey,
+                            amount: data.amount,
+                            currency: data.currency,
+                            name: "EarCrafters",
+                            description: "Order Payment",
+                            order_id: data.razorpayOrderId,
+                            handler: function(response) {
+                                console.log("Payment successful, response:", response);
+                                Swal.fire({
+                                    toast: true,
+                                    position: 'top-end',
+                                    icon: 'success',
+                                    title: 'Your payment has been successfully completed.',
+                                    showConfirmButton: false,
+                                    timer: 3000
+                                })
+                                .then(() => {
+                                    window.location.href = `/order-success?orderId=${data.orderId}`;
+                                });
+                            },
+                            // Adding a failure handler to the razorpay options
+                            "prefill": {
+                                name: orderData.customerName,
+                                email: orderData.customerEmail,
+                            },
+                            "theme": {
+                                "color": "#F37254"
+                            },
+                            "modal": {
+                                "ondismiss": function() {
+                                console.log('Payment window was closed before completing.');
+                                }
+                            },
+                        };
+                        
+                        console.log("Razorpay options:", options);
+                        
+                        var rzp1 = new Razorpay(options);
+                        try {
+
+                            console.log("Razorpay open");
+                            rzp1.open();
+                            
+                        } catch (error) {
+                            console.error("Error opening Razorpay window:", error);
+                            window.location.href = `/payment/razorpay-order-failed?orderId=${data.orderId}`;     // Redirect to the failure page
+                        }
+
+                        // Handle Razorpay payment failure
+                        rzp1.on('payment.failed', function(response) {
+                            console.log("Payment failed:", response);
                             Swal.fire({
                                 toast: true,
                                 position: 'top-end',
-                                icon: 'success',
-                                title: 'Your payment has been successfully completed.',
+                                icon: 'error',
+                                title: 'Payment failed. Please try again later',
                                 showConfirmButton: false,
                                 timer: 3000
                             })
                             .then(() => {
-                                window.location.href = `/order-success?orderId=${data.orderId}`;
-                            });
-                        },
-                        // Adding a failure handler to the razorpay options
-                        "prefill": {
-                            name: orderData.customerName,
-                            email: orderData.customerEmail,
-                        },
-                        "theme": {
-                            "color": "#F37254"
-                        },
-                        "modal": {
-                            "ondismiss": function() {
-                            console.log('Payment window was closed before completing.');
-                            }
-                        },
-                    };
-                    
-                    console.log("Razorpay options:", options);
-                    
-                    var rzp1 = new Razorpay(options);
-                    try {
-
-                        console.log("Razorpay open");
-                        rzp1.open();
-                        
-                    } catch (error) {
-                        console.error("Error opening Razorpay window:", error);
-                        window.location.href = `/payment/razorpay-order-failed?orderId=${data.orderId}`;     // Redirect to the failure page
+                                window.location.href = `/payment/razorpay-order-failed?orderId=${data.orderId}`;
+                            })
+                        })
+                    } else {
+                        console.log('Error');
                     }
-
-                    // Handle Razorpay payment failure
-                    rzp1.on('payment.failed', function(response) {
-                        console.log("Payment failed:", response);
-                        Swal.fire({
-                            toast: true,
-                            position: 'top-end',
-                            icon: 'error',
-                            title: 'Payment failed. Please try again later',
-                            showConfirmButton: false,
-                            timer: 3000
-                        })
-                        .then(() => {
-                            window.location.href = `/payment/razorpay-order-failed?orderId=${data.orderId}`;
-                        })
-                    })
-                } else {
-                    console.log('Error');
-                }
-            })
-            .catch((error) => {
-                console.log('Error:', error);
-                document.getElementById('loadingOverlay').classList.add('d-none');
-                document.getElementById('usePaymentMethodBtn').disabled = false; // Re-enable the button
-                Swal.fire({
-                    toast: true,
-                    position: 'top-end',
-                    icon: 'error',
-                    title: 'Payment failed. Please try again later.',
-                    showConfirmButton: false,
-                    timer: 3000
+                })
+                .catch((error) => {
+                    console.log('Error:', error);
+                    document.getElementById('loadingOverlay').classList.add('d-none');
+                    document.getElementById('usePaymentMethodBtn').disabled = false; // Re-enable the button
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'error',
+                        title: 'Payment failed. Please try again later.',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
                 });
-            });
-        };
+            };
 
+        });
     });
 
 

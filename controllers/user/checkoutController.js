@@ -810,6 +810,7 @@ const razorpayOrderSuccess = async (req, res) => {
         isBlock: false,
         isSoftDelete: false
       });
+      
       if (product) {
         if (product.quantity < orderedQuantity) {
           return res.status(BadRequest).json({
