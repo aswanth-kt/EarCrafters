@@ -445,17 +445,26 @@
 
             // Image validation
             let hasImage = false;
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+
             ['input1', 'input2', 'input3'].forEach(inputId => {
                 const input = document.getElementById(inputId);
                 if (input.files && input.files.length > 0) {
-                    hasImage = true;
+                    const file = input.files[0];
+                    if (!allowedTypes.includes(file.type)) {
+                        displayErrorMessage("images-error", `Only JPG, PNG, and WEBP images are allowed.`);
+                        isValid = false;
+                    } else {
+                        hasImage = true;
+                    }
                 }
             });
-            
+
             if (!hasImage) {
-                displayErrorMessage("images-error", 'Please select three image.');
+                displayErrorMessage("images-error", 'Please select at least one image.');
                 isValid = false;
             }
+
 
             return isValid;
         }

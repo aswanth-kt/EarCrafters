@@ -236,7 +236,13 @@
             } 
 
 
-            if ( parseInt(quantity) < 0) {
+            // if ( parseInt(quantity) < 0) {
+            //     displayErrorMessage('quantity-error', 'Please enter a valid non-negative quantity.');
+            //     isValid = false;
+            // }
+
+            const quantityElements = document.getElementsByName('quantity')[0].value;
+            if (parseInt(quantityElements) < 0) {
                 displayErrorMessage('quantity-error', 'Please enter a valid non-negative quantity.');
                 isValid = false;
             }
@@ -261,7 +267,17 @@
                 console.log('images:', images.files)
                 displayErrorMessage("images-error",'Please select an image.');
                 isValid = false;
+            };
+
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+            for (let i = 0; i < images.files.length; i++) {
+                if (!allowedTypes.includes(images.files[i].type)) {
+                    displayErrorMessage("images-error", 'Only JPG, PNG, and WEBP images are allowed.');
+                    isValid = false;
+                    break;
+                }
             }
+
 
             return isValid;
         }
