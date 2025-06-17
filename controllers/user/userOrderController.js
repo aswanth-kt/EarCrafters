@@ -176,31 +176,39 @@ const cancelOrder = async (req, res) => {
         { $set: { status: "Cancelled" } }, // If all cancelled set to status cancelled
         { new: true }
       );
-    }
-
-    const wallet = await Wallet.findOne({ userId: userData._id });
-    if (!wallet) {
-      return res.status(BadRequest).json({
-        status: false,
-        message: "Wallet not found",
-      });
-    }
+    };
 
     // After product cancellation money back to add wallet
     const couponDidcount = Number(order.discount);
     const cancelProductPrice = Number((price / totalPrice) * couponDidcount); // Find one without coupon product price
     const priceWithoutOffer = Number(price - cancelProductPrice);
     const roundedPrice = Math.round(priceWithoutOffer);
-    wallet.balance += roundedPrice;
 
-    // Save transaction history
-    wallet.transactions.push({
-      type: "credit",
-      amount: roundedPrice,
-      description: "Cancelled product amount added to wallet",
-      balance: wallet.balance,
-      createdAt: new Date(),
-    });
+    let wallet = await Wallet.findOne({ userId: userData._id });
+
+    if (!wallet) {
+      wallet = new Wallet ({
+        userId: userData._id,
+        balance: roundedPrice,
+        transactions: [{
+          type: "credit",
+          description: "Cancelled product amount added to wallet",
+          amount: roundedPrice,
+          balance: roundedPrice,
+          createdAt: new Date(),
+        }]
+      })
+    } else {
+      wallet.balance += roundedPrice;
+      // Save transaction history
+      wallet.transactions.push({
+        type: "credit",
+        amount: roundedPrice,
+        description: "Cancelled product amount added to wallet",
+        balance: wallet.balance,
+        createdAt: new Date(),
+      });
+    }
 
     await wallet.save();
 
@@ -322,30 +330,35 @@ const returnProduct = async (req, res) => {
     }
     console.log("Updated order:", updatedOrder);
 
-    const wallet = await Wallet.findOne({ userId: userData._id });
+    const couponDidcount = Number(updatedOrder.discount);
+    const cancelProductPrice = Number((price / totalPrice) * couponDidcount); // Find one without coupon product price
+    const priceWithoutOffer = Number(price - cancelProductPrice);
+    const roundedPrice = Math.round(priceWithoutOffer);
+    console.log(
+      "couponDiscount:",
+      couponDidcount,
+      "cancelProductPrice:",
+      cancelProductPrice,
+      "roundedPrice:",
+      roundedPrice
+    ); //Debuging
+
+    let wallet = await Wallet.findOne({ userId: userData._id });
+
     if (!wallet) {
-      return res.status(BadRequest).json({
-        status: false,
-        message: "Wallet not found",
-      });
-    }
-
-    // After product Returned money back to add wallet
-    // if (updatedOrder.status === "Returned") {
-      const couponDidcount = Number(updatedOrder.discount);
-      const cancelProductPrice = Number((price / totalPrice) * couponDidcount); // Find one without coupon product price
-      const priceWithoutOffer = Number(price - cancelProductPrice);
-      const roundedPrice = Math.round(priceWithoutOffer);
-      console.log(
-        "couponDiscount:",
-        couponDidcount,
-        "cancelProductPrice:",
-        cancelProductPrice,
-        "roundedPrice:",
-        roundedPrice
-      ); //Debuging
+      wallet = new Wallet({
+        userId: userData._id,
+        balance: roundedPrice,
+        transactions: [{
+          type: "credit",
+          description: "Returned product amount added to wallet",
+          amount: roundedPrice,
+          balance: roundedPrice,
+          createdAt: new Date(),
+        }]
+      })
+    } else {
       wallet.balance += roundedPrice;
-
       // Save transaction history
       wallet.transactions.push({
         type: "credit",
@@ -354,16 +367,18 @@ const returnProduct = async (req, res) => {
         balance: wallet.balance,
         createdAt: new Date(),
       });
-
-      await wallet.save();
-    // }
+    }
+    await wallet.save();
+    
 
     res.status(OK).json({
       status: true,
       message: "Return request submitted and waiting admin approval",
       order: updatedOrder,
     });
+
   } catch (error) {
+    
     console.error("Error in return product:", error);
     return res.status(InternalServerError).json({
       status: false,

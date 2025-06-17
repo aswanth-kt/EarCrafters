@@ -547,7 +547,7 @@
       productId: productId,
       reason: reason,
       otherReason: reason === 'other' ? otherReason : '',
-      cancelQuantity: cancelQuantity,
+      cancelQuantity: parseInt(cancelQuantity),
       cancelledAt: new Date().toISOString(),
       orderId: orderId,
       finalAmount,

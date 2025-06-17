@@ -202,12 +202,12 @@ const signup = async (req, res) => {
             transactions: [{
               type: "credit",
               amount: 200,
-              description: "You've earned ₹200 referral credit",
+              description: `₹200rs earned - ${reffered_user.name} used your code`,
               balance: 200,
               createdAt: new Date(),
             }]
           });
-          refferedUserWallet.save();
+          await refferedUserWallet.save();
 
         }else {
 
@@ -217,7 +217,7 @@ const signup = async (req, res) => {
           refferedUserWallet.transactions.push({
             type: "credit",
             amount: 200,
-            description: "You've earned ₹200 referral credit",
+            description: `₹200rs earned - ${reffered_user.name} used your code`,
             balance: refferedUserWallet.balance,
             createdAt: new Date(),
           });
