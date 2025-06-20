@@ -564,8 +564,8 @@ const filterProducts = async (req, res) => {
 const filterByPrice = async (req, res) => {
   try {
     const user = req.session.user;
-    const lowestPrice = req.query.gt;
-    const highestPrice = req.query.lt;
+    const lowestPrice = parseFloat(req.query.gt);
+    const highestPrice = parseFloat(req.query.lt);
 
     const userData = await User.findOne({ _id: user });
     const categories = await Category.find({ isListed: true }).lean();
