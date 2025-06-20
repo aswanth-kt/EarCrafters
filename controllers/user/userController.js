@@ -169,7 +169,7 @@ const signup = async (req, res) => {
 
     // Check the email is unique
     const findUser = await User.findOne({ email });
-    console.log("findUser:", findUser);
+    // console.log("findUser:", findUser);
     
     if (findUser) {
       return res.render("signup", {
@@ -184,14 +184,14 @@ const signup = async (req, res) => {
     }
 
     const reffered_user = await User.findOne({referralCode: referral});
-    console.log("reffered_user:", reffered_user);
+    // console.log("reffered_user:", reffered_user);
 
     // Check the refferal code
     if (referral) {
       if (reffered_user.referralCode === referral) {
 
         let refferedUserWallet = await Wallet.findOne({userId: reffered_user._id});
-        console.log("refferedUserWallet:", refferedUserWallet);
+        // console.log("refferedUserWallet:", refferedUserWallet);
 
         if (!refferedUserWallet) {
 
@@ -644,7 +644,7 @@ const searchProducts = async (req, res) => {
         category: { $in: categoryIds },
       }).lean();
     }
-    console.log("search result: ", searchResults.length);
+    // console.log("search result: ", searchResults.length);
     searchResults.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
     // pagination

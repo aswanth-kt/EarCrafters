@@ -355,7 +355,7 @@ const updateCartQuantity = async (req, res) => {
     // Get all user's carts
     let userCarts = await Cart.find({ userId });
     // let userCarts = await Cart.find({ _id: { $in: user.cart } });
-    console.log("User Carts :", userCarts);
+    // console.log("User Carts :", userCarts);
 
     // Find if this product is already in any of the user's carts
     let existingCartWithProduct = null;

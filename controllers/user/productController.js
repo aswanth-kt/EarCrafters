@@ -63,7 +63,7 @@ const productDetails = async (req, res) => {
 const generateInvoice = async (req, res) => {
   try {
     const { orderId } = req.params;
-    console.log("Order id:", orderId, typeof orderId);
+    // console.log("Order id:", orderId, typeof orderId);
 
     if (!orderId) {
       return res.status(BadRequest).json({

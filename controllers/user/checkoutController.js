@@ -215,13 +215,13 @@ const getCheckoutPage = async (req, res) => {
       ? userAddress.address.filter((addr) => addr.isDefault === false)
       : null;
 
-    console.log("notDefaultAddress :", notDefaultAddress);
+    // console.log("notDefaultAddress :", notDefaultAddress);
 
     // Only default address
     const defaultAddress = userAddress
       ? userAddress.address.find((addr) => addr.isDefault)
     : null;
-    console.log("DefaultAddress :", defaultAddress);
+    // console.log("DefaultAddress :", defaultAddress);
 
     const cartItems = cart ? cart.items : [];
     // console.log(userAddress.address[0].name)
@@ -340,7 +340,7 @@ const getEditCheckoutAddress = async (req, res) => {
     const currentAddress = await Address.findOne({ "address._id": addressId });
 
     if (!currentAddress) {
-      console.log("Current address not found", currentAddress);
+      // console.log("Current address not found", currentAddress);
       return res.status(NotFound).json({
         status: false,
         message: "Address Not Found",
@@ -538,7 +538,7 @@ const getOrderSuccess = async (req, res) => {
       .populate("orderItems.product")
       .exec();
 
-    console.log("Order in order success page:", order);
+    // console.log("Order in order success page:", order);
 
     if (!order) {
       return res.status(NotFound).json({
@@ -579,7 +579,7 @@ const walletPlaceOrder = async (req, res) => {
       gst,
     } = req.body;
 
-    console.log("Body: ", req.body);
+    // console.log("Body: ", req.body);
 
     const userId = req.session.user;
     const userData = await User.findById(userId, {
@@ -847,7 +847,7 @@ const razorpayOrderSuccess = async (req, res) => {
     };
 
     // console.log("Razorpay instance:", razorpay);
-    console.log("Creating order with options:", options);
+    // console.log("Creating order with options:", options);
 
     if (!razorpay) {
       console.error("Razorpay instance not initialized");
@@ -902,7 +902,7 @@ const razorpayOrderSuccess = async (req, res) => {
 const getRazorpayOrderFaild = async (req, res) => {
   try {
     const { orderId } = req.query;
-    console.log("OrderId:", orderId);
+    // console.log("OrderId:", orderId);
 
     const userId = req.session.user;
     const userData = await User.findById(userId, {

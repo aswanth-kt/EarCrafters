@@ -270,7 +270,7 @@ const editProfile = async (req, res) => {
   try {
     const { fieldName } = req.params; //name field, email field, phone field
     const fieldValue = req.body[fieldName]; //name value, email value, phone value
-    console.log(fieldName, ":", fieldValue);
+    // console.log(fieldName, ":", fieldValue);
 
     const allowFields = ["name", "email", "phone"];
     if (!allowFields.includes(fieldName)) {
@@ -618,13 +618,13 @@ const postEditAddress = async (req, res) => {
   try {
     // Receive user input data from frondend
     const inputData = req.body;
-    console.log("formData :", inputData);
+    // console.log("formData :", inputData);
 
     const userId = req.session.user;
     const userData = await User.findById(userId);
 
     const addressId = inputData.addressId || req.query.addressId;
-    console.log("addressId :", addressId);
+    // console.log("addressId :", addressId);
 
     if (req.query.comeIn) {
       redirectToCheckout = "/checkout";

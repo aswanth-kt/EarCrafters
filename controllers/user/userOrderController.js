@@ -100,7 +100,7 @@ const cancelOrder = async (req, res) => {
       price,
       totalPrice,
     } = req.body;
-    console.log("Body :", req.body);
+    // console.log("Body :", req.body);
 
     if (!req.body) {
       return res.status(NotFound).json({
@@ -234,7 +234,7 @@ const loadTrackOrders = async (req, res) => {
     const user = req.session.user;
 
     const order = await Order.findById(orderId);
-    console.log("order in track:", order);
+    // console.log("order in track:", order);
     if (!order) {
       return res.status(NotFound).json({
         status: false,
@@ -267,7 +267,7 @@ const returnProduct = async (req, res) => {
       price,
       totalPrice,
     } = req.body;
-    console.log("Return Request Body:", req.body);
+    // console.log("Return Request Body:", req.body);
 
     const userId = req.session.user;
     const userData = await User.findById(userId);
@@ -328,20 +328,20 @@ const returnProduct = async (req, res) => {
         message: "Failed to update order",
       });
     }
-    console.log("Updated order:", updatedOrder);
+    // console.log("Updated order:", updatedOrder);
 
     const couponDidcount = Number(updatedOrder.discount);
     const cancelProductPrice = Number((price / totalPrice) * couponDidcount); // Find one without coupon product price
     const priceWithoutOffer = Number(price - cancelProductPrice);
     const roundedPrice = Math.round(priceWithoutOffer);
-    console.log(
-      "couponDiscount:",
-      couponDidcount,
-      "cancelProductPrice:",
-      cancelProductPrice,
-      "roundedPrice:",
-      roundedPrice
-    ); //Debuging
+    // console.log(
+    //   "couponDiscount:",
+    //   couponDidcount,
+    //   "cancelProductPrice:",
+    //   cancelProductPrice,
+    //   "roundedPrice:",
+    //   roundedPrice
+    // ); //Debuging
 
     let wallet = await Wallet.findOne({ userId: userData._id });
 
@@ -399,7 +399,7 @@ const retryPayment = async (req, res) => {
       orderId,
       gst,
     } = req.body;
-    console.log("req.body:", req.body);
+    // console.log("req.body:", req.body);
 
     const userId = req.session.user;
 
@@ -415,7 +415,7 @@ const retryPayment = async (req, res) => {
     const defaultAddress = userAddress.address
       .flat()
       .filter((add) => add.isDefault === true);
-    console.log("User address:", defaultAddress);
+    // console.log("User address:", defaultAddress);
 
     if (!defaultAddress) {
       return res.status(BadRequest).json({
