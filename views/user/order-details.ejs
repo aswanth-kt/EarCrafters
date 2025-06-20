@@ -297,12 +297,14 @@
                   
                 <% } else if (item.cancellationStatus === "Not Cancelled" &&
                             order.status !== "Delivered" &&
-                            order.status !== "Returned") { %>
-                  <button class="cancel-btn"
+                            order.status !== "Returned" &&
+                            order.status !== "Payment Pending") 
+                            { %>
+                    <button class="cancel-btn"
                     onclick="showCancelConfirmation('<%= item.product._id %>', '<%= index %>', '<%= order.orderId %>', '<%= order.finalAmount %>', '<%= item.price %>', '<%= order.totalPrice %>')">
                     Cancel Order
-                  </button>
-                <% } %>
+                    </button>
+                  <% } %>
               </td>            
 
               </tr>
