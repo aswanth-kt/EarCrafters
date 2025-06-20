@@ -218,7 +218,7 @@ const loadDashboard = async (req, res) => {
           totalSales: data.totalSalesInDaily || 0
         }
       });
-      console.log("formattedDailyhWiseData:", formattedDailyhWiseData);
+      // console.log("formattedDailyhWiseData:", formattedDailyhWiseData);
 
       return res.render("dashboard", {
         status: true,

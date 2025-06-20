@@ -76,8 +76,8 @@ const loadSalesReport = async (req, res) => {
     let labels = Object.keys(salesByDate);       
     let totalSales = Object.values(salesByDate); 
 
-    console.log("dates:", labels);
-    console.log("totalSales:", totalSales);
+    // console.log("dates:", labels);
+    // console.log("totalSales:", totalSales);
 
     res.render("salesReport", {
       overallSalesCount,
@@ -119,7 +119,7 @@ const exportSalesReport = async (req, res) => {
       format,
       filterType,
     } = data;
-    console.log("Body:", req.body);
+    // console.log("Body:", req.body);
 
     // Assume discounts and coupons are always included by default
     const showDiscount = true;

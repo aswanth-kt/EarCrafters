@@ -69,24 +69,6 @@ const blockCustomer = async (req, res) => {
     }
 };
 
-// // Admin block using params
-// const blockCustomer = async (req, res) => {
-//     try {
-
-//         let id = req.params.id;
-//         console.log(id);
-        
-//         await User.updateOne({_id : id}, {$set : {isBlock : true} });   //Updated block field
-//         res.redirect("/admin/users");
-
-//     } catch (error) {
-
-//         console.error("Error at Block customer", error);
-//         res.redirect("/pageerror");
-        
-//     }
-// };
-
 
 
 

@@ -92,7 +92,7 @@ const loadOrderDetailsPage = async (req, res) => {
     // console.log("Default address:", defaultAddress, "User address:", userAddresses);
 
     const productId = order.orderItems.find((item) => item.product);
-    console.log("Load order details productId:", productId._id);
+    // console.log("Load order details productId:", productId._id);
 
     if (!productId) {
       return res.status(NotFound).json({
@@ -102,7 +102,7 @@ const loadOrderDetailsPage = async (req, res) => {
     }
 
     const returnReason = order.orderItems.map((item) => item.returnReason);
-    console.log("returnReason: ", returnReason);
+    // console.log("returnReason: ", returnReason);
 
     res.render("admin-order-details", {
       order,
@@ -123,8 +123,8 @@ const loadOrderDetailsPage = async (req, res) => {
 const updateOrderStatus = async (req, res) => {
   try {
     const { orderId, status, productId, declinedStatus } = req.body;
-    console.log("Body:", req.body);
-    console.log("ProductID:", productId, typeof productId);
+    // console.log("Body:", req.body);
+    // console.log("ProductID:", productId, typeof productId);
 
     const order = await Order.findById(orderId).populate("orderItems.product");
 
@@ -135,12 +135,12 @@ const updateOrderStatus = async (req, res) => {
       });
     }
 
-    console.log("Order items count:", order.orderItems.length);
+    // console.log("Order items count:", order.orderItems.length);
 
     // Print each product ID for debugging
-    order.orderItems.forEach((item, index) => {
-      console.log(`Item ${index} product ID:`, item.product._id.toString());
-    });
+    // order.orderItems.forEach((item, index) => {
+    //   console.log(`Item ${index} product ID:`, item.product._id.toString());
+    // });
 
     let orderItem = null;
 
@@ -148,7 +148,7 @@ const updateOrderStatus = async (req, res) => {
       orderItem = order.orderItems.find(
         (item) => item.product._id.toString() === productId.toString()
       );
-      console.log("Found order item:", orderItem ? "Yes" : "No");
+      // console.log("Found order item:", orderItem ? "Yes" : "No");
     }
 
 
