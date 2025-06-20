@@ -9,6 +9,7 @@ const {
   NotFound,
   InternalServerError,
 } = require("../../helpers/httpStatusCodes");
+const { session } = require("passport");
 
 const productDetails = async (req, res) => {
   try {
@@ -29,15 +30,19 @@ const productDetails = async (req, res) => {
       _id: { $ne: product._id }, // Exclude current product
     }).limit(4);
 
-    const cart = await Cart.findOne({ _id: { $in: userData.cart } }).populate(
-      "items.productId"
-    );
+    // For display cart quantity at top
+    let cartItemQty;
+    if (req.session.user) {
+      const cart = await Cart.findOne({ _id: { $in: userData.cart } }).populate(
+        "items.productId"
+      );
 
-    const cartItemQty = cart.items.map((item) => {
-      return {
-        quantity: item.quantity,
-      };
-    });
+      cartItemQty = cart.items.map((item) => {
+        return {
+          quantity: item.quantity,
+        };
+      });
+    }
 
     res.render("product-details", {
       userData: userData,
