@@ -82,13 +82,13 @@
                     <% if (data[i].isBlock === false) { %>
 
                     <button class="btn btn-danger" style="width: 80px;">
-                        <a href="/admin/blockProduct?id=<%= data[i]._id %>" class="text-white" style="text-decoration: none;">Block</a>
+                        <a class="text-white" style="text-decoration: none;" onclick="blockProduct('<%= data[i]._id %>')">Block</a>
                     </button>
 
                     <% } else{ %>
                     
                     <button class="btn btn-success" style="width: 80px;">
-                        <a href="/admin/unblockProduct?id=<%= data[i]._id %>" class="text-white" style="text-decoration: none;">Unblock</a>
+                        <a class="text-white" style="text-decoration: none;" onclick="unblockProduct('<%= data[i]._id %>')">Unblock</a>
                     </button>
 
                     <% } %>
@@ -155,6 +155,104 @@
 
 
 <script>
+
+    function blockProduct(productId) {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "If this product is blocked, it cannot be used!",
+            icon: "info",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes Block!"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: "/admin/blockProduct",
+                    method: "POST",
+                    data: {
+                        productId: productId,
+                    },
+                    success: (response) => {
+                        if (response.status === true) {
+                            Swal.fire({
+                                title: "Blocked",
+                                text: response.message,
+                                icon: "success",
+                                timer: 3000,
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire(
+                                "Failed",
+                                response.message || "Could not remove the offer",
+                                "error"
+                            );
+                        }
+                    },
+                    error: (error) => {
+                        console.error("AJAX Error:", error);
+                        Swal.fire(
+                            "Error",
+                            "Something went wrong",
+                            "error"
+                        );
+                    }
+                });
+            }
+        })
+        
+    };
+
+    function unblockProduct(productId) {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "If you want this product!",
+            icon: "info",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, Unbock!"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: "/admin/unblockProduct",
+                    method: "POST",
+                    data: {
+                        productId: productId,
+                    },
+                    success: (response) => {
+                        if (response.status === true) {
+                            Swal.fire({
+                                title: "Unblocked!",
+                                text: response.message,
+                                icon: "success",
+                                timer: 3000,
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire(
+                                "Failed",
+                                response.message || "Could not remove the offer",
+                                "error"
+                            );
+                        }
+                    },
+                    error: (error) => {
+                        console.error("AJAX Error:", error);
+                        Swal.fire(
+                            "Error",
+                            "Something went wrong",
+                            "error"
+                        );
+                    }
+                });
+            }
+        });
+        
+    }
 
     async function addOffer(productId) {
         try {

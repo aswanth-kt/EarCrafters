@@ -209,9 +209,19 @@ const removeProductOffer = async (req, res) => {
 // Block products
 const blockProduct = async (req, res) => {
   try {
-    const productId = req.query.id;
-    await Product.updateOne({ _id: productId }, { $set: { isBlock: true } });
-    return res.redirect("/admin/products");
+    const productId = req.body.productId;
+    const product = await Product.updateOne({ _id: productId }, { $set: { isBlock: true } });
+    if (!product) {
+      return res.status(BadRequest).json({
+        status: false,
+        message: "Product is not found!!",
+      })
+    }
+
+    return res.status(OK).json({
+      status: true,
+      message: "The product has been blocked!"
+    })
   } catch (error) {
     console.error("Error at Block products", error);
     return res.redirect("/admin/pageerror");
@@ -221,9 +231,20 @@ const blockProduct = async (req, res) => {
 // Unblock products
 const unblockProduct = async (req, res) => {
   try {
-    const productId = req.query.id;
-    await Product.updateOne({ _id: productId }, { $set: { isBlock: false } });
-    return res.redirect("/admin/products");
+    const productId = req.body.productId;
+    const product = await Product.updateOne({ _id: productId }, { $set: { isBlock: false } });
+    if (!product) {
+      return res.status(BadRequest).json({
+        status: false,
+        message: "Product is not found!!",
+      })
+    };
+
+    return res.status(OK).json({
+      status: true,
+      message: "The product has been Unblocked!"
+    })
+
   } catch (error) {
     console.error("Error at Unblock products", error);
     return res.redirect("/admin/pageerror");
