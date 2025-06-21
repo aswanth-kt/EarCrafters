@@ -80,6 +80,7 @@ app.listen(port, () => {
     console.log(`Localhost:       http://localhost:${port}`);
     console.log(`Admin Panel:     http://localhost:${port}/admin/login`);
     console.log(`Live Site:       https://earcrafters.onrender.com`);
+    console.log(`Live Site:       https://earcrafters.shop`);
 });
 
 

@@ -234,7 +234,7 @@
                   </li>
 
                   <li class="nav-item">
-                    <a class="nav-link" href="/logout">
+                    <a class="nav-link" onclick="logout('<%= user.name %>')">
                       <i class="fi-rs-sign-out mr-10"></i>Logout
                     </a>
                   </li>
@@ -563,6 +563,22 @@
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 <script>
+
+  function logout(name) {
+    Swal.fire({
+      title: `Hai ${name}`,
+      text: "Are you sure?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes Logout!"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        location.href = "/logout"
+      }
+    });
+  }
 
   // Function to open the add money modal
 function addMoney() {
