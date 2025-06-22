@@ -544,10 +544,11 @@
                     </div>
                     <div class="card-body">
                       <h6 class="mb-3">Refer your friends and earn money!</h6>
-                      <p>Share this Code: <strong>
+                      <p>Share this Code: <strong  id="refCode">
                           <%= user.referralCode %>
                         </strong></p>
                       <p>Earned: ₹ 200</p>
+                      <button type="button" class="btn btn-dark" onclick="copyCode()">Copy Code</button>
                     </div>
                   </div>
                 </div>
@@ -563,6 +564,26 @@
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 <script>
+
+  function copyCode() {
+    try{
+      const refCode = document.getElementById("refCode").innerText;
+      navigator.clipboard.writeText(refCode)
+      .then(() => {
+        Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'success',
+          title: "Referral code copied!",
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+        });
+      })
+    }catch(err) {
+      console.log("error in copy code:", err)
+    }
+  }
 
   function logout(name) {
     Swal.fire({
@@ -737,56 +758,6 @@ function addMoney() {
       })
     })
   });
-
-
-//   // Load wallet history when the tab is clicked
-// document.getElementById('track-wallet-history-tab').addEventListener('click', function(e) {
-//   // Load the wallet history when this tab is clicked
-//   loadWalletHistory();
-//   console.log("Call loadWalletHistory()");
-// });
-
-// function loadWalletHistory(page = 1) {
-//   console.log("Load wallet history");
-//   fetch(`/wallet/history?page=${page}`)
-//     .then(response => response.json())
-//     .then(data => {
-//       const historyTableBody = document.getElementById('walletHistoryBody');
-//       // Clear loading message
-//       historyTableBody.innerHTML = '';
-      
-//       if (data.status && data.transactions && data.transactions.length > 0) {
-//         data.transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
-        
-//         // Add transaction rows
-//         data.transactions.forEach(transaction => {
-//           const date = new Date(transaction.createdAt).toLocaleDateString();
-//           const type = transaction.type;
-//           const amountClass = transaction.type === 'credit' ? 'text-success' : 'text-danger';
-//           const amount = transaction.amount;
-//           const typeClass = transaction.type === 'credit' ? 'text-success' : 'text-danger';
-          
-//           historyTableBody.innerHTML += `
-//             <tr>
-//               <td>${date}</td>
-//               <td>${transaction.description}</td>
-//               <td class="${typeClass}">${type}</td>
-//               <td class="${amountClass}">${amount}</td>
-//               <td>₹${transaction.balance.toFixed(2)}</td>
-//             </tr>
-//           `;
-//         });
-//       } else {
-//         historyTableBody.innerHTML = '<tr><td colspan="4" class="text-center">No transaction history found</td></tr>';
-//       }
-//     })
-//     .catch(error => {
-//       console.error('Error loading wallet history:', error);
-//       document.getElementById('walletHistoryBody').innerHTML = 
-//         '<tr><td colspan="4" class="text-center text-danger">Failed to load transaction history</td></tr>';
-//     });
-// }
-
 
 
   // Global variable to track wallet history state

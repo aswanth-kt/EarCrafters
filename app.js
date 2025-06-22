@@ -73,6 +73,9 @@ app.use(express.static(path.join(__dirname, "public")));     //mension static fo
 app.use("/", userRouter);
 app.use("/admin", adminRouter);
 
+app.use("*", (req, res)=>{
+    res.redirect("pageNotFound");
+})
 
 
 const port = process.env.PORT || 4330;
