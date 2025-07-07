@@ -31,18 +31,18 @@ const productDetails = async (req, res) => {
     }).limit(4);
 
     // For display cart quantity at top
-    let cartItemQty;
-    if (req.session.user) {
-      const cart = await Cart.findOne({ _id: { $in: userData.cart } }).populate(
-        "items.productId"
-      );
+    // let cartItemQty;
+    // if (req.session.user) {
+    //   const cart = await Cart.findOne({ _id: { $in: userData.cart } }).populate(
+    //     "items.productId"
+    //   );
 
-      cartItemQty = cart.items.map((item) => {
-        return {
-          quantity: item.quantity,
-        };
-      });
-    }
+    //   cartItemQty = cart.items.map((item) => {
+    //     return {
+    //       quantity: item.quantity,
+    //     };
+    //   });
+    // }
 
     res.render("product-details", {
       userData: userData,
@@ -52,7 +52,7 @@ const productDetails = async (req, res) => {
       totalOffer: totalOffer,
       category: findCategory,
       relatedProducts, //Recomented product
-      cartItemQty: cartItemQty || null, //cart qty
+      // cartItemQty: cartItemQty || null, //cart qty
     });
   } catch (error) {
     console.error("Error in product details", error);
