@@ -28,7 +28,7 @@ const getOrderDetails = async (req, res) => {
     const order = await Order.findOne({ _id: orderId })
       .populate("orderItems.product", "productName productImage")
       .exec();
-
+      
     if (!order) {
       return res.status(NotFound).json({ message: "Order not found" });
     }

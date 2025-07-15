@@ -161,6 +161,7 @@ function generateReferral (userName) {
 const signup = async (req, res) => {
   try {
     const { name, phone, email, password, cPassword, referral } = req.body;
+    console.log("Signup details from form:", req.body);
 
     // Check oassword is match
     if (password !== cPassword) {
@@ -202,7 +203,7 @@ const signup = async (req, res) => {
             transactions: [{
               type: "credit",
               amount: 200,
-              description: `₹200rs earned - ${reffered_user.name} used your code`,
+              description: `₹200 rs earned - ${name} used your code`,
               balance: 200,
               createdAt: new Date(),
             }]
@@ -217,7 +218,7 @@ const signup = async (req, res) => {
           refferedUserWallet.transactions.push({
             type: "credit",
             amount: 200,
-            description: `₹200rs earned - ${reffered_user.name} used your code`,
+            description: `₹200 rs earned - ${name} used your code`,
             balance: refferedUserWallet.balance,
             createdAt: new Date(),
           });

@@ -48,7 +48,7 @@ const applyCoupon = async (req, res) => {
         message: "You have already used this coupon",
       });
     }
-
+    
     // Check if coupon discount is greater than total price
     if (coupon.offerPrice >= totalPrice) {
       return res.status(BadRequest).json({
