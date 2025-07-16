@@ -75,8 +75,14 @@
                     <% } %>
                 
                 </td>
-                <td> <%= data[i].quantity %> </td>
-                <td>
+                <td> 
+                    <% if (data[i].quantity < 10) {%>
+                        <p style="color: red;"><%= data[i].quantity %></p> 
+                    <%} else {%>
+                        <p><%= data[i].quantity %></p> 
+                    <%}%>
+                    </td>
+                <td> 
                 
                     <!-- Block and Unblock products -->
                     <% if (data[i].isBlock === false) { %>

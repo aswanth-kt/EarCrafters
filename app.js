@@ -14,8 +14,8 @@ const adminRouter = require("./routes/adminRouter");
 
 
 
-app.use(express.json());    //for convert form data
-app.use(express.urlencoded({extended: true}));    //convert urls string
+app.use(express.json());    
+app.use(express.urlencoded({extended: true}));    //for parse form data. convert urls string
 
 // Session setup
 app.use(session({
