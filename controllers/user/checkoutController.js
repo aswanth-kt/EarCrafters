@@ -207,6 +207,14 @@ const getCheckoutPage = async (req, res) => {
       };
     });
 
+    const product = await Product.findOne({_id: cartData._id, isBlock: false});
+    if (!product) {
+      return res.status(400).json({
+        status: false,
+        message: "Product is blocked by admin or unavailabe this item"
+      });
+    }
+
     const userAddress = await Address.findOne({ userId: userId }).select(
       "address"
     );

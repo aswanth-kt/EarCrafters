@@ -81,7 +81,7 @@ const loadHomepage = async (req, res) => {
   } catch (error) {
     console.error("Home page not found", error);
     res.status(InternalServerError).send("Server error");
-  }
+  };
 };
 
 // Load signup page
