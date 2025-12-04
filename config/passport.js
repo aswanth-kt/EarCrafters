@@ -10,7 +10,7 @@ passport.use(new GoogleStrategy(
         clientID : process.env.GOOGLE_CLIENT_ID,
         clientSecret : process.env.gOOGLE_CLIENT_SECRET,
         // callbackURL : "https://earcrafters.shop/auth/google/callback",
-        callbackURL: "https://earcrafters.onrender.com/callback",
+        callbackURL: "https://earcrafters.onrender.com/auth/callback",
     },
 
     async (accessToken, refreshToken, profile, done) => {
