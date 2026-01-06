@@ -49,6 +49,8 @@ Welcome to **EarCrafters** – your one-stop shop for all things audio! Discover
 ## Hosted Website 🌐
 
 Visit our hosted website to explore and shop:  
+[earcrafters.onrender.com](https://earcrafters.onrender.com)
+
 [www.earcrafters.shop](https://www.earcrafters.shop)
 
 ---
